@@ -23,7 +23,7 @@ import java.util.List;
  * @author Stefano Chirico &lt;stefano dot chirico at unitn dot it&gt;
  * @since 2017.03.31
  */
-public class JDBCUserDAO extends JDBCDAO<User, Integer> implements UserDAO {
+public class BACKUP_UserDAO extends JDBCDAO<User, Integer> implements UserDAO {
 
     /**
      * The default constructor of the class.
@@ -33,7 +33,7 @@ public class JDBCUserDAO extends JDBCDAO<User, Integer> implements UserDAO {
      * @author Stefano Chirico
      * @since 1.0.180330
      */
-    public JDBCUserDAO(Connection con) {
+    public BACKUP_UserDAO(Connection con) {
         super(con);
     }
 
