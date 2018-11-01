@@ -3,3 +3,6 @@ target/
 
 #tests
 src/test/
+
+#database
+db.sl

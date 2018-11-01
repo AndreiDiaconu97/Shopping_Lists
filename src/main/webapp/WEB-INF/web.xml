@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <context-param>
-        <param-name>dburl</param-name>
-        <param-value>jdbc:derby:C:\Users\andrea\Documents\NetBeansProjects\db.sl</param-value>
+        <param-name>relative_dburl</param-name>
+        <param-value>db.sl</param-value>
     </context-param>
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
-        <filter-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.filters.AuthenticationFilter</filter-class>
+        <filter-class>filters.AuthenticationFilter</filter-class>
     </filter>
     <filter>
         <filter-name>AdminFilter</filter-name>
-        <filter-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.filters.AdminFilter</filter-class>
+        <filter-class>filters.AdminFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
@@ -30,23 +30,23 @@
     </filter-mapping>
     <listener>
         <description>ServletContextListener</description>
-        <listener-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.listeners.WebAppContextListener</listener-class>
+        <listener-class>listeners.WebAppContextListener</listener-class>
     </listener>
     <servlet>
         <servlet-name>UsersListServlet</servlet-name>
-        <servlet-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.servlets.UsersListServlet</servlet-class>
+        <servlet-class>servlets.UsersListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ShoppingListsServlet</servlet-name>
-        <servlet-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.servlets.ShoppingListsServlet</servlet-class>
+        <servlet-class>servlets.ShoppingListsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.servlets.LoginServlet</servlet-class>
+        <servlet-class>servlets.LoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>it.unitn.aa1718.webprogramming.lab07.shoppingList.servlets.LogoutServlet</servlet-class>
+        <servlet-class>servlets.LogoutServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>UsersListServlet</servlet-name>

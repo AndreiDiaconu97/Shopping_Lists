@@ -32,7 +32,13 @@ public class WebAppContextListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        String dburl = sce.getServletContext().getInitParameter("dburl");
+        String realPath = sce.getServletContext().getRealPath("/");
+        realPath = realPath.substring(0, realPath.lastIndexOf("\\target"));
+        String dburl = "jdbc:derby:" + realPath + "\\" + sce.getServletContext().getInitParameter("relative_dburl");
+        dburl = dburl.replace('\\', '/');
+        System.err.println("DBURL IS: " + dburl);
+        sce.getServletContext().setInitParameter("dburl", dburl);
+        System.err.println("dburl in context: " + sce.getServletContext().getInitParameter("relative_dburl"));
         try {
             JDBCDAOFactory.configure(dburl);
             DAOFactory daoFactory = JDBCDAOFactory.getInstance();
