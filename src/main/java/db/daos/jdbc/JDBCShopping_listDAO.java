@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implements Shopping_listDAO{
+public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implements Shopping_listDAO {
 
     public JDBCShopping_listDAO(Connection con) {
         super(con);
@@ -51,5 +51,5 @@ public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implem
     public List<Shopping_list> getByUserId(Integer userId) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }
