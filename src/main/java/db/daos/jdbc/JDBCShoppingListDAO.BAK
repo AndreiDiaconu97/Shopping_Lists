@@ -24,7 +24,7 @@ import java.util.List;
  * @author Stefano Chirico &lt;stefano dot chirico at unitn dot it&gt;
  * @since 2017.03.31
  */
-public class JDBCShoppingListDAO extends JDBCDAO<ShoppingList, Integer> implements ShoppingListDAO {
+public class BACKUP_ShoppingListDAO extends JDBCDAO<ShoppingList, Integer> implements ShoppingListDAO {
     
     /**
      * The default constructor of the class.
@@ -34,7 +34,7 @@ public class JDBCShoppingListDAO extends JDBCDAO<ShoppingList, Integer> implemen
      * @author Stefano Chirico
      * @since 1.0.180330
      */
-    public JDBCShoppingListDAO(Connection con) {
+    public BACKUP_ShoppingListDAO(Connection con) {
         super(con);
     }
 
