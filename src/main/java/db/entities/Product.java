@@ -21,8 +21,8 @@ public class Product {
     private Float rating;
     private Integer num_votes;
     private Boolean is_public;
-    private List<Shop_list_NR> shop_l_NR;  // not meant for user display
-    private List<Shopping_list> shop_l;    // not meant for user display
+    //private List<Shop_list_NR> shop_l_NR;  // not meant for user display
+    //private List<Shopping_list> shop_l;    // not meant for user display
 
     public String getName() {
         return primaryKey.getName();
@@ -32,19 +32,19 @@ public class Product {
         this.primaryKey.setName(name);
     }
 
-    public Prod_category getCategory() {
+    public String getCategory() {
         return primaryKey.getCategory();
     }
 
-    public void setCategory(Prod_category category) {
+    public void setCategory(String category) {
         this.primaryKey.setCategory(category);
     }
 
-    public Reg_User getCreator() {
+    public String getCreator() {
         return primaryKey.getCreator();
     }
 
-    public void setCreator(Reg_User creator) {
+    public void setCreator(String creator) {
         this.primaryKey.setCreator(creator);
     }
 
@@ -104,27 +104,11 @@ public class Product {
         this.is_public = is_public;
     }
 
-    public List<Shop_list_NR> getShop_l_NR() {
-        return shop_l_NR;
-    }
-
-    public void setShop_l_NR(List<Shop_list_NR> shop_l_NR) {
-        this.shop_l_NR = shop_l_NR;
-    }
-
-    public List<Shopping_list> getShop_l() {
-        return shop_l;
-    }
-
-    public void setShop_l(List<Shopping_list> shop_l) {
-        this.shop_l = shop_l;
-    }
-
     public class PrimaryKey {
 
         private String name;
-        private Prod_category category;
-        private Reg_User creator;
+        private String category;
+        private String creator;
 
         public String getName() {
             return name;
@@ -134,19 +118,19 @@ public class Product {
             this.name = name;
         }
 
-        public Prod_category getCategory() {
+        public String getCategory() {
             return category;
         }
 
-        public void setCategory(Prod_category category) {
+        public void setCategory(String category) {
             this.category = category;
         }
 
-        public Reg_User getCreator() {
+        public String getCreator() {
             return creator;
         }
 
-        public void setCreator(Reg_User creator) {
+        public void setCreator(String creator) {
             this.creator = creator;
         }
     }

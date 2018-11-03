@@ -18,9 +18,9 @@ public class Shop_list_NR {
     private String name;
     private String description;
     private String image;
-    private List_category category;
+    private String category;
     private Timestamp last_seen;
-    private List<Product> products;
+    //private List<Product> products;
 
     public Integer getID() {
         return ID;
@@ -54,11 +54,11 @@ public class Shop_list_NR {
         this.image = image;
     }
 
-    public List_category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(List_category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
@@ -69,13 +69,4 @@ public class Shop_list_NR {
     public void setLast_seen(Timestamp last_seen) {
         this.last_seen = last_seen;
     }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
 }
