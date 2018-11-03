@@ -46,4 +46,14 @@ public class JDBCReg_UserDAO extends JDBCDAO<Reg_User, String> implements Reg_Us
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public Reg_User getByEmail(String email) throws DAOException {
+        return getByPrimaryKey(email);
+    }
+
+    @Override
+    public Reg_User getByID(Integer id) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

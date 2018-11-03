@@ -6,7 +6,7 @@
  */
 package filters;
 
-import db.entities.User;
+import db.entities.Reg_User;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -54,11 +54,11 @@ public class AuthenticationFilter implements Filter {
         if (request instanceof HttpServletRequest) {
             ServletContext servletContext = ((HttpServletRequest) request).getServletContext();
             HttpSession session = ((HttpServletRequest) request).getSession(false);
-            User user = null;
+            Reg_User reg_user = null;
             if (session != null) {
-                user = (User) session.getAttribute("user");
+                reg_user = (Reg_User) session.getAttribute("reg_user");
             }
-            if (user == null) {
+            if (reg_user == null) {
                 String contextPath = servletContext.getContextPath();
                 if (!contextPath.endsWith("/")) {
                     contextPath += "/";

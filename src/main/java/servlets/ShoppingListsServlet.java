@@ -6,10 +6,10 @@
  */
 package servlets;
 
-import db.daos.ShoppingListDAO;
-import db.daos.UserDAO;
-import db.entities.ShoppingList;
-import db.entities.User;
+import db.daos.Reg_UserDAO;
+import db.daos.Shopping_listDAO;
+import db.entities.Reg_User;
+import db.entities.Shopping_list;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -30,8 +30,8 @@ import javax.servlet.http.HttpSession;
  */
 public class ShoppingListsServlet extends HttpServlet {
 
-    private ShoppingListDAO shoppingListDao;
-    private UserDAO userDao;
+    private Shopping_listDAO shopping_listDao;
+    private Reg_UserDAO reg_userDao;
 
     @Override
     public void init() throws ServletException {
@@ -40,12 +40,12 @@ public class ShoppingListsServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao factory for user storage system");
         }
         try {
-            shoppingListDao = daoFactory.getDAO(ShoppingListDAO.class);
+            shopping_listDao = daoFactory.getDAO(Shopping_listDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao factory for shopping-list storage system", ex);
         }
         try {
-            userDao = daoFactory.getDAO(UserDAO.class);
+            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao factory for user storage system", ex);
         }
@@ -58,14 +58,14 @@ public class ShoppingListsServlet extends HttpServlet {
         String descriptiopn = request.getParameter("description");
 
         try {
-            ShoppingList shoppingList = new ShoppingList();
-            shoppingList.setName(name);
-            shoppingList.setDescription(descriptiopn);
+            Shopping_list shopping_list = new Shopping_list();
+            shopping_list.setName(name);
+            shopping_list.setDescription(descriptiopn);
 
-            User user = userDao.getByPrimaryKey(userId);
+            Reg_User reg_user = reg_userDao.getByID(userId);
 
-            shoppingListDao.insert(shoppingList);
-            shoppingListDao.linkShoppingListToUser(shoppingList, user);
+            shopping_listDao.insert(shopping_list);
+            shopping_listDao.linkShoppingListToReg_User(shopping_list, reg_user);
         } catch (DAOException ex) {
             //TODO: log exception
         }
@@ -82,16 +82,16 @@ public class ShoppingListsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Integer userId = null;
-        User user = null;
+        Reg_User reg_user = null;
         try {
             userId = Integer.valueOf(request.getParameter("id"));
         } catch (RuntimeException ex) {
             HttpSession session = request.getSession(false);
             if (session != null) {
-                user = (User) session.getAttribute("user");
+                reg_user = (Reg_User) session.getAttribute("reg_user");
             }
-            if (user != null) {
-                userId = user.getId();
+            if (reg_user != null) {
+                userId = reg_user.getId();
             }
         }
         if (userId == null) {
@@ -107,16 +107,16 @@ public class ShoppingListsServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         try {
-            if (user == null) {
-                user = userDao.getByPrimaryKey(userId);
+            if (reg_user == null) {
+                reg_user = reg_userDao.getByID(userId);
             }
-            List<ShoppingList> shoppingLists = shoppingListDao.getByUserId(userId);
+            List<Shopping_list> shopping_lists = shopping_listDao.getByUserId(userId);
 
             out.println(
                     "<!DOCTYPE html>\n"
                     + "<html>\n"
                     + "    <head>\n"
-                    + "        <title>Lab 07: Shopping lists shared with " + user.getFirstName() + " " + user.getLastName() + "</title>\n"
+                    + "        <title>Lab 07: Shopping lists shared with " + reg_user.getName() + "</title>\n"
                     + "        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"
                     + "        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n"
                     + "        <!-- Latest compiled and minified CSS -->\n"
@@ -132,26 +132,26 @@ public class ShoppingListsServlet extends HttpServlet {
                     + "                        <h5 class=\"card-title float-left\">Shopping Lists</h5><button type=\"button\" class=\"btn btn-outline-light bg-light text-primary btn-sm float-right\" data-toggle=\"modal\" data-target=\"#myModal\"><span class=\"fas fa-plus\" aria-hidden=\"true\"></span></button>\n"
                     + "                    </div>\n"
                     + "                    <div class=\"card-body\">\n"
-                    + "                        The following table lists all the shopping-lists shared with &quot;" + user.getFirstName() + " " + user.getLastName() + "&quot;.<br>\n"
+                    + "                        The following table lists all the shopping-lists shared with &quot;" + reg_user.getName() + "&quot;.<br>\n"
                     + "                    </div>\n"
                     + "\n"
                     + "                    <!-- Shopping Lists cards -->\n"
                     + "                    <div id=\"accordion\">\n"
             );
             int index = 1;
-            for (ShoppingList shoppingList : shoppingLists) {
+            for (Shopping_list shopping_list : shopping_lists) {
                 out.println(
                         "                        <div class=\"card\">\n"
                         + "                            <div class=\"card-header\" id=\"heading" + (index) + "\">\n"
                         + "                                <h5 class=\"mb-0\">\n"
                         + "                                    <button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#collapse" + (index) + "\" aria-expanded=\"true\" aria-controls=\"collapse" + (index) + "\">\n"
-                        + "                                        " + shoppingList.getName() + "\n"
+                        + "                                        " + shopping_list.getName() + "\n"
                         + "                                    </button>\n"
                         + "                                </h5>\n"
                         + "                            </div>\n"
                         + "                            <div id=\"collapse" + (index) + "\" class=\"collapse" + (index == 1 ? " show" : "") + "\" aria-labelledby=\"heading" + (index++) + "\" data-parent=\"#accordion\">\n"
                         + "                                <div class=\"card-body\">\n"
-                        + "                                    " + shoppingList.getDescription() + "\n"
+                        + "                                    " + shopping_list.getDescription() + "\n"
                         + "                                </div>\n"
                         + "                            </div>\n"
                         + "                        </div>\n"
@@ -176,7 +176,7 @@ public class ShoppingListsServlet extends HttpServlet {
                     + "                            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n"
                     + "                        </div>\n"
                     + "                        <div class=\"modal-body\">\n"
-                    + "                            <input type=\"hidden\" name=\"idUser\" value=\"" + user.getId() + "\">\n"
+                    + "                            <input type=\"hidden\" name=\"idUser\" value=\"" + reg_user.getId() + "\">\n"
                     + "                            <div class=\"form-label-group\">\n"
                     + "                                <input type=\"text\" name=\"name\" id=\"name\" class=\"form-control\" placeholder=\"Name\" required autofocus>\n"
                     + "                                <label for=\"name\">Name</label>\n"

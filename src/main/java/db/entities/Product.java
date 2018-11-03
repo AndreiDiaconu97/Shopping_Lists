@@ -13,12 +13,11 @@ import java.util.List;
  */
 public class Product {
 
-    private String name;
+    private PrimaryKey primaryKey;
+    private Integer id;
     private String description;
     private String logo;
     private String photo;
-    private Prod_category category;
-    private Reg_User creator;
     private Float rating;
     private Integer num_votes;
     private Boolean is_public;
@@ -26,11 +25,35 @@ public class Product {
     private List<Shopping_list> shop_l;    // not meant for user display
 
     public String getName() {
-        return name;
+        return primaryKey.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.primaryKey.setName(name);
+    }
+
+    public Prod_category getCategory() {
+        return primaryKey.getCategory();
+    }
+
+    public void setCategory(Prod_category category) {
+        this.primaryKey.setCategory(category);
+    }
+
+    public Reg_User getCreator() {
+        return primaryKey.getCreator();
+    }
+
+    public void setCreator(Reg_User creator) {
+        this.primaryKey.setCreator(creator);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -57,22 +80,6 @@ public class Product {
         this.photo = photo;
     }
 
-    public Prod_category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Prod_category category) {
-        this.category = category;
-    }
-
-    public Reg_User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(Reg_User creator) {
-        this.creator = creator;
-    }
-
     public Float getRating() {
         return rating;
     }
@@ -97,20 +104,50 @@ public class Product {
         this.is_public = is_public;
     }
 
-    public List<Shop_list_NR> getShop_l_NR_found_in() {
+    public List<Shop_list_NR> getShop_l_NR() {
         return shop_l_NR;
     }
 
-    public void setShop_l_NR_found_in(List<Shop_list_NR> shop_l_NR_found_in) {
-        this.shop_l_NR = shop_l_NR_found_in;
+    public void setShop_l_NR(List<Shop_list_NR> shop_l_NR) {
+        this.shop_l_NR = shop_l_NR;
     }
 
-    public List<Shopping_list> getShop_l_found_in() {
+    public List<Shopping_list> getShop_l() {
         return shop_l;
     }
 
-    public void setShop_l_found_in(List<Shopping_list> shop_l_found_in) {
-        this.shop_l = shop_l_found_in;
+    public void setShop_l(List<Shopping_list> shop_l) {
+        this.shop_l = shop_l;
     }
 
+    public class PrimaryKey {
+
+        private String name;
+        private Prod_category category;
+        private Reg_User creator;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Prod_category getCategory() {
+            return category;
+        }
+
+        public void setCategory(Prod_category category) {
+            this.category = category;
+        }
+
+        public Reg_User getCreator() {
+            return creator;
+        }
+
+        public void setCreator(Reg_User creator) {
+            this.creator = creator;
+        }
+    }
 }

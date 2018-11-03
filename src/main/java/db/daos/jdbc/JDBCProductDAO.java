@@ -7,6 +7,7 @@ package db.daos.jdbc;
 
 import db.daos.ProductDAO;
 import db.entities.Product;
+import db.entities.Product.PrimaryKey;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCProductDAO extends JDBCDAO<Product, Integer> implements ProductDAO {
+public class JDBCProductDAO extends JDBCDAO<Product, PrimaryKey> implements ProductDAO {
 
     public JDBCProductDAO(Connection con) {
         super(con);
@@ -27,12 +28,17 @@ public class JDBCProductDAO extends JDBCDAO<Product, Integer> implements Product
     }
 
     @Override
-    public Product getByPrimaryKey(Integer primaryKey) throws DAOException {
+    public Product getByPrimaryKey(PrimaryKey primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public List<Product> getAll() throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Product getByID(Integer id) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

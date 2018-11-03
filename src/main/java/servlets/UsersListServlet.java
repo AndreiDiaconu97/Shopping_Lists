@@ -6,8 +6,8 @@
  */
 package servlets;
 
-import db.daos.UserDAO;
-import db.entities.User;
+import db.daos.Reg_UserDAO;
+import db.entities.Reg_User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class UsersListServlet extends HttpServlet {
 
-    private UserDAO dao;
+    private Reg_UserDAO dao;
 
     @Override
     public void init() throws ServletException {
@@ -36,7 +36,7 @@ public class UsersListServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao factory for user storage system");
         }
         try {
-            dao = daoFactory.getDAO(UserDAO.class);
+            dao = daoFactory.getDAO(Reg_UserDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao factory for user storage system", ex);
         }
@@ -53,7 +53,7 @@ public class UsersListServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         try {
-            List<User> users = dao.getAll();
+            List<Reg_User> reg_users = dao.getAll();
 
             out.println(
                     "<!DOCTYPE html>\n"
@@ -93,13 +93,12 @@ public class UsersListServlet extends HttpServlet {
                     + "                            </thead>\n"
                     + "                            <tbody>\n"
             );
-            for (User user : users) {
+            for (Reg_User reg_user : reg_users) {
                 out.println(
                         "                                <tr>\n"
-                        + "                                    <td>" + user.getEmail() + "</td>\n"
-                        + "                                    <td>" + user.getFirstName() + "</td>\n"
-                        + "                                    <td>" + user.getLastName() + "</td>\n"
-                        + "                                    <td><a href=\"" + response.encodeURL(contextPath + "restricted/shopping.lists.handler?id=" + user.getId()) + "\"><span class=\"badge badge-primary badge-pill\">" + user.getShoppingListsCount() + "</span></a></td>\n"
+                        + "                                    <td>" + reg_user.getEmail() + "</td>\n"
+                        + "                                    <td>" + reg_user.getName() + "</td>\n"
+                        + "                                    <td><a href=\"" + response.encodeURL(contextPath + "restricted/shopping.lists.handler?id=" + reg_user.getId()) + "\"><span class=\"badge badge-primary badge-pill\">" + "reg_user.getShoppingListsCount()" + "</span></a></td>\n"
                         + "                                </tr>\n"
                 );
             }

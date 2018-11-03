@@ -6,7 +6,7 @@
  */
 package servlets;
 
-import db.entities.User;
+import db.entities.Reg_User;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,8 +23,7 @@ import javax.servlet.http.HttpSession;
 public class LogoutServlet extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -40,11 +39,11 @@ public class LogoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session != null) {
-            User user = (User) session.getAttribute("user");
-            if (user != null) {
-                session.setAttribute("user", null);
+            Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
+            if (reg_user != null) {
+                session.setAttribute("reg_user", null);
                 session.invalidate();
-                user = null;
+                reg_user = null;
             }
         }
 

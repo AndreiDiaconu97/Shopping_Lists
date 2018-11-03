@@ -13,20 +13,43 @@ import java.util.List;
  */
 public class Shopping_list {
 
-    private String name;
+    private PrimaryKey primaryKey;
+    private Integer id;
     private String description;
     private String image;
-    private Reg_User owner;
-    private List_category category;
     private List<Reg_User> users;
     private List<Product> products;
 
     public String getName() {
-        return name;
+        return primaryKey.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.primaryKey.setName(name);
+    }
+
+    public Reg_User getOwner() {
+        return primaryKey.getOwner();
+    }
+
+    public void setOwner(Reg_User owner) {
+        this.primaryKey.setOwner(owner);
+    }
+
+    public List_category getCategory() {
+        return primaryKey.getCategory();
+    }
+
+    public void setCategory(List_category category) {
+        this.primaryKey.setCategory(category);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -45,22 +68,6 @@ public class Shopping_list {
         this.image = image;
     }
 
-    public Reg_User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Reg_User owner) {
-        this.owner = owner;
-    }
-
-    public List_category getCategory() {
-        return category;
-    }
-
-    public void setCategory(List_category category) {
-        this.category = category;
-    }
-
     public List<Reg_User> getUsers() {
         return users;
     }
@@ -75,5 +82,37 @@ public class Shopping_list {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public class PrimaryKey {
+
+        private String name;
+        private Reg_User owner;
+        private List_category category;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Reg_User getOwner() {
+            return owner;
+        }
+
+        public void setOwner(Reg_User owner) {
+            this.owner = owner;
+        }
+
+        public List_category getCategory() {
+            return category;
+        }
+
+        public void setCategory(List_category category) {
+            this.category = category;
+        }
+
     }
 }

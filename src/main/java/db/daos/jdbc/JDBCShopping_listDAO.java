@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implements Shopping_listDAO {
+public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Shopping_list.PrimaryKey> implements Shopping_listDAO {
 
     public JDBCShopping_listDAO(Connection con) {
         super(con);
@@ -28,7 +28,7 @@ public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implem
     }
 
     @Override
-    public Shopping_list getByPrimaryKey(Integer primaryKey) throws DAOException {
+    public Shopping_list getByPrimaryKey(Shopping_list.PrimaryKey primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -49,6 +49,11 @@ public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Integer> implem
 
     @Override
     public List<Shopping_list> getByUserId(Integer userId) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Shopping_list getByID(Integer id) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

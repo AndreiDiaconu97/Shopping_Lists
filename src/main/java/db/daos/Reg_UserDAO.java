@@ -15,4 +15,9 @@ import db.exceptions.DAOException;
 public interface Reg_UserDAO extends DAO<Reg_User, String> {
 
     public Reg_User getByEmailAndPassword(String email, String password) throws DAOException;
+
+    public Reg_User getByEmail(String email) throws DAOException;
+
+    public Reg_User getByID(Integer id) throws DAOException;
+
 }

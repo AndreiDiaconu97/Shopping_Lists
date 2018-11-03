@@ -6,8 +6,8 @@
  */
 package servlets;
 
-import db.daos.UserDAO;
-import db.entities.User;
+import db.daos.Reg_UserDAO;
+import db.entities.Reg_User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginServlet extends HttpServlet {
 
-    private UserDAO userDao;
+    private Reg_UserDAO reg_userDao;
 
     @Override
     public void init() throws ServletException {
@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao factory for user storage system");
         }
         try {
-            userDao = daoFactory.getDAO(UserDAO.class);
+            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao factory for user storage system", ex);
         }
@@ -132,15 +132,15 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
-            User user = userDao.getByEmailAndPassword(email, password);
-            if (user == null) {
+            Reg_User reg_user = reg_userDao.getByEmailAndPassword(email, password);
+            if (reg_user == null) {
                 response.sendRedirect(response.encodeRedirectURL(contextPath + "login.handler"));
             } else {
-                request.getSession().setAttribute("user", user);
-                if (user.getIsAdmin()) {
+                request.getSession().setAttribute("reg_user", reg_user);
+                if (reg_user.getIs_admin()) {
                     response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin/users.handler"));
                 } else {
-                    response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.handler?id=" + user.getId()));
+                    response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.handler?id=" + reg_user.getId()));
                 }
             }
         } catch (DAOException ex) {
