@@ -5,8 +5,11 @@
  */
 package db.daos;
 
+import db.entities.Product;
 import db.entities.Reg_User;
+import db.entities.Shopping_list;
 import db.exceptions.DAOException;
+import java.util.List;
 
 /**
  *
@@ -20,4 +23,9 @@ public interface Reg_UserDAO extends DAO<Reg_User, String> {
 
     public Reg_User getByID(Integer id) throws DAOException;
 
+    public List<Product> getProductsCreated(Reg_User reg_user) throws DAOException;
+
+    public List<Shopping_list> getOwningShopLists(Reg_User reg_user) throws DAOException;
+
+    public List<Shopping_list> getShopLists(Reg_User reg_user) throws DAOException;
 }

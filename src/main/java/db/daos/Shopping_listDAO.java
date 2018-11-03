@@ -5,6 +5,7 @@
  */
 package db.daos;
 
+import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shopping_list;
 import db.entities.Shopping_list.PrimaryKey;
@@ -21,8 +22,11 @@ public interface Shopping_listDAO extends DAO<Shopping_list, PrimaryKey> {
 
     public boolean linkShoppingListToReg_User(Shopping_list shoppingList, Reg_User user) throws DAOException;
 
-    public List<Shopping_list> getByUserId(Integer userId) throws DAOException;
-
     public Shopping_list getByID(Integer id) throws DAOException;
 
+    public List<Shopping_list> getByOwner(String owner) throws DAOException;
+
+    public List<Reg_User> getListUsers(Shopping_list shopping_list) throws DAOException;
+
+    public List<Product> getListProducts(Shopping_list shopping_list) throws DAOException;
 }

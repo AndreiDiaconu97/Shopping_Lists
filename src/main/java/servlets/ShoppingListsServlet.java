@@ -110,7 +110,7 @@ public class ShoppingListsServlet extends HttpServlet {
             if (reg_user == null) {
                 reg_user = reg_userDao.getByID(userId);
             }
-            List<Shopping_list> shopping_lists = shopping_listDao.getByUserId(userId);
+            List<Shopping_list> shopping_lists = reg_userDao.getOwningShopLists(reg_user);
 
             out.println(
                     "<!DOCTYPE html>\n"

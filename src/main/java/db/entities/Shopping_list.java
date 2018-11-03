@@ -17,8 +17,6 @@ public class Shopping_list {
     private Integer id;
     private String description;
     private String image;
-    private List<Reg_User> users;
-    private List<Product> products;
 
     public String getName() {
         return primaryKey.getName();
@@ -28,19 +26,19 @@ public class Shopping_list {
         this.primaryKey.setName(name);
     }
 
-    public Reg_User getOwner() {
+    public String getOwner() {
         return primaryKey.getOwner();
     }
 
-    public void setOwner(Reg_User owner) {
+    public void setOwner(String owner) {
         this.primaryKey.setOwner(owner);
     }
 
-    public List_category getCategory() {
+    public String getCategory() {
         return primaryKey.getCategory();
     }
 
-    public void setCategory(List_category category) {
+    public void setCategory(String category) {
         this.primaryKey.setCategory(category);
     }
 
@@ -68,27 +66,11 @@ public class Shopping_list {
         this.image = image;
     }
 
-    public List<Reg_User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<Reg_User> users) {
-        this.users = users;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
     public class PrimaryKey {
 
         private String name;
-        private Reg_User owner;
-        private List_category category;
+        private String owner;
+        private String category;
 
         public String getName() {
             return name;
@@ -98,21 +80,20 @@ public class Shopping_list {
             this.name = name;
         }
 
-        public Reg_User getOwner() {
+        public String getOwner() {
             return owner;
         }
 
-        public void setOwner(Reg_User owner) {
+        public void setOwner(String owner) {
             this.owner = owner;
         }
 
-        public List_category getCategory() {
+        public String getCategory() {
             return category;
         }
 
-        public void setCategory(List_category category) {
+        public void setCategory(String category) {
             this.category = category;
         }
-
     }
 }

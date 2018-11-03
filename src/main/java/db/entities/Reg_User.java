@@ -18,10 +18,11 @@ public class Reg_User {
     private String password;
     private String avatar;
     private String name;
+    private String surname;
     private Boolean is_admin;
-    private List<Product> products_created;
-    private List<Shopping_list> owning_shop_lists;
-    private List<Shopping_list> shared_shop_lists;
+    //private List<Product> products_created;
+    //private List<Shopping_list> owning_shop_lists;
+    //private List<Shopping_list> shared_shop_lists;
 
     public Integer getId() {
         return id;
@@ -63,36 +64,20 @@ public class Reg_User {
         this.name = name;
     }
 
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
     public Boolean getIs_admin() {
         return is_admin;
     }
 
     public void setIs_admin(Boolean is_admin) {
         this.is_admin = is_admin;
-    }
-
-    public List<Product> getProducts_created() {
-        return products_created;
-    }
-
-    public void setProducts_created(List<Product> products_created) {
-        this.products_created = products_created;
-    }
-
-    public List<Shopping_list> getOwning_shop_lists() {
-        return owning_shop_lists;
-    }
-
-    public void setOwning_shop_lists(List<Shopping_list> owning_shop_lists) {
-        this.owning_shop_lists = owning_shop_lists;
-    }
-
-    public List<Shopping_list> getShared_shop_lists() {
-        return shared_shop_lists;
-    }
-
-    public void setShared_shop_lists(List<Shopping_list> shared_shop_lists) {
-        this.shared_shop_lists = shared_shop_lists;
     }
 
 }
