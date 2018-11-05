@@ -6,12 +6,10 @@
 package db.daos.jdbc;
 
 import db.daos.NV_UserDAO;
-import db.daos.NV_UserDAO;
-import db.entities.NV_User;
-import db.entities.Product;
+import static db.daos.jdbc.JDBC_utility.resultSetToNV_User;
+import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
 import db.entities.NV_User;
 import db.entities.Reg_User;
-import db.entities.Shopping_list;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,12 +61,13 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public List<NV_User> getAll() throws DAOException {
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS")) {
-            ResultSet rs = stm.executeQuery();
-            List<NV_User> nv_users = new ArrayList<>();
-            while (rs.next()) {
-                nv_users.add(resultSetToNV_User(rs));
+            try (ResultSet rs = stm.executeQuery()) {
+                List<NV_User> nv_users = new ArrayList<>();
+                while (rs.next()) {
+                    nv_users.add(resultSetToNV_User(rs));
+                }
+                return nv_users;
             }
-            return nv_users;
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get all the nv_users");
         }
@@ -83,27 +82,77 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     public NV_User getByCode(String code) throws DAOException {
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE CODE = ?")) {
             stm.setString(1, code);
-            ResultSet rs = stm.executeQuery();
-            return rs.next() ? resultSetToNV_User(rs) : null;
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? resultSetToNV_User(rs) : null;
+            }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get nv_user by code");
         }
     }
 
     @Override
-    public Reg_User registerUsingCode(String code) throws DAOException {
+    public Reg_User validateUsingCode(String code) throws DAOException {
         NV_User nv_user = getByCode(code);
-
+        if(nv_user == null){
+            throw new DAOException("Passed verification code is invalid");
+        }
+        String query = "INSERT INTO REG_USERS(email, password, name, surname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, nv_user.getEmail());
+            stm.setString(2, nv_user.getPassword());
+            stm.setString(3, nv_user.getName());
+            stm.setString(4, nv_user.getSurname());
+            stm.setBoolean(5, false);
+            stm.setString(6, nv_user.getAvatar());
+            stm.executeQuery();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to validate nv_user", ex);
+        }
+        
+        query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, nv_user.getEmail());
+            try(ResultSet rs = stm.executeQuery()){
+                return resultSetToReg_User(rs);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get validated nv_user as reg_user", ex);
+        }
     }
 
-    private NV_User resultSetToNV_User(ResultSet rs) throws SQLException {
-        NV_User nv_user = new NV_User();
-        nv_user.setEmail(rs.getString("EMAIL"));
-        nv_user.setPassword(rs.getString("PASSWORD"));
-        nv_user.setName(rs.getString(("NAME")));
-        nv_user.setSurname(rs.getString("SURNAME"));
-        nv_user.setAvatar(rs.getString("AVATAR"));
-        nv_user.setCode(rs.getString("CODE"));
-        return nv_user;
+    @Override
+    public void insert(NV_User nv_user) throws DAOException {
+        if (nv_user == null) {
+            throw new DAOException("Given nv_user is null");
+        }
+        String query = "INSERT INTO NV_USERS VALUES(?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, nv_user.getEmail());
+            stm.setString(2, nv_user.getPassword());
+            stm.setString(3, nv_user.getName());
+            stm.setString(4, nv_user.getSurname());
+            stm.setString(5, nv_user.getAvatar());
+            stm.setString(6, nv_user.getCode());
+            stm.executeQuery();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to add nv_user to DB", ex);
+        }
     }
+
+    @Override
+    public void delete(NV_User nv_user) throws DAOException {
+        if (nv_user == null) {
+            throw new DAOException("Given nv_user is null");
+        }
+        String query = "DELETE FROM NV_USERS WHERE EMAIL = ?";
+        try(PreparedStatement stm = CON.prepareStatement(query)){
+            stm.setString(1, nv_user.getEmail());
+            stm.executeQuery();
+        }
+        catch(SQLException ex){
+            throw new DAOException("Impossible to remove nv_user");
+        }
+    }
+
+    
 }

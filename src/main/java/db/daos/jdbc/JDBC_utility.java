@@ -5,6 +5,7 @@
  */
 package db.daos.jdbc;
 
+import db.entities.NV_User;
 import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shopping_list;
@@ -53,5 +54,16 @@ public class JDBC_utility {
         shopping_list.setName(rs.getString("NAME"));
         shopping_list.setOwner(rs.getString("OWNER"));
         return shopping_list;
+    }
+    
+    public static NV_User resultSetToNV_User(ResultSet rs) throws SQLException {
+        NV_User nv_user = new NV_User();
+        nv_user.setEmail(rs.getString("EMAIL"));
+        nv_user.setPassword(rs.getString("PASSWORD"));
+        nv_user.setName(rs.getString(("NAME")));
+        nv_user.setSurname(rs.getString("SURNAME"));
+        nv_user.setAvatar(rs.getString("AVATAR"));
+        nv_user.setCode(rs.getString("CODE"));
+        return nv_user;
     }
 }

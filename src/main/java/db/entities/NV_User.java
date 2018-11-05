@@ -13,12 +13,11 @@ import java.util.List;
  */
 public class NV_User {
 
-    private Integer id;
     private String email;
     private String password;
-    private String avatar;
     private String name;
     private String surname;
+    private String avatar;
     private String code;
     //private List<Product> products_created;
     //private List<Shopping_list> owning_shop_lists;
@@ -30,14 +29,6 @@ public class NV_User {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getEmail() {
