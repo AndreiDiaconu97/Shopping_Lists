@@ -45,7 +45,7 @@ public class WebAppContextListener implements ServletContextListener {
             sce.getServletContext().setAttribute("daoFactory", daoFactory);
         } catch (DAOFactoryException ex) {
             Logger.getLogger(getClass().getName()).severe(ex.toString());
-            throw new RuntimeException(ex);
+            throw new RuntimeException("Impossible to setup daofactory in listener", ex);
         }
     }
 

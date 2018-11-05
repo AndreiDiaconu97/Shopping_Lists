@@ -64,11 +64,10 @@ public class LoginServlet extends HttpServlet {
                 if (reg_user.getIs_admin()) {
                     response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin"));
                 } else {
-                    response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.handler"));
+                    response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.html"));
                 }
             }
         } catch (DAOException ex) {
-            //TODO: log exception
             request.getServletContext().log("Impossible to retrieve the user", ex);
         }
     }

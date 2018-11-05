@@ -162,7 +162,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
         }
         String query = "SELECT * FROM LISTS WHERE ID IN (SELECT LIST FROM LISTS_SHARING WHERE REG_USER = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, reg_user.getEmail());
+            stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<Shop_list> shopping_lists = new ArrayList<>();
                 while (rs.next()) {

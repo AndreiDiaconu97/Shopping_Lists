@@ -54,7 +54,7 @@
 
     Reg_User reg_user = null;
     if (session != null) {
-        reg_user = (Reg_User) session.getAttribute("user");
+        reg_user = (Reg_User) session.getAttribute("reg_user");
     }
     
     if (reg_user == null) {

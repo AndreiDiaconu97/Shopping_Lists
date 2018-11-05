@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Shop_list {
 
-    private PrimaryKey primaryKey;
+    private PrimaryKey primaryKey = new PrimaryKey();
     private Integer id;
     private String description;
     private String image;

@@ -68,7 +68,7 @@ public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey>
             throw new DAOException("owner parameter is null");
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS WHERE OWNER = ?")) {
-            stm.setString(1, owner);
+            stm.setString(1, owner); // QUESTO DA CAMBIARE
             try (ResultSet rs = stm.executeQuery()) {
                 List<Shop_list> shopping_lists = new ArrayList<>();
 
