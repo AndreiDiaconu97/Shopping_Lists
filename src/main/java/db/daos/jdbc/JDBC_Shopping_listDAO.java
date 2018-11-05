@@ -59,20 +59,11 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS WHERE ID = ?")) {
             stm.setInt(1, id);
-
             try (ResultSet rs = stm.executeQuery()) {
-                Shopping_list shopping_list = new Shopping_list();
-                shopping_list.setId(rs.getInt("ID"));
-                shopping_list.setCategory(rs.getString("CATEGORY"));
-                shopping_list.setDescription(rs.getString("DESCRIPTION"));
-                shopping_list.setImage(rs.getString("LOGO"));
-                shopping_list.setName(rs.getString("NAME"));
-                shopping_list.setOwner(rs.getString("OWNER"));
-
-                return shopping_list;
+                return rs.next() ? JDBC_utility.resultSetToShopping_list(rs) : null;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the shopping_list for the passed primary key", ex);
+            throw new DAOException("Impossible to get the shopping_list for the passed id", ex);
         }
     }
 
@@ -87,15 +78,7 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
                 List<Shopping_list> shopping_lists = new ArrayList<>();
 
                 while (rs.next()) {
-                    Shopping_list shopping_list = new Shopping_list();
-                    shopping_list.setId(rs.getInt("ID"));
-                    shopping_list.setCategory(rs.getString("CATEGORY"));
-                    shopping_list.setDescription(rs.getString("DESCRIPTION"));
-                    shopping_list.setImage(rs.getString("LOGO"));
-                    shopping_list.setName(rs.getString("NAME"));
-                    shopping_list.setOwner(rs.getString("OWNER"));
-
-                    shopping_lists.add(shopping_list);
+                    shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
                 }
                 return shopping_lists;
             }

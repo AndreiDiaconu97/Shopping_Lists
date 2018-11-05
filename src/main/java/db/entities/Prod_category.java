@@ -15,7 +15,7 @@ public class Prod_category {
     private String name;
     private String description;
     private String logo;
-    private List<Product> products;
+    //private List<Product> products;
 
     public String getName() {
         return name;
@@ -39,13 +39,5 @@ public class Prod_category {
 
     public void setLogo(String logo) {
         this.logo = logo;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
     }
 }
