@@ -5,13 +5,13 @@
 --%>
 
 <%@page import="java.util.List"%>
-<%@page import="db.entities.ShoppingList"%>
+<%@page import="db.entities.Shop_list"%>
 <%@page import="db.exceptions.DAOException"%>
-<%@page import="db.daos.ShoppingListDAO"%>
-<%@page import="db.entities.User"%>
+<%@page import="db.daos.Shop_listDAO"%>
+<%@page import="db.entities.Reg_User"%>
 <%@page import="db.exceptions.DAOFactoryException"%>
 <%@page import="db.factories.DAOFactory"%>
-<%@page import="db.daos.UserDAO"%>
+<%@page import="db.daos.Reg_UserDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%!
     private UserDAO userDao;

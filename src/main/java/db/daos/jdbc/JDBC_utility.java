@@ -8,7 +8,7 @@ package db.daos.jdbc;
 import db.entities.NV_User;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shopping_list;
+import db.entities.Shop_list;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -45,8 +45,8 @@ public class JDBC_utility {
         return product;
     }
 
-    public static Shopping_list resultSetToShopping_list(ResultSet rs) throws SQLException {
-        Shopping_list shopping_list = new Shopping_list();
+    public static Shop_list resultSetToShopping_list(ResultSet rs) throws SQLException {
+        Shop_list shopping_list = new Shop_list();
         shopping_list.setCategory(rs.getString("CATEGORY"));
         shopping_list.setDescription(rs.getString("DESCRIPTION"));
         shopping_list.setId(rs.getInt("ID"));

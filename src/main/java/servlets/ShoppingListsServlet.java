@@ -8,7 +8,7 @@ package servlets;
 
 import db.daos.Reg_UserDAO;
 import db.entities.Reg_User;
-import db.entities.Shopping_list;
+import db.entities.Shop_list;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -58,7 +58,7 @@ public class ShoppingListsServlet extends HttpServlet {
         String descriptiopn = request.getParameter("description");
 
         try {
-            Shopping_list shopping_list = new Shopping_list();
+            Shop_list shopping_list = new Shop_list();
             shopping_list.setName(name);
             shopping_list.setDescription(descriptiopn);
 
@@ -110,7 +110,7 @@ public class ShoppingListsServlet extends HttpServlet {
             if (reg_user == null) {
                 reg_user = reg_userDao.getByID(userId);
             }
-            List<Shopping_list> shopping_lists = reg_userDao.getOwningShopLists(reg_user);
+            List<Shop_list> shopping_lists = reg_userDao.getOwningShopLists(reg_user);
 
             out.println(
                     "<!DOCTYPE html>\n"
@@ -139,7 +139,7 @@ public class ShoppingListsServlet extends HttpServlet {
                     + "                    <div id=\"accordion\">\n"
             );
             int index = 1;
-            for (Shopping_list shopping_list : shopping_lists) {
+            for (Shop_list shopping_list : shopping_lists) {
                 out.println(
                         "                        <div class=\"card\">\n"
                         + "                            <div class=\"card-header\" id=\"heading" + (index) + "\">\n"

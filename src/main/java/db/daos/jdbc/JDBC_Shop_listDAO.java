@@ -7,7 +7,7 @@ package db.daos.jdbc;
 
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shopping_list;
+import db.entities.Shop_list;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,9 +21,9 @@ import db.daos.Shop_listDAO;
  *
  * @author Andrei Diaconu
  */
-public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list.PrimaryKey> implements Shop_listDAO {
+public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey> implements Shop_listDAO {
 
-    public JDBC_Shopping_listDAO(Connection con) {
+    public JDBC_Shop_listDAO(Connection con) {
         super(con);
     }
 
@@ -33,27 +33,22 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
     }
 
     @Override
-    public Shopping_list getByPrimaryKey(Shopping_list.PrimaryKey primaryKey) throws DAOException {
+    public Shop_list getByPrimaryKey(Shop_list.PrimaryKey primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<Shopping_list> getAll() throws DAOException {
+    public List<Shop_list> getAll() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Integer insert(Shopping_list shoppingList) throws DAOException {
+    public boolean linkShoppingListToReg_User(Shop_list shoppingList, Reg_User user) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean linkShoppingListToReg_User(Shopping_list shoppingList, Reg_User user) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Shopping_list getByID(Integer id) throws DAOException {
+    public Shop_list getByID(Integer id) throws DAOException {
         if (id == null) {
             throw new DAOException("id parameter is null");
         }
@@ -68,14 +63,14 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
     }
 
     @Override
-    public List<Shopping_list> getByOwner(String owner) throws DAOException {
+    public List<Shop_list> getByOwner(String owner) throws DAOException {
         if (owner == null) {
             throw new DAOException("owner parameter is null");
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS WHERE OWNER = ?")) {
             stm.setString(1, owner);
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shopping_list> shopping_lists = new ArrayList<>();
+                List<Shop_list> shopping_lists = new ArrayList<>();
 
                 while (rs.next()) {
                     shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
@@ -88,17 +83,22 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
     }
 
     @Override
-    public List<Reg_User> getListUsers(Shopping_list shopping_list) throws DAOException {
+    public List<Reg_User> getListUsers(Shop_list shopping_list) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<Product> getListProducts(Shopping_list shopping_list) throws DAOException {
+    public List<Product> getListProducts(Shop_list shopping_list) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void delete(Shopping_list entity) throws DAOException {
+    public void delete(Shop_list entity) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void insert(Shop_list entity) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

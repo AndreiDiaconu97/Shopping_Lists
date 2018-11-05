@@ -8,7 +8,7 @@ package db.daos.jdbc;
 import db.daos.Reg_UserDAO;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shopping_list;
+import db.entities.Shop_list;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -135,7 +135,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
     }
 
     @Override
-    public List<Shopping_list> getOwningShopLists(Reg_User reg_user) throws DAOException {
+    public List<Shop_list> getOwningShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -144,7 +144,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             stm.setString(1, reg_user.getEmail());
 
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shopping_list> shopping_lists = new ArrayList<>();
+                List<Shop_list> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
                     shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
                 }
@@ -156,7 +156,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
     }
 
     @Override
-    public List<Shopping_list> getShopLists(Reg_User reg_user) throws DAOException {
+    public List<Shop_list> getShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -164,7 +164,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shopping_list> shopping_lists = new ArrayList<>();
+                List<Shop_list> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
                     shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
                 }

@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class Shopping_list {
+public class Shop_list {
 
     private PrimaryKey primaryKey;
     private Integer id;
