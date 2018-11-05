@@ -20,13 +20,13 @@ public class JDBC_utility {
 
     public static Reg_User resultSetToReg_User(ResultSet rs) throws SQLException {
         Reg_User reg_user = new Reg_User();
-        reg_user.setAvatar(rs.getString("AVATAR"));
-        reg_user.setEmail(rs.getString("EMAIL"));
         reg_user.setId(rs.getInt("ID"));
-        reg_user.setIs_admin(rs.getBoolean("IS_ADMIN"));
-        reg_user.setName(rs.getString(("NAME")));
+        reg_user.setEmail(rs.getString("EMAIL"));
         reg_user.setPassword(rs.getString("PASSWORD"));
-        reg_user.setSurname(rs.getString("SURNAME"));
+        reg_user.setFirstname(rs.getString(("FIRSTNAME")));
+        reg_user.setLastname(rs.getString("LASTNAME"));
+        reg_user.setAvatar(rs.getString("AVATAR"));
+        reg_user.setIs_admin(rs.getBoolean("IS_ADMIN"));
         return reg_user;
     }
 
@@ -60,8 +60,8 @@ public class JDBC_utility {
         NV_User nv_user = new NV_User();
         nv_user.setEmail(rs.getString("EMAIL"));
         nv_user.setPassword(rs.getString("PASSWORD"));
-        nv_user.setName(rs.getString(("NAME")));
-        nv_user.setSurname(rs.getString("SURNAME"));
+        nv_user.setFirstname(rs.getString(("FIRSTNAME")));
+        nv_user.setLastname(rs.getString("LASTNAME"));
         nv_user.setAvatar(rs.getString("AVATAR"));
         nv_user.setCode(rs.getString("CODE"));
         return nv_user;

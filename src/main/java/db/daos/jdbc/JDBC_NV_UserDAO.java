@@ -96,12 +96,12 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if(nv_user == null){
             throw new DAOException("Passed verification code is invalid");
         }
-        String query = "INSERT INTO REG_USERS(email, password, name, surname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO REG_USERS(email, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
             stm.setString(2, nv_user.getPassword());
-            stm.setString(3, nv_user.getName());
-            stm.setString(4, nv_user.getSurname());
+            stm.setString(3, nv_user.getFirstname());
+            stm.setString(4, nv_user.getLastname());
             stm.setBoolean(5, false);
             stm.setString(6, nv_user.getAvatar());
             stm.executeQuery();
@@ -129,8 +129,8 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
             stm.setString(2, nv_user.getPassword());
-            stm.setString(3, nv_user.getName());
-            stm.setString(4, nv_user.getSurname());
+            stm.setString(3, nv_user.getFirstname());
+            stm.setString(4, nv_user.getLastname());
             stm.setString(5, nv_user.getAvatar());
             stm.setString(6, nv_user.getCode());
             stm.executeQuery();

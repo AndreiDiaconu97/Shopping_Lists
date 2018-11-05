@@ -16,9 +16,9 @@ public class Reg_User {
     private Integer id;
     private String email;
     private String password;
+    private String firstname;
+    private String lastname;
     private String avatar;
-    private String name;
-    private String surname;
     private Boolean is_admin;
     //private List<Product> products_created;
     //private List<Shopping_list> owning_shop_lists;
@@ -56,20 +56,20 @@ public class Reg_User {
         this.avatar = avatar;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public Boolean getIs_admin() {

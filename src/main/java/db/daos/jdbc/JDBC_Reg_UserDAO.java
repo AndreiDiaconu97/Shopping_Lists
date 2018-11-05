@@ -180,12 +180,12 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "INSERT INTO REG_USERS(email, password, name, surname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO REG_USERS(email, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
             stm.setString(2, reg_user.getPassword());
-            stm.setString(3, reg_user.getName());
-            stm.setString(4, reg_user.getSurname());
+            stm.setString(3, reg_user.getFirstname());
+            stm.setString(4, reg_user.getLastname());
             stm.setBoolean(5, reg_user.getIs_admin());
             stm.setString(6, reg_user.getAvatar());
             stm.executeQuery();

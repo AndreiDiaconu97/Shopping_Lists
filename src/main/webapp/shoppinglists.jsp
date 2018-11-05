@@ -14,8 +14,8 @@
 <%@page import="db.daos.Reg_UserDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%!
-    private UserDAO userDao;
-    private ShoppingListDAO shoppingListDao;
+    private Reg_UserDAO reg_userDao;
+    private Shop_listDAO shop_listDao;
 
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");

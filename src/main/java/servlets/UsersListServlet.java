@@ -97,7 +97,7 @@ public class UsersListServlet extends HttpServlet {
                 out.println(
                         "                                <tr>\n"
                         + "                                    <td>" + reg_user.getEmail() + "</td>\n"
-                        + "                                    <td>" + reg_user.getName() + "</td>\n"
+                        + "                                    <td>" + reg_user.getFirstname() + "</td>\n"
                         + "                                    <td><a href=\"" + response.encodeURL(contextPath + "restricted/shopping.lists.handler?id=" + reg_user.getId()) + "\"><span class=\"badge badge-primary badge-pill\">" + "reg_user.getShoppingListsCount()" + "</span></a></td>\n"
                         + "                                </tr>\n"
                 );
