@@ -20,27 +20,26 @@
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
         if (daoFactory == null) {
-            throw new RuntimeException(new ServletException("Impossible to get dao factory for user storage system"));
+            throw new RuntimeException(new ServletException("Impossible to get dao factory"));
         }
         try {
-            userDao = daoFactory.getDAO(UserDAO.class);
+            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new RuntimeException(new ServletException("Impossible to get dao factory for user storage system", ex));
+            throw new RuntimeException(new ServletException("Impossible to get dao for reg_user", ex));
         }
-
         try {
-            shoppingListDao = daoFactory.getDAO(ShoppingListDAO.class);
+            shop_listDao = daoFactory.getDAO(Shop_listDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new RuntimeException(new ServletException("Impossible to get the dao factory for shopping list storage system", ex));
+            throw new RuntimeException(new ServletException("Impossible to get the dao for shop_list", ex));
         }
     }
 
     public void jspDestroy() {
-        if (userDao != null) {
-            userDao = null;
+        if (reg_userDao != null) {
+            reg_userDao = null;
         }
-        if (shoppingListDao != null) {
-            shoppingListDao = null;
+        if (shop_listDao != null) {
+            shop_listDao = null;
         }
     }
 %>
@@ -53,39 +52,24 @@
         contextPath += "/";
     }
 
-    Integer userId = null;
-    User user = null;
-    User authenticatedUser = null;
+    Reg_User reg_user = null;
     if (session != null) {
-        authenticatedUser = (User) session.getAttribute("user");
+        reg_user = (Reg_User) session.getAttribute("user");
     }
-    try {
-        userId = Integer.valueOf(request.getParameter("id"));
-    } catch (RuntimeException ex) {
-        if (session != null) {
-            user = authenticatedUser;
-        }
-        if (user != null) {
-            userId = user.getId();
-        }
-    }
-    if (userId == null) {
+    
+    if (reg_user == null) {
         if (!response.isCommitted()) {
             response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
         }
     }
 
     try {
-
-        if (user == null) {
-            user = userDao.getByPrimaryKey(userId);
-        }
-        List<ShoppingList> shoppingLists = shoppingListDao.getByUserId(userId);
+        List<Shop_list> shoppingLists = reg_userDao.getShopLists(reg_user);
 %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Lab 08: Shopping lists shared with<%=user.getFirstName() + " " + user.getLastName()%></title>
+        <title>Lab 08: Shopping lists shared with<%=reg_user.getFirstname() + " " + reg_user.getLastname()%></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- Latest compiled and minified CSS -->
@@ -98,10 +82,10 @@
         <div class="container-fluid">
             <div class="card border-primary">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="card-title float-left">Shopping Lists</h5><span><a href="<%=contextPath%>restricted/export2PDF?id=<%=userId%>" class="far fa-file-pdf fa-2x text-light float-right" aria-hidden="true"></a></span><button type="button" class="btn btn-outline-light bg-light text-primary btn-sm float-right" data-toggle="modal" data-target="#editDialog"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                    <h5 class="card-title float-left">Shopping Lists</h5><span><a href="<%=contextPath%>restricted/export2PDF?id=<%=reg_user.getId()%>" class="far fa-file-pdf fa-2x text-light float-right" aria-hidden="true"></a></span><button type="button" class="btn btn-outline-light bg-light text-primary btn-sm float-right" data-toggle="modal" data-target="#editDialog"><i class="fas fa-plus" aria-hidden="true"></i></button>
                 </div>
                 <div class="card-body">
-                    The following table lists all the shopping-lists shared with &quot;<%=user.getFirstName() + " " + user.getLastName()%>&quot;.<br>
+                    The following table lists all the shopping-lists shared with &quot;<%=reg_user.getFirstname() + " " + reg_user.getLastname()%>&quot;.<br>
                 </div>
 
                 <!-- Shopping Lists cards -->
@@ -117,7 +101,7 @@
                     <%
                     } else {
                         int index = 1;
-                        for (ShoppingList shoppingList : shoppingLists) {
+                        for (Shop_list shoppingList : shoppingLists) {
                     %>
                     <div class="card">
                         <div class="card-header" id="heading<%=index%>">
@@ -138,19 +122,6 @@
                             }
                         }
                     %>
-                </div>                    
-                <div class="card-footer"><span class="float-left">Copyright &copy; 2018 - Stefano Chirico</span>
-                    <%
-                        if (authenticatedUser.getEmail().equals("stefano.chirico@unitn.it")) {
-                    %>
-                    <a class="float-right" href="users.html"><button type="button" class="btn btn-primary btn-sm">Go to Users List</button></a>
-                    <%
-                        } else {
-                    %>
-                    <a class="float-right" href="logout.handler"><button type="button" class="btn btn-primary btn-sm">Logout</button></a>
-                    <%
-                        }
-                    %>
                 </div>
             </div>
         </div>
@@ -164,7 +135,7 @@
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fas fa-window-close red-window-close"></i></span></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="idUser" value="<%=user.getId()%>">
+                            <input type="hidden" name="idUser" value="<%=reg_user.getId()%>">
                             <input type="hidden" name="idShoppingList" id="idShoppingList">
                             <div class="form-label-group">
                                 <input type="text" name="name" id="name" class="form-control" placeholder="Name" required autofocus>
@@ -233,7 +204,6 @@
                     <div class="card-body">
                         Error in retriving shopping lists: <%=ex.getMessage()%><br>
                     </div>
-                    <div class="card-footer">Copyright &copy; 2018 - Stefano Chirico</div>
                 </div>
             </div>
         </div>
