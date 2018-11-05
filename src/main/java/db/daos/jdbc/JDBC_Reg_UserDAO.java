@@ -71,13 +71,13 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
     @Override
     public Reg_User getByEmailAndPassword(String email, String password) throws DAOException {
         String msg = "";
-        if (email == null || "".equals(email)){
+        if (email == null || "".equals(email)) {
             msg += "Given email is empty. ";
         }
         if (password == null || "".equals(password)) {
             msg += "Given password is empty.";
         }
-        if (msg.length() > 1){
+        if (msg.length() > 1) {
             throw new DAOException(msg);
         }
         String query = "SELECT * FROM REG_USERS WHERE EMAIL = ? AND PASSWORD = ?";
@@ -174,9 +174,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             throw new DAOException("Impossible to get shopping lists for the passed reg_user", ex);
         }
     }
-    
+
     @Override
-    public void insert(Reg_User reg_user) throws DAOException{
+    public void insert(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -188,8 +188,14 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             stm.setString(4, reg_user.getLastname());
             stm.setBoolean(5, reg_user.getIs_admin());
             stm.setString(6, reg_user.getAvatar());
-            stm.executeQuery();
-            reg_user.setId(getByEmail(reg_user.getEmail()).getId());
+            stm.executeUpdate();
+
+            // This should avoid using an extra query for id retrieving
+            ResultSet rs = stm.getGeneratedKeys();
+            if (rs.next()) {
+                reg_user.setId(rs.getInt(1));
+            }
+            // OLD: reg_user.setId(getByEmail(reg_user.getEmail()).getId());
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add reg_user to DB", ex);
         }
@@ -201,12 +207,40 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             throw new DAOException("Given reg_user is null");
         }
         String query = "DELETE FROM REG_USERS WHERE ID = ?";
-        try(PreparedStatement stm = CON.prepareStatement(query)){
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
-            stm.executeQuery();
-        }
-        catch(SQLException ex){
+            stm.executeUpdate();
+        } catch (SQLException ex) {
             throw new DAOException("Impossible to remove reg_user");
+        }
+    }
+
+    @Override
+    public void update(Reg_User reg_user) throws DAOException {
+        if (reg_user == null) {
+            throw new DAOException("Given reg_user is null");
+        }
+
+        Integer reg_userId = reg_user.getId();
+        if (reg_userId == null) {
+            throw new DAOException("Reg_User is not valid", new NullPointerException("Reg_User id is null"));
+        }
+
+        String query = "UPDATE REG_USERS SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, reg_user.getEmail());
+            stm.setString(1, reg_user.getPassword());
+            stm.setString(2, reg_user.getFirstname());
+            stm.setString(3, reg_user.getLastname());
+            stm.setBoolean(4, reg_user.getIs_admin());
+            stm.setString(5, reg_user.getAvatar());
+
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("Update affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the shopping_list", ex);
         }
     }
 }

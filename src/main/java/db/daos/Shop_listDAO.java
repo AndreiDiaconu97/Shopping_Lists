@@ -22,7 +22,7 @@ public interface Shop_listDAO extends DAO<Shop_list, PrimaryKey> {
 
     public Shop_list getByID(Integer id) throws DAOException;
 
-    public List<Shop_list> getByOwner(String owner) throws DAOException;
+    public List<Shop_list> getByOwner(Integer owner) throws DAOException;
 
     public List<Reg_User> getListUsers(Shop_list shopping_list) throws DAOException;
 

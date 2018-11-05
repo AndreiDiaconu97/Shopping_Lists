@@ -46,4 +46,9 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> impl
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public void update(Prod_category entity) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

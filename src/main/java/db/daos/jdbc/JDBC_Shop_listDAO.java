@@ -63,12 +63,12 @@ public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey>
     }
 
     @Override
-    public List<Shop_list> getByOwner(String owner) throws DAOException {
+    public List<Shop_list> getByOwner(Integer owner) throws DAOException {
         if (owner == null) {
             throw new DAOException("owner parameter is null");
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS WHERE OWNER = ?")) {
-            stm.setString(1, owner); // QUESTO DA CAMBIARE
+            stm.setInt(1, owner); // QUESTO DA CAMBIARE
             try (ResultSet rs = stm.executeQuery()) {
                 List<Shop_list> shopping_lists = new ArrayList<>();
 
@@ -99,6 +99,11 @@ public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey>
 
     @Override
     public void insert(Shop_list entity) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void update(Shop_list entity) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
