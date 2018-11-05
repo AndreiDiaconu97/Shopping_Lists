@@ -15,9 +15,9 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCList_categoryDAO extends JDBCDAO<List_category, Integer> implements List_categoryDAO {
+public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> implements List_categoryDAO {
 
-    public JDBCList_categoryDAO(Connection con) {
+    public JDBC_List_categoryDAO(Connection con) {
         super(con);
     }
 

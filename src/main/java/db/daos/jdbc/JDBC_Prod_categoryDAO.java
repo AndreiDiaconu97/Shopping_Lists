@@ -5,9 +5,8 @@
  */
 package db.daos.jdbc;
 
-import db.daos.ProductDAO;
-import db.entities.Product;
-import db.entities.Product.PrimaryKey;
+import db.daos.Prod_categoryDAO;
+import db.entities.Prod_category;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.util.List;
@@ -16,9 +15,9 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCProductDAO extends JDBCDAO<Product, PrimaryKey> implements ProductDAO {
+public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> implements Prod_categoryDAO {
 
-    public JDBCProductDAO(Connection con) {
+    public JDBC_Prod_categoryDAO(Connection con) {
         super(con);
     }
 
@@ -28,17 +27,12 @@ public class JDBCProductDAO extends JDBCDAO<Product, PrimaryKey> implements Prod
     }
 
     @Override
-    public Product getByPrimaryKey(PrimaryKey primaryKey) throws DAOException {
+    public Prod_category getByPrimaryKey(Integer primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<Product> getAll() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Product getByID(Integer id) throws DAOException {
+    public List<Prod_category> getAll() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

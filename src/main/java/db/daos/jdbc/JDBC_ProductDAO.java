@@ -5,8 +5,9 @@
  */
 package db.daos.jdbc;
 
-import db.daos.Shop_list_NRDAO;
-import db.entities.Shop_list_NR;
+import db.daos.ProductDAO;
+import db.entities.Product;
+import db.entities.Product.PrimaryKey;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCShop_listNRDAO extends JDBCDAO<Shop_list_NR, Integer> implements Shop_list_NRDAO {
+public class JDBC_ProductDAO extends JDBC_DAO<Product, PrimaryKey> implements ProductDAO {
 
-    public JDBCShop_listNRDAO(Connection con) {
+    public JDBC_ProductDAO(Connection con) {
         super(con);
     }
 
@@ -27,12 +28,17 @@ public class JDBCShop_listNRDAO extends JDBCDAO<Shop_list_NR, Integer> implement
     }
 
     @Override
-    public Shop_list_NR getByPrimaryKey(Integer primaryKey) throws DAOException {
+    public Product getByPrimaryKey(PrimaryKey primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<Shop_list_NR> getAll() throws DAOException {
+    public List<Product> getAll() throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Product getByID(Integer id) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

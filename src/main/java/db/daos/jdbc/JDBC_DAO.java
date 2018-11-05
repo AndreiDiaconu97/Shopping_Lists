@@ -21,7 +21,7 @@ import java.util.HashMap;
  * @author Stefano Chirico
  * @since 1.0.180330
  */
-public abstract class JDBCDAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> implements DAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> {
+public abstract class JDBC_DAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> implements DAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> {
     /**
      * The JDBC {@link Connection} used to access the persistence system.
      */
@@ -38,7 +38,7 @@ public abstract class JDBCDAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> implements DAO<EN
      * @author Stefano Chirico
      * @since 1.0.180330
      */
-    protected JDBCDAO(Connection con) {
+    protected JDBC_DAO(Connection con) {
         super();
         this.CON = con;
         FRIEND_DAOS = new HashMap<>();

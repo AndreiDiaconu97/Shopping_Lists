@@ -22,9 +22,9 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCReg_UserDAO extends JDBCDAO<Reg_User, String> implements Reg_UserDAO {
+public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_UserDAO {
 
-    public JDBCReg_UserDAO(Connection con) {
+    public JDBC_Reg_UserDAO(Connection con) {
         super(con);
     }
 

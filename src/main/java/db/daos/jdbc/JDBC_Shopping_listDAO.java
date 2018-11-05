@@ -21,9 +21,9 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBCShopping_listDAO extends JDBCDAO<Shopping_list, Shopping_list.PrimaryKey> implements Shopping_listDAO {
+public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list.PrimaryKey> implements Shopping_listDAO {
 
-    public JDBCShopping_listDAO(Connection con) {
+    public JDBC_Shopping_listDAO(Connection con) {
         super(con);
     }
 

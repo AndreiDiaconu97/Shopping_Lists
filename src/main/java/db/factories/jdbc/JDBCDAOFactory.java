@@ -7,7 +7,7 @@
 package db.factories.jdbc;
 
 import db.daos.DAO;
-import db.daos.jdbc.JDBCDAO;
+import db.daos.jdbc.JDBC_DAO;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.lang.reflect.Constructor;
@@ -134,7 +134,7 @@ public class JDBCDAOFactory implements DAOFactory {
             
             Constructor<DAO_CLASS> constructor = daoClass.getConstructor(Connection.class);
             DAO_CLASS daoInstance = constructor.newInstance(CON);
-            if (!(daoInstance instanceof JDBCDAO)) {
+            if (!(daoInstance instanceof JDBC_DAO)) {
                 throw new DAOFactoryException("The daoInterface passed as parameter doesn't extend JDBCDAO class");
             }
             DAO_CACHE.put(daoInterface, daoInstance);
