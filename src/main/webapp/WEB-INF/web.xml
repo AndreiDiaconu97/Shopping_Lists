@@ -33,6 +33,24 @@
         <url-pattern>/login.handler</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>ShoppingListsREGViewer</servlet-name>
+        <jsp>/shop_lists_REG.jsp</jsp>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ShoppingListsREGViewer</servlet-name>
+        <url-pattern>/restricted/shopping.lists.html</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ShoppingListsNRViewer</servlet-name>
+        <url-pattern>/restricted/shopping.lists.handler</url-pattern>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ShoppingListsNRViewer</servlet-name>
+        <url-pattern>/restricted/shopping.lists.handler</url-pattern>
+    </servlet-mapping>
+    
     <listener>
         <description>ServletContextListener</description>
         <listener-class>listeners.WebAppContextListener</listener-class>

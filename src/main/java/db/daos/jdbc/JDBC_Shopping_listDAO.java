@@ -5,7 +5,6 @@
  */
 package db.daos.jdbc;
 
-import db.daos.Shopping_listDAO;
 import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shopping_list;
@@ -16,12 +15,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import db.daos.Shop_listDAO;
 
 /**
  *
  * @author Andrei Diaconu
  */
-public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list.PrimaryKey> implements Shopping_listDAO {
+public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list.PrimaryKey> implements Shop_listDAO {
 
     public JDBC_Shopping_listDAO(Connection con) {
         super(con);
@@ -94,6 +94,11 @@ public class JDBC_Shopping_listDAO extends JDBC_DAO<Shopping_list, Shopping_list
 
     @Override
     public List<Product> getListProducts(Shopping_list shopping_list) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void delete(Shopping_list entity) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

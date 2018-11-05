@@ -29,7 +29,4 @@ public interface Reg_UserDAO extends DAO<Reg_User, String> {
 
     public List<Shopping_list> getShopLists(Reg_User reg_user) throws DAOException;
     
-    public void insert(Reg_User reg_user) throws DAOException;
-    
-    public void delete(Reg_User reg_user) throws DAOException;
 }

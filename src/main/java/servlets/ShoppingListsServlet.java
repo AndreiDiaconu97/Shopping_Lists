@@ -7,7 +7,6 @@
 package servlets;
 
 import db.daos.Reg_UserDAO;
-import db.daos.Shopping_listDAO;
 import db.entities.Reg_User;
 import db.entities.Shopping_list;
 import db.exceptions.DAOException;
@@ -21,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import db.daos.Shop_listDAO;
 
 /**
  * Servlet that handles the shopping-lists web page.
@@ -30,7 +30,7 @@ import javax.servlet.http.HttpSession;
  */
 public class ShoppingListsServlet extends HttpServlet {
 
-    private Shopping_listDAO shopping_listDao;
+    private Shop_listDAO shopping_listDao;
     private Reg_UserDAO reg_userDao;
 
     @Override
@@ -40,7 +40,7 @@ public class ShoppingListsServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao factory for user storage system");
         }
         try {
-            shopping_listDao = daoFactory.getDAO(Shopping_listDAO.class);
+            shopping_listDao = daoFactory.getDAO(Shop_listDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao factory for shopping-list storage system", ex);
         }

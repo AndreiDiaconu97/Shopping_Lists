@@ -16,9 +16,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public interface Shopping_listDAO extends DAO<Shopping_list, PrimaryKey> {
-
-    public Integer insert(Shopping_list shoppingList) throws DAOException;
+public interface Shop_listDAO extends DAO<Shopping_list, PrimaryKey> {
 
     public boolean linkShoppingListToReg_User(Shopping_list shoppingList, Reg_User user) throws DAOException;
 
