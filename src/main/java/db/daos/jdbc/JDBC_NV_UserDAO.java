@@ -6,6 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.NV_UserDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 import static db.daos.jdbc.JDBC_utility.resultSetToNV_User;
 import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
 import db.entities.NV_User;
@@ -15,7 +16,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +31,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
 
     @Override
     public Long getCount() throws DAOException {
-        try (Statement stmt = CON.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM NV_USERS");
-            return rs.next() ? rs.getLong(1) : 0L;
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to count NV_users", ex);
-        }
+        return getCountFor("NV_USERS", CON);
     }
 
     @Override

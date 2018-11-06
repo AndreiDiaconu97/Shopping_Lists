@@ -6,6 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.Shop_list_NRDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 import db.entities.Shop_list_NR;
 import db.exceptions.DAOException;
 import java.sql.Connection;
@@ -23,7 +24,7 @@ public class JDBC_Shop_listNRDAO extends JDBC_DAO<Shop_list_NR, Integer> impleme
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getCountFor("LISTS_ANONYMOUS", CON);
     }
 
     @Override

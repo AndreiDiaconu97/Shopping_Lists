@@ -6,6 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.ProductDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 import db.entities.Product;
 import db.entities.Product.PrimaryKey;
 import db.exceptions.DAOException;
@@ -24,7 +25,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, PrimaryKey> implements Pr
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getCountFor("PRODUCTS", CON);
     }
 
     @Override

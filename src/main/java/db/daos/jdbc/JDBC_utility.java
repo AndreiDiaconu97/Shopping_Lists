@@ -9,6 +9,9 @@ import db.entities.NV_User;
 import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shop_list;
+import db.exceptions.DAOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -17,6 +20,16 @@ import java.sql.SQLException;
  * @author Andrei Diaconu
  */
 public class JDBC_utility {
+
+    public static Long getCountFor(String table, Connection con) throws DAOException {
+        try (PreparedStatement stm = con.prepareStatement("SELECT COUNT(*) FROM ?")) {
+            stm.setString(1, table);
+            ResultSet rs = stm.executeQuery();
+            return rs.next() ? rs.getLong(1) : 0L;
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to count " + table + " elements", ex);
+        }
+    }
 
     public static Reg_User resultSetToReg_User(ResultSet rs) throws SQLException {
         Reg_User reg_user = new Reg_User();
@@ -55,7 +68,7 @@ public class JDBC_utility {
         shopping_list.setOwner(rs.getString("OWNER"));
         return shopping_list;
     }
-    
+
     public static NV_User resultSetToNV_User(ResultSet rs) throws SQLException {
         NV_User nv_user = new NV_User();
         nv_user.setEmail(rs.getString("EMAIL"));

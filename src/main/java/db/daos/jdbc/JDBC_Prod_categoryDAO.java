@@ -6,6 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.Prod_categoryDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 import db.entities.Prod_category;
 import db.exceptions.DAOException;
 import java.sql.Connection;
@@ -23,7 +24,7 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getCountFor("PRODUCTS_CATEGORIES", CON);
     }
 
     @Override

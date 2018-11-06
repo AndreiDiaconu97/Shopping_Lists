@@ -6,6 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.List_categoryDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 import db.entities.List_category;
 import db.exceptions.DAOException;
 import java.sql.Connection;
@@ -23,7 +24,7 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getCountFor("LISTS_CATEGORIES", CON);
     }
     
     @Override

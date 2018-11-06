@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import db.daos.Shop_listDAO;
+import static db.daos.jdbc.JDBC_utility.getCountFor;
 
 /**
  *
@@ -29,7 +30,7 @@ public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey>
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getCountFor("LISTS", CON);
     }
 
     @Override
