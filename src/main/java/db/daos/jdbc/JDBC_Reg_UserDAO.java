@@ -39,21 +39,6 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
     }
 
     @Override
-    public Reg_User getByPrimaryKey(String email) throws DAOException {
-        if ("".equals(email) || email == null) {
-            throw new DAOException("Given email is empty");
-        }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM REG_USERS WHERE EMAIL = ?")) {
-            stm.setString(1, email);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? JDBC_utility.resultSetToReg_User(rs) : null;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the user for the passed email", ex);
-        }
-    }
-
-    @Override
     public List<Reg_User> getAll() throws DAOException {
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM REG_USERS")) {
             try (ResultSet rs = stm.executeQuery()) {
@@ -94,7 +79,17 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
 
     @Override
     public Reg_User getByEmail(String email) throws DAOException {
-        return getByPrimaryKey(email);
+        if ("".equals(email) || email == null) {
+            throw new DAOException("Given email is empty");
+        }
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM REG_USERS WHERE EMAIL = ?")) {
+            stm.setString(1, email);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? JDBC_utility.resultSetToReg_User(rs) : null;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the user for the passed email", ex);
+        }
     }
 
     @Override

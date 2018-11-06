@@ -5,8 +5,6 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu

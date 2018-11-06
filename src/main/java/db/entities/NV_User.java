@@ -5,8 +5,6 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu
@@ -19,9 +17,6 @@ public class NV_User {
     private String lastname;
     private String avatar;
     private String code;
-    //private List<Product> products_created;
-    //private List<Shopping_list> owning_shop_lists;
-    //private List<Shopping_list> shared_shop_lists;
 
     public String getCode() {
         return code;

@@ -44,21 +44,6 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     }
 
     @Override
-    public NV_User getByPrimaryKey(String email) throws DAOException {
-        if (email == null) {
-            throw new DAOException("email is null");
-        }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE EMAIL = ?")) {
-            stm.setString(1, email);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? resultSetToNV_User(rs) : null;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the nv_user for the passed primary key", ex);
-        }
-    }
-
-    @Override
     public List<NV_User> getAll() throws DAOException {
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS")) {
             try (ResultSet rs = stm.executeQuery()) {
@@ -75,7 +60,17 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
 
     @Override
     public NV_User getByEmail(String email) throws DAOException {
-        return getByPrimaryKey(email);
+        if (email == null) {
+            throw new DAOException("email is null");
+        }
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE EMAIL = ?")) {
+            stm.setString(1, email);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? resultSetToNV_User(rs) : null;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the nv_user for the passed email", ex);
+        }
     }
 
     @Override

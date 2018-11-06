@@ -28,11 +28,6 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, PrimaryKey> implements Pr
     }
 
     @Override
-    public Product getByPrimaryKey(PrimaryKey primaryKey) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public List<Product> getAll() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

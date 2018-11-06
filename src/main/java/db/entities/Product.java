@@ -5,8 +5,6 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu
@@ -21,8 +19,6 @@ public class Product {
     private Float rating;
     private Integer num_votes;
     private Boolean is_public;
-    //private List<Shop_list_NR> shop_l_NR;  // not meant for user display
-    //private List<Shopping_list> shop_l;    // not meant for user display
 
     public String getName() {
         return primaryKey.getName();

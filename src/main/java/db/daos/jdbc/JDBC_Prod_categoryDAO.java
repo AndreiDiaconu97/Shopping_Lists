@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> implements Prod_categoryDAO {
+public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> implements Prod_categoryDAO {
 
     public JDBC_Prod_categoryDAO(Connection con) {
         super(con);
@@ -23,11 +23,6 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> impl
 
     @Override
     public Long getCount() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Prod_category getByPrimaryKey(Integer primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

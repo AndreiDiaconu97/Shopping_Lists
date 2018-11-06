@@ -5,8 +5,6 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu
@@ -20,9 +18,6 @@ public class Reg_User {
     private String lastname;
     private String avatar;
     private Boolean is_admin;
-    //private List<Product> products_created;
-    //private List<Shopping_list> owning_shop_lists;
-    //private List<Shopping_list> shared_shop_lists;
 
     public Integer getId() {
         return id;

@@ -5,8 +5,6 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu
@@ -15,9 +13,7 @@ public class List_category {
 
     private String name;
     private String description;
-    private String image;
-    //private List<Shop_list_NR> shop_l_NR;   // not meant for user display
-    //private List<Shopping_list> shop_l;     // not meant for user display
+    private String logo;
 
     public String getName() {
         return name;
@@ -35,11 +31,11 @@ public class List_category {
         this.description = description;
     }
 
-    public String getImage() {
-        return image;
+    public String getLogo() {
+        return logo;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 }

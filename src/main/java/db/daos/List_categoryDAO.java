@@ -11,6 +11,6 @@ import db.entities.List_category;
  *
  * @author Andrei Diaconu
  */
-public interface List_categoryDAO extends DAO<List_category, Integer> {
+public interface List_categoryDAO extends DAO<List_category, String> {
     
 }

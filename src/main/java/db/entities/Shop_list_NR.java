@@ -6,7 +6,6 @@
 package db.entities;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  *
@@ -20,7 +19,6 @@ public class Shop_list_NR {
     private String image;
     private String category;
     private Timestamp last_seen;
-    //private List<Product> products;
 
     public Integer getID() {
         return ID;

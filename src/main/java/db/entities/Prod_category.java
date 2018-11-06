@@ -5,17 +5,15 @@
  */
 package db.entities;
 
-import java.util.List;
-
 /**
  *
  * @author Andrei Diaconu
  */
 public class Prod_category {
+
     private String name;
     private String description;
     private String logo;
-    //private List<Product> products;
 
     public String getName() {
         return name;

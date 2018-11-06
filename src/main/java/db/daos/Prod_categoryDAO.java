@@ -12,6 +12,6 @@ import db.entities.Prod_category;
  *
  * @author Andrei Diaconu
  */
-public interface Prod_categoryDAO extends DAO<Prod_category, Integer> {
+public interface Prod_categoryDAO extends DAO<Prod_category, String> {
     
 }

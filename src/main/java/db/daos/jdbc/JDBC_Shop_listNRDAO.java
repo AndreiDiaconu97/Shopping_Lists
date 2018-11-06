@@ -27,11 +27,6 @@ public class JDBC_Shop_listNRDAO extends JDBC_DAO<Shop_list_NR, Integer> impleme
     }
 
     @Override
-    public Shop_list_NR getByPrimaryKey(Integer primaryKey) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public List<Shop_list_NR> getAll() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

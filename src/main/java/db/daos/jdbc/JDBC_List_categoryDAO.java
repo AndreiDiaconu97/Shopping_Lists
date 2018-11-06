@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> implements List_categoryDAO {
+public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> implements List_categoryDAO {
 
     public JDBC_List_categoryDAO(Connection con) {
         super(con);
@@ -25,12 +25,7 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     public Long getCount() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public List_category getByPrimaryKey(Integer primaryKey) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
     @Override
     public List<List_category> getAll() throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
