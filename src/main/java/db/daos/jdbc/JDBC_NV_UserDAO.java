@@ -32,14 +32,10 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public Long getCount() throws DAOException {
         try (Statement stmt = CON.createStatement()) {
-            ResultSet counter = stmt.executeQuery("SELECT COUNT(*) FROM NV_USERS");
-            if (counter.next()) {
-                return counter.getLong(1);
-            } else {
-                return 0L;
-            }
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM NV_USERS");
+            return rs.next() ? rs.getLong(1) : 0L;
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to count nv_users", ex);
+            throw new DAOException("Impossible to count NV_users", ex);
         }
     }
 
@@ -54,14 +50,14 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
                 return nv_users;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get all the nv_users");
+            throw new DAOException("Impossible to get all the nv_users", ex);
         }
     }
 
     @Override
     public NV_User getByEmail(String email) throws DAOException {
-        if (email == null) {
-            throw new DAOException("email is null");
+        if ("".equals(email) || email == null) {
+            throw new DAOException("Given email is empty");
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE EMAIL = ?")) {
             stm.setString(1, email);
@@ -75,20 +71,23 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
 
     @Override
     public NV_User getByCode(String code) throws DAOException {
+        if ("".equals(code) || code == null) {
+            throw new DAOException("Given code is empty");
+        }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE CODE = ?")) {
             stm.setString(1, code);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToNV_User(rs) : null;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get nv_user by code");
+            throw new DAOException("Impossible to get nv_user by code", ex);
         }
     }
 
     @Override
     public Reg_User validateUsingCode(String code) throws DAOException {
         NV_User nv_user = getByCode(code);
-        if(nv_user == null){
+        if (nv_user == null) {
             throw new DAOException("Passed verification code is invalid");
         }
         String query = "INSERT INTO REG_USERS(email, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
@@ -99,16 +98,16 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             stm.setString(4, nv_user.getLastname());
             stm.setBoolean(5, false);
             stm.setString(6, nv_user.getAvatar());
-            stm.executeQuery();
+            stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to validate nv_user", ex);
         }
-        
+
         query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
-            try(ResultSet rs = stm.executeQuery()){
-                return resultSetToReg_User(rs);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? resultSetToReg_User(rs) : null;
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get validated nv_user as reg_user", ex);
@@ -128,7 +127,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             stm.setString(4, nv_user.getLastname());
             stm.setString(5, nv_user.getAvatar());
             stm.setString(6, nv_user.getCode());
-            stm.executeQuery();
+            stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add nv_user to DB", ex);
         }
@@ -140,19 +139,34 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             throw new DAOException("Given nv_user is null");
         }
         String query = "DELETE FROM NV_USERS WHERE EMAIL = ?";
-        try(PreparedStatement stm = CON.prepareStatement(query)){
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
             stm.executeQuery();
-        }
-        catch(SQLException ex){
-            throw new DAOException("Impossible to remove nv_user");
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove nv_user", ex);
         }
     }
 
     @Override
-    public void update(NV_User entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void update(NV_User nv_user) throws DAOException {
+        if (nv_user == null) {
+            throw new DAOException("Given nv_user is null");
+        }
+        String query = "UPDATE NV_USERS SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, AVATAR = ?, VERIFICATION_CODE = ? WHERE ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, nv_user.getEmail());
+            stm.setString(1, nv_user.getPassword());
+            stm.setString(2, nv_user.getFirstname());
+            stm.setString(3, nv_user.getLastname());
+            stm.setString(5, nv_user.getAvatar());
+            stm.setString(6, nv_user.getCode());
 
-    
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("nv_user update affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the nv_user", ex);
+        }
+    }
 }

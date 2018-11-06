@@ -6,6 +6,9 @@
 package db.daos.jdbc;
 
 import db.daos.Reg_UserDAO;
+import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
+import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
+import static db.daos.jdbc.JDBC_utility.resultSetToShopping_list;
 import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shop_list;
@@ -34,7 +37,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM REG_USERS");
             return rs.next() ? rs.getLong(1) : 0L;
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to count users", ex);
+            throw new DAOException("Impossible to count reg_users", ex);
         }
     }
 
@@ -44,7 +47,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             try (ResultSet rs = stm.executeQuery()) {
                 List<Reg_User> reg_users = new ArrayList<>();
                 while (rs.next()) {
-                    reg_users.add(JDBC_utility.resultSetToReg_User(rs));
+                    reg_users.add(resultSetToReg_User(rs));
                 }
                 return reg_users;
             }
@@ -70,7 +73,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             stm.setString(1, email);
             stm.setString(2, password);
             try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? JDBC_utility.resultSetToReg_User(rs) : null;
+                return rs.next() ? resultSetToReg_User(rs) : null;
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the user for the passed email and password", ex);
@@ -82,10 +85,11 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
         if ("".equals(email) || email == null) {
             throw new DAOException("Given email is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM REG_USERS WHERE EMAIL = ?")) {
+        String query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? JDBC_utility.resultSetToReg_User(rs) : null;
+                return rs.next() ? resultSetToReg_User(rs) : null;
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the user for the passed email", ex);
@@ -101,7 +105,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, id);
             try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? JDBC_utility.resultSetToReg_User(rs) : null;
+                return rs.next() ? resultSetToReg_User(rs) : null;
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the user for the passed id", ex);
@@ -120,7 +124,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
                 while (rs.next()) {
-                    products.add(JDBC_utility.resultSetToProduct(rs));
+                    products.add(resultSetToProduct(rs));
                 }
                 return products;
             }
@@ -141,7 +145,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             try (ResultSet rs = stm.executeQuery()) {
                 List<Shop_list> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToShopping_list(rs));
                 }
                 return shopping_lists;
             }
@@ -161,7 +165,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             try (ResultSet rs = stm.executeQuery()) {
                 List<Shop_list> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(JDBC_utility.resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToShopping_list(rs));
                 }
                 return shopping_lists;
             }
@@ -206,7 +210,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
             stm.setInt(1, reg_user.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to remove reg_user");
+            throw new DAOException("Impossible to remove reg_user", ex);
         }
     }
 
@@ -232,10 +236,10 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, String> implements Reg_
 
             int count = stm.executeUpdate();
             if (count != 1) {
-                throw new DAOException("Update affected an invalid number of records: " + count);
+                throw new DAOException("reg_user pdate affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update the shopping_list", ex);
+            throw new DAOException("Impossible to update the reg_user", ex);
         }
     }
 }
