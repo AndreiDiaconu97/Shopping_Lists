@@ -13,10 +13,23 @@ public class NV_User {
 
     private String email;
     private String password;
+    private String salt;
     private String firstname;
     private String lastname;
     private String avatar;
     private String code;
+
+    public NV_User() {
+    }
+    
+    public NV_User(String email, String password, String firstname, String lastname, String avatar, String code) {
+        this.email = email;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.avatar = avatar;
+        this.code = code;
+        setPassword(password);
+    }
 
     public String getCode() {
         return code;
@@ -39,7 +52,17 @@ public class NV_User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        // this.salt = create random 200len string
+        // this.password = hash64 on salt+password
+
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getAvatar() {

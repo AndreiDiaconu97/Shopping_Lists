@@ -103,4 +103,9 @@ public class JDBC_Shop_listDAO extends JDBC_DAO<Shop_list, Shop_list.PrimaryKey>
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public Shop_list getByPrimaryKey(Shop_list.PrimaryKey primaryKey) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

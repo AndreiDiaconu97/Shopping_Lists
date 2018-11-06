@@ -35,7 +35,6 @@ public class JDBC_utility {
         Reg_User reg_user = new Reg_User();
         reg_user.setId(rs.getInt("ID"));
         reg_user.setEmail(rs.getString("EMAIL"));
-        reg_user.setPassword(rs.getString("PASSWORD"));
         reg_user.setFirstname(rs.getString(("FIRSTNAME")));
         reg_user.setLastname(rs.getString("LASTNAME"));
         reg_user.setAvatar(rs.getString("AVATAR"));

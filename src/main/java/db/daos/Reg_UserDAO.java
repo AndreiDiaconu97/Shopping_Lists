@@ -15,18 +15,16 @@ import java.util.List;
  *
  * @author Andrei Diaconu
  */
-public interface Reg_UserDAO extends DAO<Reg_User, String> {
+public interface Reg_UserDAO extends DAO<Reg_User, Integer> {
 
     public Reg_User getByEmailAndPassword(String email, String password) throws DAOException;
 
     public Reg_User getByEmail(String email) throws DAOException;
-
-    public Reg_User getByID(Integer id) throws DAOException;
 
     public List<Product> getProductsCreated(Reg_User reg_user) throws DAOException;
 
     public List<Shop_list> getOwningShopLists(Reg_User reg_user) throws DAOException;
 
     public List<Shop_list> getShopLists(Reg_User reg_user) throws DAOException;
-    
+
 }

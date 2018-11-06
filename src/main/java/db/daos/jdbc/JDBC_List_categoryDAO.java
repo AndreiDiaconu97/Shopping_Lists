@@ -26,9 +26,14 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
     public Long getCount() throws DAOException {
         return getCountFor("LISTS_CATEGORIES", CON);
     }
-    
+
     @Override
     public List<List_category> getAll() throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List_category getByPrimaryKey(String primaryKey) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

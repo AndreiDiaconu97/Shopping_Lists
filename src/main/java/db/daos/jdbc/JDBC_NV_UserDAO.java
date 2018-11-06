@@ -50,7 +50,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     }
 
     @Override
-    public NV_User getByEmail(String email) throws DAOException {
+    public NV_User getByPrimaryKey(String email) throws DAOException {
         if ("".equals(email) || email == null) {
             throw new DAOException("Given email is empty");
         }
@@ -62,6 +62,11 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the nv_user for the passed email", ex);
         }
+    }
+
+    @Override
+    public NV_User getByEmail(String email) throws DAOException {
+        return getByPrimaryKey(email);
     }
 
     @Override
@@ -94,6 +99,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             stm.setBoolean(5, false);
             stm.setString(6, nv_user.getAvatar());
             stm.executeUpdate();
+            delete(nv_user);
         } catch (SQLException ex) {
             throw new DAOException("Impossible to validate nv_user", ex);
         }
@@ -147,14 +153,14 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Given nv_user is null");
         }
-        String query = "UPDATE NV_USERS SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, AVATAR = ?, VERIFICATION_CODE = ? WHERE ID = ?";
+        String query = "UPDATE NV_USERS SET PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, AVATAR = ?, VERIFICATION_CODE = ? WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, nv_user.getEmail());
             stm.setString(1, nv_user.getPassword());
             stm.setString(2, nv_user.getFirstname());
             stm.setString(3, nv_user.getLastname());
-            stm.setString(5, nv_user.getAvatar());
-            stm.setString(6, nv_user.getCode());
+            stm.setString(4, nv_user.getAvatar());
+            stm.setString(5, nv_user.getCode());
+            stm.setString(6, nv_user.getEmail());
 
             int count = stm.executeUpdate();
             if (count != 1) {

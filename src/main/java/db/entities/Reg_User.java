@@ -14,6 +14,7 @@ public class Reg_User {
     private Integer id;
     private String email;
     private String password;
+    private String salt;
     private String firstname;
     private String lastname;
     private String avatar;
@@ -41,6 +42,14 @@ public class Reg_User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getAvatar() {
