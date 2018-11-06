@@ -21,4 +21,6 @@ public interface NV_UserDAO extends DAO<NV_User, String> {
     
     public Reg_User validateUsingCode(String code) throws DAOException;
     
+    public String generateCode(int code_size) throws DAOException;
+    
 }

@@ -10,16 +10,39 @@ import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.Shop_list;
 import db.exceptions.DAOException;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
  * @author Andrei Diaconu
  */
 public class JDBC_utility {
+
+    private static final String symbols = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";   
+    private static final Random random = new SecureRandom();
+
+    public static String randomString(int length) {
+        char buf[] = new char[length];
+        for (int idx = 0; idx < buf.length; ++idx) {
+            buf[idx] = symbols.charAt(random.nextInt(symbols.length()));
+        }
+        return new String(buf);
+    }
+    
+    public static String secureHash(String password, String salt){
+        // should implement using slow hash function
+        return DigestUtils.sha512Hex(password.concat(salt));
+    }
+    
+    public static boolean secureHashEquals(String password, String salt, String hashed){
+        return hashed.equals(DigestUtils.sha512Hex(password.concat(salt)));
+    }
 
     public static Long getCountFor(String table, Connection con) throws DAOException {
         try (PreparedStatement stm = con.prepareStatement("SELECT COUNT(*) FROM ?")) {

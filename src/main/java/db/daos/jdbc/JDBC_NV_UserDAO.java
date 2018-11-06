@@ -170,4 +170,24 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             throw new DAOException("Impossible to update the nv_user", ex);
         }
     }
+
+    @Override
+    public String generateCode(int code_size) throws DAOException {
+        String code;
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE CODE = ?")) {
+            while (true) {
+                code = JDBC_utility.randomString(code_size);
+                stm.setString(1, code);
+                try(ResultSet rs = stm.executeQuery()){
+                    if(rs.next()){
+                        //trovato un elemento con quel codice
+                    } else {
+                        return code;
+                    }
+                }
+            }
+        } catch(SQLException ex){
+            throw new DAOException("Failed to generate verification code");
+        }
+    }
 }

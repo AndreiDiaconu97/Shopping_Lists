@@ -5,6 +5,9 @@
  */
 package db.entities;
 
+import db.daos.jdbc.JDBC_utility;
+import java.security.SecureRandom;
+
 /**
  *
  * @author Andrei Diaconu
@@ -18,11 +21,22 @@ public class NV_User {
     private String lastname;
     private String avatar;
     private String code;
+    
+    private static final int salt_size = 100;
+    private static final int code_size = 50;
+
+    public static int getSalt_size() {
+        return salt_size;
+    }
+
+    public static int getCode_size() {
+        return code_size;
+    }
 
     public NV_User() {
     }
     
-    public NV_User(String email, String password, String firstname, String lastname, String avatar, String code) {
+    public NV_User(String email, String password, String firstname, String lastname, String avatar) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -53,8 +67,9 @@ public class NV_User {
 
     public void setPassword(String password) {
         // this.salt = create random 200len string
+        this.salt = JDBC_utility.randomString(salt_size);
         // this.password = hash64 on salt+password
-
+        this.password = JDBC_utility.secureHash(password, this.salt);
     }
 
     public String getSalt() {
