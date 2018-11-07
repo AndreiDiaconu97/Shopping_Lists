@@ -52,6 +52,10 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (product == null) {
             throw new DAOException("Given product is null");
         }
+        if (product.getId() != null) {
+            throw new DAOException("Cannot insert product: it has arleady an id");
+        }
+
         String query = "INSERT INTO PRODUCTS(name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, product.getName());

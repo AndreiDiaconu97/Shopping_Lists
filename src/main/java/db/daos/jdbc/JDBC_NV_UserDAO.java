@@ -121,6 +121,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Given nv_user is null");
         }
+        
         String query = "INSERT INTO NV_USERS VALUES(?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
