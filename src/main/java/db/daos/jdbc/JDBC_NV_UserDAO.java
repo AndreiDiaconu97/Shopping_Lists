@@ -75,7 +75,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if ("".equals(code) || code == null) {
             throw new DAOException("Given code is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE CODE = ?")) {
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE = ?")) {
             stm.setString(1, code);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToNV_User(rs) : null;

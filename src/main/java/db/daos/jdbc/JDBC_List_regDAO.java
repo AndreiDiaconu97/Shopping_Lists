@@ -60,7 +60,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 return rs.next() ? JDBC_utility.resultSetToList_reg(rs) : null;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the shopping_list for the passed id", ex);
+            throw new DAOException("Impossible to get the list_reg for the passed id", ex);
         }
     }
 
@@ -117,7 +117,8 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         if (list_reg == null) {
             throw new DAOException("list_reg parameter is null");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM PRODUCTS WHERE ID IN (SELECT PRODUCT FROM LISTS_PRODUCTS WHERE LIST = ?)")) {
+        String query = "SELECT * FROM PRODUCTS WHERE ID IN (SELECT PRODUCT FROM LISTS_PRODUCTS WHERE LIST = ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
@@ -179,19 +180,19 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Given list_reg is null");
         }
 
-        Integer reg_userId = list_reg.getId();
-        if (reg_userId == null) {
-            throw new DAOException("Reg_User is not valid", new NullPointerException("Reg_User id is null"));
+        Integer list_regId = list_reg.getId();
+        if (list_regId == null) {
+            throw new DAOException("List_reg is not valid", new NullPointerException("List_reg id is null"));
         }
 
         String query = "UPDATE LISTS SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, OWNER = ?, LOGO = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, list_reg.getName());
-            stm.setString(1, list_reg.getDescription());
-            stm.setString(1, list_reg.getCategory());
-            stm.setInt(1, list_reg.getOwner());
-            stm.setString(1, list_reg.getLogo());
-            stm.setInt(7, list_reg.getId());
+            stm.setString(2, list_reg.getDescription());
+            stm.setString(3, list_reg.getCategory());
+            stm.setInt(4, list_reg.getOwner());
+            stm.setString(5, list_reg.getLogo());
+            stm.setInt(6, list_reg.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {
@@ -199,6 +200,27 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to update the list_reg", ex);
+        }
+    }
+
+    @Override
+    public List<Reg_User> getReg_UsersSharedTo(List_reg list_reg) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("list_reg parameter is null");
+        }
+        String query = "SELECT * FROM REG_USERS WHERE ID IN (SELECT REG_USER FROM LISTS_SHARING WHERE LIST = ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            try (ResultSet rs = stm.executeQuery()) {
+                List<Reg_User> reg_users = new ArrayList<>();
+
+                while (rs.next()) {
+                    reg_users.add(JDBC_utility.resultSetToReg_User(rs));
+                }
+                return reg_users;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the reg_users for the passed list_reg", ex);
         }
     }
 }

@@ -139,5 +139,4 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
             throw new DAOException("Impossible to get the product for the passed id", ex);
         }
     }
-
 }
