@@ -40,7 +40,7 @@ public class JDBC_utility {
 
     public static String secureHash(String password, String salt) {
         // should implement using slow hash function
-        return DigestUtils.sha512Hex(password.concat(salt));
+        return DigestUtils.sha256Hex(password.concat(salt));
     }
 
     public static boolean secureHashEquals(String password, String salt, String hashed) {
@@ -101,7 +101,7 @@ public class JDBC_utility {
         nv_user.setFirstname(rs.getString(("FIRSTNAME")));
         nv_user.setLastname(rs.getString("LASTNAME"));
         nv_user.setAvatar(rs.getString("AVATAR"));
-        nv_user.setCode(rs.getString("CODE"));
+        nv_user.setCode(rs.getString("VERIFICATION_CODE"));
         return nv_user;
     }
 

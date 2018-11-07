@@ -13,14 +13,6 @@
         <url-pattern>/restricted/*</url-pattern>
     </filter-mapping>
     <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>servlets.LogoutServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/logout.handler</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>Shop_list_jsp</servlet-name>
         <jsp-file>/shop_lists.jsp</jsp-file>
     </servlet>

@@ -36,7 +36,7 @@ public class NV_User {
     public NV_User() {
     }
     
-    public NV_User(String email, String password, String firstname, String lastname, String avatar) {
+    public NV_User(String email, String password, String firstname, String lastname, String avatar, String code) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -65,6 +65,7 @@ public class NV_User {
     }
 
     public void setPassword(String password) {
+        // this.salt = create random 200len string
         this.salt = JDBC_utility.randomString(SALT_SIZE);
         this.password = JDBC_utility.secureHash(password, this.salt);
     }
