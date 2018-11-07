@@ -180,20 +180,21 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public String generateCode(int code_size) throws DAOException {
         String code;
-        try (Statement stm = CON.createStatement()) {
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE = ?")) {
             while (true) {
                 code = JDBC_utility.randomString(code_size);
-                try (ResultSet rs = stm.executeQuery("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE = " + code)) {
-                    if (!rs.next()) { // se non trovo elementi con quel code, ritorno
+                stm.setString(1, code);
+                try (ResultSet rs = stm.executeQuery()) {
+                    if (!(rs.next())) { // se non trovo elementi con quel code, ritorno
                         return code;
                     }
                 } catch (SQLException ex) {
-                    System.err.println("FAILED GENERATING CODE, IN QUERY EXEC");
+                    System.err.println("ARE YOU KIDDING ME?! FAILED GENERATING CODE, IN QUERY EXEC:\n" + ex.getMessage());
                     throw ex;
                 }
             }
         } catch (SQLException ex) {
-            throw new DAOException("Failed to generate verification code");
+            throw new DAOException("Failed to generate verification code because of:\n" + ex.getMessage());
         }
     }
 }
