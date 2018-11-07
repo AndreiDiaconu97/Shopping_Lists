@@ -229,6 +229,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.setString(4, reg_user.getLastname());
             stm.setBoolean(5, reg_user.getIs_admin());
             stm.setString(6, reg_user.getAvatar());
+            stm.setInt(7, reg_user.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

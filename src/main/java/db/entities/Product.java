@@ -11,8 +11,10 @@ package db.entities;
  */
 public class Product {
 
-    private PrimaryKey primaryKey;
     private Integer id;
+    private String name;
+    private String category;
+    private Integer creator;
     private String description;
     private String logo;
     private String photo;
@@ -21,27 +23,27 @@ public class Product {
     private Boolean is_public;
 
     public String getName() {
-        return primaryKey.getName();
+        return name;
     }
 
     public void setName(String name) {
-        this.primaryKey.setName(name);
+        this.name = name;
     }
 
     public String getCategory() {
-        return primaryKey.getCategory();
+        return category;
     }
 
     public void setCategory(String category) {
-        this.primaryKey.setCategory(category);
+        this.category = category;
     }
 
-    public String getCreator() {
-        return primaryKey.getCreator();
+    public Integer getCreator() {
+        return creator;
     }
 
-    public void setCreator(String creator) {
-        this.primaryKey.setCreator(creator);
+    public void setCreator(Integer creator) {
+        this.creator = creator;
     }
 
     public Integer getId() {
@@ -100,34 +102,4 @@ public class Product {
         this.is_public = is_public;
     }
 
-    public class PrimaryKey {
-
-        private String name;
-        private String category;
-        private String creator;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getCategory() {
-            return category;
-        }
-
-        public void setCategory(String category) {
-            this.category = category;
-        }
-
-        public String getCreator() {
-            return creator;
-        }
-
-        public void setCreator(String creator) {
-            this.creator = creator;
-        }
-    }
 }

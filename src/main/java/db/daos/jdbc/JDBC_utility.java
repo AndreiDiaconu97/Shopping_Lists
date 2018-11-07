@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -24,23 +26,23 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class JDBC_utility {
 
-    private static final String symbols = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";   
-    private static final Random random = new SecureRandom();
+    private static final String SYMBOLS = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";
+    private static final Random RANDOM = new SecureRandom();
 
     public static String randomString(int length) {
         char buf[] = new char[length];
         for (int idx = 0; idx < buf.length; ++idx) {
-            buf[idx] = symbols.charAt(random.nextInt(symbols.length()));
+            buf[idx] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
         }
         return new String(buf);
     }
-    
-    public static String secureHash(String password, String salt){
+
+    public static String secureHash(String password, String salt) {
         // should implement using slow hash function
         return DigestUtils.sha512Hex(password.concat(salt));
     }
-    
-    public static boolean secureHashEquals(String password, String salt, String hashed){
+
+    public static boolean secureHashEquals(String password, String salt, String hashed) {
         return hashed.equals(DigestUtils.sha512Hex(password.concat(salt)));
     }
 
@@ -68,7 +70,7 @@ public class JDBC_utility {
     public static Product resultSetToProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
         product.setCategory(rs.getString("CATEGORY"));
-        product.setCreator(rs.getString("CREATOR"));
+        product.setCreator(rs.getInt("CREATOR"));
         product.setDescription(rs.getString("DESCRIPTION"));
         product.setId(rs.getInt("ID"));
         product.setIs_public(rs.getBoolean("IS_PUBLIC"));
@@ -101,4 +103,5 @@ public class JDBC_utility {
         nv_user.setCode(rs.getString("CODE"));
         return nv_user;
     }
+
 }

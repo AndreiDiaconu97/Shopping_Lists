@@ -67,7 +67,7 @@ public class RegistrationServlet extends HttpServlet {
                 // already registered, need verification
                 response.sendRedirect(contextPath + "registration.html?needToVerify=true");
             } else {
-                NV_User nv_user = new NV_User(email, password, firstname, lastname, nv_userDao.generateCode(NV_User.getCode_size()));
+                NV_User nv_user = new NV_User(email, password, firstname, lastname, nv_userDao.generateCode(NV_User.getCODE_SIZE()));
                 // send email with code
             }
         } catch(DAOException ex){
