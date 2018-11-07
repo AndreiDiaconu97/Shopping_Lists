@@ -85,6 +85,7 @@ public class AuthenticationServlet extends HttpServlet {
         if (request.getParameter("login") != null) {
 
         } else if (request.getParameter("register") != null) {
+            System.err.println("REGISTERING YOZA");
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String firstname = request.getParameter("firstname");

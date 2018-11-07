@@ -29,14 +29,6 @@
         <url-pattern>/logout.handler</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>RegistrationServlet</servlet-name>
-        <servlet-class>servlets.RegistrationServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>RegistrationServlet</servlet-name>
-        <url-pattern>/registration.handler</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>Shop_list_jsp</servlet-name>
         <jsp-file>/shop_lists.jsp</jsp-file>
     </servlet>
@@ -64,7 +56,6 @@
         <description>ServletContextListener</description>
         <listener-class>listeners.WebAppContextListener</listener-class>
     </listener>
-    
     <session-config>
         <session-timeout>
             30
