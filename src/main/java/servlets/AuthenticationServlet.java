@@ -119,7 +119,7 @@ public class AuthenticationServlet extends HttpServlet {
                     // already registered, need verification
                     response.sendRedirect(contextPath + "registration.html?needToVerify=true");
                 } else {
-                    String code = nv_userDao.generateCode(NV_User.getCode_size());
+                    String code = nv_userDao.generateCode(NV_User.getCODE_SIZE());
                     NV_User nv_user = new NV_User(email, password, firstname, lastname, code);
                     try {
                         nv_userDao.insert(nv_user);
