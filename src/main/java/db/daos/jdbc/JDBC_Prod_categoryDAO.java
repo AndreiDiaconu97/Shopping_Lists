@@ -6,10 +6,14 @@
 package db.daos.jdbc;
 
 import db.daos.Prod_categoryDAO;
-import static db.daos.jdbc.JDBC_utility.getCountFor;
+import static db.daos.jdbc.JDBC_utility.*;
 import db.entities.Prod_category;
 import db.exceptions.DAOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,12 +28,12 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
 
     @Override
     public Long getCount() throws DAOException {
-        return getCountFor("PRODUCTS_CATEGORIES", CON);
+        return getCountFor(P_CAT_TABLE, CON);
     }
 
     @Override
     public List<Prod_category> getAll() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getAllFor(P_CAT_TABLE, CON, Prod_category.class);
     }
 
     @Override

@@ -11,12 +11,14 @@ import db.entities.Reg_User;
 import db.entities.List_reg;
 import db.entities.List_anonymous;
 import db.entities.List_category;
+import db.entities.Prod_category;
 import db.exceptions.DAOException;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -26,6 +28,18 @@ import org.apache.commons.codec.digest.DigestUtils;
  * @author Andrei Diaconu
  */
 public class JDBC_utility {
+
+    /// ALL TABLES OF THE DATABASE ///
+    public static final String L_TABLE = "LISTS";
+    public static final String L_ANONYM_TABLE = "LISTS_ANONYMOUS";
+    public static final String L_ANONYM_P_TABLE = "LISTS_ANONYMOUS_PRODUCTS";
+    public static final String L_CAT_TABLE = "LISTS_CATEGORIES";
+    public static final String L_P_TABLE = "LISTS_PRODUCTS";
+    public static final String L_SHARING_TABLE = "LISTS_SHARING";
+    public static final String U_NV_TABLE = "NV_USERS";
+    public static final String U_REG_TABLE = "REG_USERS";
+    public static final String P_TABLE = "PRODUCTS";
+    public static final String P_CAT_TABLE = "PRODUCTS_CATEGORIES";
 
     private static final String SYMBOLS = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";
     private static final Random RANDOM = new SecureRandom();
@@ -54,6 +68,49 @@ public class JDBC_utility {
             return rs.next() ? rs.getLong(1) : 0L;
         } catch (SQLException ex) {
             throw new DAOException("Impossible to count " + table + " elements", ex);
+        }
+    }
+
+    public static <T> List<T> getAllFor(String table, Connection con, Class<T> returnType) throws DAOException { // should be tested
+        try (PreparedStatement stm = con.prepareStatement("SELECT * FROM ?")) {
+            stm.setString(1, table);
+            try (ResultSet rs = stm.executeQuery()) {
+                List<T> Tlist = new ArrayList<>();
+                if (returnType == List_anonymous.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToList_anonymous(rs));
+                    }
+                } else if (returnType == List_category.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToList_category(rs));
+                    }
+                } else if (returnType == List_reg.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToList_reg(rs));
+                    }
+                } else if (returnType == NV_User.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToNV_User(rs));
+                    }
+                } else if (returnType == Prod_category.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToProd_category(rs));
+                    }
+                } else if (returnType == Product.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToProduct(rs));
+                    }
+                } else if (returnType == Reg_User.class) {
+                    while (rs.next()) {
+                        Tlist.add((T) resultSetToReg_User(rs));
+                    }
+                } else {
+                    throw new Error("Invalid class of argument!");
+                }
+                return Tlist;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get all the elements of" + table + " table.", ex);
         }
     }
 
@@ -122,5 +179,13 @@ public class JDBC_utility {
         list_category.setLogo(rs.getString("LOGO"));
         list_category.setName(rs.getString("NAME"));
         return list_category;
+    }
+
+    public static Prod_category resultSetToProd_category(ResultSet rs) throws SQLException {
+        Prod_category prod_category = new Prod_category();
+        prod_category.setDescription(rs.getString("DESCRIPTION"));
+        prod_category.setLogo(rs.getString("LOGO"));
+        prod_category.setName(rs.getString("NAME"));
+        return prod_category;
     }
 }

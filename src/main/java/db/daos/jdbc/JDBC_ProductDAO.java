@@ -6,8 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.ProductDAO;
-import static db.daos.jdbc.JDBC_utility.getCountFor;
-import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
+import static db.daos.jdbc.JDBC_utility.*;
 import db.entities.Product;
 import db.exceptions.DAOException;
 import java.sql.Connection;
@@ -29,22 +28,12 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public Long getCount() throws DAOException {
-        return getCountFor("PRODUCTS", CON);
+        return getCountFor(P_TABLE, CON);
     }
 
     @Override
     public List<Product> getAll() throws DAOException {
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM PRODUCTS")) {
-            try (ResultSet rs = stm.executeQuery()) {
-                List<Product> products = new ArrayList<>();
-                while (rs.next()) {
-                    products.add(resultSetToProduct(rs));
-                }
-                return products;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get all the products", ex);
-        }
+        return getAllFor(P_TABLE, CON, Product.class);
     }
 
     @Override
@@ -56,17 +45,18 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
             throw new DAOException("Cannot insert product: it has arleady an id");
         }
 
-        String query = "INSERT INTO PRODUCTS(name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO ?(name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, product.getName());
-            stm.setString(1, product.getDescription());
-            stm.setString(1, product.getCategory());
-            stm.setInt(1, product.getCreator());
-            stm.setBoolean(1, product.getIs_public());
-            stm.setString(1, product.getLogo());
-            stm.setString(1, product.getPhoto());
-            stm.setInt(1, product.getNum_votes());
-            stm.setFloat(1, product.getRating());
+            stm.setString(1, P_TABLE);
+            stm.setString(2, product.getName());
+            stm.setString(3, product.getDescription());
+            stm.setString(4, product.getCategory());
+            stm.setInt(5, product.getCreator());
+            stm.setBoolean(6, product.getIs_public());
+            stm.setString(7, product.getLogo());
+            stm.setString(8, product.getPhoto());
+            stm.setInt(9, product.getNum_votes());
+            stm.setFloat(10, product.getRating());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -83,9 +73,10 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (product == null) {
             throw new DAOException("Given product is null");
         }
-        String query = "DELETE FROM PRODUCTS WHERE ID = ?";
+        String query = "DELETE FROM ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setInt(1, product.getId());
+            stm.setString(1, P_TABLE);
+            stm.setInt(2, product.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove product", ex);
@@ -103,18 +94,19 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
             throw new DAOException("Product is not valid", new NullPointerException("Product id is null"));
         }
 
-        String query = "UPDATE PRODUCTS SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, IS_PUBLIC = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
+        String query = "UPDATE ? SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, IS_PUBLIC = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, product.getName());
-            stm.setString(1, product.getDescription());
-            stm.setString(1, product.getCategory());
-            stm.setInt(1, product.getCreator());
-            stm.setBoolean(1, product.getIs_public());
-            stm.setString(1, product.getLogo());
-            stm.setString(1, product.getPhoto());
-            stm.setInt(1, product.getNum_votes());
-            stm.setFloat(1, product.getRating());
-            stm.setInt(1, product.getId());
+            stm.setString(1, P_TABLE);
+            stm.setString(2, product.getName());
+            stm.setString(3, product.getDescription());
+            stm.setString(4, product.getCategory());
+            stm.setInt(5, product.getCreator());
+            stm.setBoolean(6, product.getIs_public());
+            stm.setString(7, product.getLogo());
+            stm.setString(8, product.getPhoto());
+            stm.setInt(9, product.getNum_votes());
+            stm.setFloat(10, product.getRating());
+            stm.setInt(11, product.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {
@@ -130,8 +122,9 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (id == null) {
             throw new DAOException("Given id is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM PRODUCTS WHERE ID = ?")) {
-            stm.setInt(1, id);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE ID = ?")) {
+            stm.setString(1, P_TABLE);
+            stm.setInt(2, id);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToProduct(rs) : null;
             }
