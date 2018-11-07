@@ -74,7 +74,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if ("".equals(code) || code == null) {
             throw new DAOException("Given code is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE CODE = ?")) {
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE = ?")) {
             stm.setString(1, code);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToNV_User(rs) : null;
@@ -90,14 +90,15 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Passed verification code is invalid");
         }
-        String query = "INSERT INTO REG_USERS(email, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO REG_USERS(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
             stm.setString(2, nv_user.getPassword());
-            stm.setString(3, nv_user.getFirstname());
-            stm.setString(4, nv_user.getLastname());
-            stm.setBoolean(5, false);
-            stm.setString(6, nv_user.getAvatar());
+            stm.setString(3, nv_user.getSalt());
+            stm.setString(4, nv_user.getFirstname());
+            stm.setString(5, nv_user.getLastname());
+            stm.setBoolean(6, false);
+            stm.setString(7, nv_user.getAvatar());
             stm.executeUpdate();
             delete(nv_user);
         } catch (SQLException ex) {
@@ -118,18 +119,22 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public void insert(NV_User nv_user) throws DAOException {
         if (nv_user == null) {
+            System.err.println("Tryed to insert null user");
             throw new DAOException("Given nv_user is null");
         }
-        String query = "INSERT INTO NV_USERS VALUES(?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO NV_USERS(email, password, salt, firstname, lastname, avatar, verification_code) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
             stm.setString(2, nv_user.getPassword());
-            stm.setString(3, nv_user.getFirstname());
-            stm.setString(4, nv_user.getLastname());
-            stm.setString(5, nv_user.getAvatar());
-            stm.setString(6, nv_user.getCode());
+            stm.setString(3, nv_user.getSalt());
+            stm.setString(4, nv_user.getFirstname());
+            stm.setString(5, nv_user.getLastname());
+            stm.setString(6, nv_user.getAvatar());
+            stm.setString(7, nv_user.getCode());
             stm.executeUpdate();
         } catch (SQLException ex) {
+            System.err.println(ex.toString());
+            System.err.println(ex.getMessage());
             throw new DAOException("Impossible to add nv_user to DB", ex);
         }
     }
@@ -142,7 +147,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         String query = "DELETE FROM NV_USERS WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, nv_user.getEmail());
-            stm.executeQuery();
+            stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove nv_user", ex);
         }
@@ -174,7 +179,7 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public String generateCode(int code_size) throws DAOException {
         String code;
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE=?")) {
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE= ? ")) {
             while (true) {
                 code = JDBC_utility.randomString(code_size);
                 stm.setString(1, code); 

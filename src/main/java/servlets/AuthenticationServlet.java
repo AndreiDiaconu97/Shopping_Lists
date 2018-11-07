@@ -81,12 +81,31 @@ public class AuthenticationServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String contextPath = getServletContext().getContextPath();
+        if (!contextPath.endsWith("/")) {
+            contextPath += "/";
+        }
+
+        if (request.getParameter("validate") != null) {
+            String code = request.getParameter("code");
+            try {
+                nv_userDao.validateUsingCode(code);
+            } catch (DAOException ex) {
+                request.getServletContext().log("Unable to validate user", ex);
+            }
+        } else {
+            // bad request
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
         }
-        
+
         // LOGOUT
         if (request.getParameter("logout") != null) {
             HttpSession session = request.getSession(false);
@@ -102,8 +121,8 @@ public class AuthenticationServlet extends HttpServlet {
             if (!response.isCommitted()) {
                 response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
             }
-            
-        // REGISTER  
+
+            // REGISTER  
         } else if (request.getParameter("register") != null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
@@ -119,16 +138,18 @@ public class AuthenticationServlet extends HttpServlet {
                     // already registered, need verification
                     response.sendRedirect(contextPath + "registration.html?needToVerify=true");
                 } else {
+                    System.err.println("ACTUALY REG " + email);
                     String code = nv_userDao.generateCode(NV_User.getCode_size());
-                    NV_User nv_user = new NV_User(email, password, firstname, lastname, code);
+                    NV_User nv_user = new NV_User(email, password, firstname, lastname, null, code);
                     try {
                         nv_userDao.insert(nv_user);
                     } catch (DAOException ex) {
                         request.getServletContext().log("Impossible to register user");
+                        System.err.println("Impossible to register user");
                     }
                     // send email with code
 
-                    String message = "http://localhost:8084/auth?validate=true&code=" + code;
+                    String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code;
                     System.err.println("Message is: " + message);
 
                     Message msg = new MimeMessage(session);
@@ -147,8 +168,8 @@ public class AuthenticationServlet extends HttpServlet {
                 request.getServletContext().log("Impossible to check if user is already registered", ex);
             }
             System.err.println("REGISTERED " + email);
-            
-        // LOGIN
+
+            // LOGIN
         } else if (request.getParameter("login") != null) {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
@@ -178,17 +199,8 @@ public class AuthenticationServlet extends HttpServlet {
             } catch (DAOException ex) {
                 request.getServletContext().log("Impossible to retrieve the user", ex);
             }
-            
-        // VALIDATE
-        } else if (request.getParameter("validate") != null) {
-            String code = request.getParameter("code");
-            try {
-                nv_userDao.validateUsingCode(code);
-            } catch (DAOException ex) {
-                request.getServletContext().log("Unable to validate user", ex);
-            }
-            
-        // CHANGE PASSWORD
+
+            // CHANge PASSWORD
         } else if (request.getParameter("changepsw") != null) {
 
         } else {
