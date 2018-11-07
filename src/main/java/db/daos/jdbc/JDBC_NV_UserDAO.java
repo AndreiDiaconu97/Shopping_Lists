@@ -41,9 +41,8 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if ("".equals(email) || email == null) {
             throw new DAOException("Given email is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE EMAIL = ?")) {
-            stm.setString(1, U_NV_TABLE);
-            stm.setString(2, email);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + U_NV_TABLE + " WHERE EMAIL = ?")) {
+            stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToNV_User(rs) : null;
             }
@@ -62,9 +61,8 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if ("".equals(code) || code == null) {
             throw new DAOException("Given code is empty");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE VERIFICATION_CODE = ?")) {
-            stm.setString(1, U_NV_TABLE);
-            stm.setString(2, code);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + U_NV_TABLE + " WHERE VERIFICATION_CODE = ?")) {
+            stm.setString(1, code);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToNV_User(rs) : null;
             }
@@ -79,26 +77,24 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Passed verification code is invalid");
         }
-        String query = "INSERT INTO ?(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_REG_TABLE + "(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, nv_user.getEmail());
-            stm.setString(3, nv_user.getPassword());
-            stm.setString(4, nv_user.getSalt());
-            stm.setString(5, nv_user.getFirstname());
-            stm.setString(6, nv_user.getLastname());
-            stm.setBoolean(7, false);
-            stm.setString(8, nv_user.getAvatar());
+            stm.setString(1, nv_user.getEmail());
+            stm.setString(2, nv_user.getPassword());
+            stm.setString(3, nv_user.getSalt());
+            stm.setString(4, nv_user.getFirstname());
+            stm.setString(5, nv_user.getLastname());
+            stm.setBoolean(6, false);
+            stm.setString(7, nv_user.getAvatar());
             stm.executeUpdate();
             delete(nv_user);
         } catch (SQLException ex) {
             throw new DAOException("Impossible to validate nv_user", ex);
         }
 
-        query = "SELECT * FROM ? WHERE EMAIL = ?";
+        query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, nv_user.getEmail());
+            stm.setString(1, nv_user.getEmail());
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToReg_User(rs) : null;
             }
@@ -113,16 +109,15 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
             System.err.println("Tried to insert null user");
             throw new DAOException("Given nv_user is null");
         }
-        String query = "INSERT INTO ?(email, password, salt, firstname, lastname, avatar, verification_code) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_NV_TABLE + "(email, password, salt, firstname, lastname, avatar, verification_code) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_NV_TABLE);
-            stm.setString(2, nv_user.getEmail());
-            stm.setString(3, nv_user.getPassword());
-            stm.setString(4, nv_user.getSalt());
-            stm.setString(5, nv_user.getFirstname());
-            stm.setString(6, nv_user.getLastname());
-            stm.setString(7, nv_user.getAvatar());
-            stm.setString(8, nv_user.getCode());
+            stm.setString(1, nv_user.getEmail());
+            stm.setString(2, nv_user.getPassword());
+            stm.setString(3, nv_user.getSalt());
+            stm.setString(4, nv_user.getFirstname());
+            stm.setString(5, nv_user.getLastname());
+            stm.setString(6, nv_user.getAvatar());
+            stm.setString(7, nv_user.getCode());
             stm.executeUpdate();
         } catch (SQLException ex) {
             System.err.println(ex.toString());
@@ -136,10 +131,9 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Given nv_user is null");
         }
-        String query = "DELETE FROM ? WHERE EMAIL = ?";
+        String query = "DELETE FROM " + U_NV_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_NV_TABLE);
-            stm.setString(2, nv_user.getEmail());
+            stm.setString(1, nv_user.getEmail());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove nv_user", ex);
@@ -151,15 +145,14 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
         if (nv_user == null) {
             throw new DAOException("Given nv_user is null");
         }
-        String query = "UPDATE ? SET PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, AVATAR = ?, VERIFICATION_CODE = ? WHERE EMAIL = ?";
+        String query = "UPDATE " + U_NV_TABLE + " SET PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, AVATAR = ?, VERIFICATION_CODE = ? WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_NV_TABLE);
-            stm.setString(2, nv_user.getPassword());
-            stm.setString(3, nv_user.getFirstname());
-            stm.setString(4, nv_user.getLastname());
-            stm.setString(5, nv_user.getAvatar());
-            stm.setString(6, nv_user.getCode());
-            stm.setString(7, nv_user.getEmail());
+            stm.setString(1, nv_user.getPassword());
+            stm.setString(2, nv_user.getFirstname());
+            stm.setString(3, nv_user.getLastname());
+            stm.setString(4, nv_user.getAvatar());
+            stm.setString(5, nv_user.getCode());
+            stm.setString(6, nv_user.getEmail());
 
             int count = stm.executeUpdate();
             if (count != 1) {
@@ -173,11 +166,10 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public String generateCode(int code_size) throws DAOException {
         String code;
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE VERIFICATION_CODE = ?")) {
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + U_NV_TABLE + " WHERE VERIFICATION_CODE = ?")) {
             while (true) {
                 code = JDBC_utility.randomString(code_size);
-                stm.setString(1, U_NV_TABLE);
-                stm.setString(2, code);
+                stm.setString(1, code);
                 try (ResultSet rs = stm.executeQuery()) {
                     if (!(rs.next())) { // se non trovo elementi con quel code, ritorno
                         return code;

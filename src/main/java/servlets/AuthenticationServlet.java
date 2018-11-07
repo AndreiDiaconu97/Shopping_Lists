@@ -61,7 +61,7 @@ public class AuthenticationServlet extends HttpServlet {
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for nv_user", ex);
         }
-        System.err.println("AUTH SERVLET ALMOST INITIALIZED");
+        super.getServletContext().log("AUTH SERVLET ALMOST INITIALIZED");
         props = System.getProperties();
         props.setProperty("mail.smtp.host", m_host);
         props.setProperty("mail.smtp.port", m_port);
@@ -69,7 +69,7 @@ public class AuthenticationServlet extends HttpServlet {
         props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.setProperty("mail.smtp.auth", "true");
         props.setProperty("mail.smtp.starttls.enable", "true");
-        props.setProperty("mail.debug", "true");
+        //props.setProperty("mail.debug", "true");
 
         session = Session.getInstance(props, new Authenticator() {
             @Override
@@ -77,7 +77,7 @@ public class AuthenticationServlet extends HttpServlet {
                 return new PasswordAuthentication(m_username, m_password);
             }
         });
-        System.err.println("AUTH SERVLET INITIALIZED");
+        super.getServletContext().log("AUTH SERVLET INITIALIZED");
     }
 
     @Override
@@ -93,7 +93,9 @@ public class AuthenticationServlet extends HttpServlet {
                 nv_userDao.validateUsingCode(code);
             } catch (DAOException ex) {
                 request.getServletContext().log("Unable to validate user", ex);
+                return;
             }
+            request.getServletContext().log("Validated user");
         } else {
             // bad request
         }
@@ -128,7 +130,7 @@ public class AuthenticationServlet extends HttpServlet {
             String password = request.getParameter("password");
             String firstname = request.getParameter("firstname");
             String lastname = request.getParameter("lastname");
-            System.err.println("REGISTERING " + email);
+            request.getServletContext().log("REGISTERING " + email);
             // email and password can't be empty because input is "required"
             try {
                 if (reg_userDao.getByEmail(email) != null) {
@@ -138,18 +140,19 @@ public class AuthenticationServlet extends HttpServlet {
                     // already registered, need verification
                     response.sendRedirect(contextPath + "registration.html?needToVerify=true");
                 } else {
-                    String code = nv_userDao.generateCode(NV_User.getCODE_SIZE());
-                    NV_User nv_user = new NV_User(email, password, firstname, lastname, null, code);
+                    NV_User nv_user = new NV_User(email, password, firstname, lastname, null);
+                    String code = nv_user.getCode();
                     try {
                         nv_userDao.insert(nv_user);
                     } catch (DAOException ex) {
                         request.getServletContext().log("Impossible to register user");
-                        System.err.println("Impossible to register user");
+                        return;
                     }
                     // send email with code
 
-                    String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code;
-                    System.err.println("Message is: " + message);
+                    String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code + 
+                            "\n\nYour pass is: " + password;
+                    request.getServletContext().log("Message is: " + message);
 
                     Message msg = new MimeMessage(session);
                     try {
@@ -166,7 +169,7 @@ public class AuthenticationServlet extends HttpServlet {
             } catch (DAOException ex) {
                 request.getServletContext().log("Impossible to check if user is already registered", ex);
             }
-            System.err.println("REGISTERED " + email);
+            request.getServletContext().log("REGISTERED " + email);
 
             // LOGIN
         } else if (request.getParameter("login") != null) {
@@ -180,10 +183,13 @@ public class AuthenticationServlet extends HttpServlet {
 
                     if (reg_userDao.getByEmail(email) != null) {
                         // wrong password
+                        System.err.println("WRONG PASSWORD");
                     } else if (nv_userDao.getByEmail(email) != null) {
                         // need to verify
+                        System.err.println("NEED TO VERIFY");
                     } else {
                         // need to register
+                        System.err.println("NEED TO REGISTER");
                     }
 
                     //response.sendRedirect(response.encodeRedirectURL(contextPath + "login.handler"));

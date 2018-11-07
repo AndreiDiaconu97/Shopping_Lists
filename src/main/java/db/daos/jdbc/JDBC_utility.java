@@ -54,11 +54,16 @@ public class JDBC_utility {
 
     public static String secureHash(String password, String salt) {
         // should implement using slow hash function
+        System.err.println("pass h: " + DigestUtils.sha256Hex(password.concat(salt)));
+        System.err.println("Salt  : " + salt);
         return DigestUtils.sha256Hex(password.concat(salt));
     }
 
     public static boolean secureHashEquals(String password, String salt, String hashed) {
-        return hashed.equals(DigestUtils.sha512Hex(password.concat(salt)));
+        System.err.println("Hashed: " + hashed);
+        System.err.println("pass h: " + DigestUtils.sha256Hex(password.concat(salt)));
+        System.err.println("Salt  : " + salt);
+        return hashed.equals(DigestUtils.sha256Hex(password.concat(salt)));
     }
 
     public static Long getCountFor(String table, Connection con) throws DAOException {
@@ -116,6 +121,8 @@ public class JDBC_utility {
         Reg_User reg_user = new Reg_User();
         reg_user.setId(rs.getInt("ID"));
         reg_user.setEmail(rs.getString("EMAIL"));
+        reg_user.setPassword(rs.getString("PASSWORD"));
+        reg_user.setSalt(rs.getString("SALT"));
         reg_user.setFirstname(rs.getString(("FIRSTNAME")));
         reg_user.setLastname(rs.getString("LASTNAME"));
         reg_user.setAvatar(rs.getString("AVATAR"));
@@ -153,6 +160,7 @@ public class JDBC_utility {
         NV_User nv_user = new NV_User();
         nv_user.setEmail(rs.getString("EMAIL"));
         nv_user.setPassword(rs.getString("PASSWORD"));
+        nv_user.setSalt(rs.getString("SALT"));
         nv_user.setFirstname(rs.getString(("FIRSTNAME")));
         nv_user.setLastname(rs.getString("LASTNAME"));
         nv_user.setAvatar(rs.getString("AVATAR"));

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
 import db.entities.List_reg;
+import java.sql.Statement;
 
 /**
  *
@@ -51,11 +52,30 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (msg.length() > 1) {
             throw new DAOException(msg);
         }
-        String query = "SELECT * FROM ? WHERE EMAIL = ? AND PASSWORD = ?";
+        
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = '" + email + "'";
+        String salt;
+        String hashed_psw;
+        try (Statement stm = CON.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(query)) {
+                if (rs.next()) {
+                    salt = rs.getString("SALT");
+                    hashed_psw = rs.getString("PASSWORD");
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the user for the passed email and password", ex);
+        }
+
+        if (!JDBC_utility.secureHashEquals(password, salt, hashed_psw)) {
+            System.err.println("HASH IS DIFFERENT");
+            return null;
+        }
+        query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, email);
-            stm.setString(3, password);
+            stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToReg_User(rs) : null;
             }
@@ -69,10 +89,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (id == null) {
             throw new DAOException("Given id is empty");
         }
-        String query = "SELECT * FROM ? WHERE ID = ?";
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setInt(2, id);
+            stm.setInt(1, id);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToReg_User(rs) : null;
             }
@@ -86,10 +105,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if ("".equals(email) || email == null) {
             throw new DAOException("Given email is empty");
         }
-        String query = "SELECT * FROM ? WHERE EMAIL = ?";
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, email);
+            stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToReg_User(rs) : null;
             }
@@ -103,10 +121,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM ? WHERE CREATOR = ?";
+        String query = "SELECT * FROM " + P_TABLE + " WHERE CREATOR = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, P_TABLE);
-            stm.setInt(2, reg_user.getId());
+            stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
                 while (rs.next()) {
@@ -124,10 +141,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM ? WHERE OWNER = ?";
+        String query = "SELECT * FROM " + L_TABLE + " WHERE OWNER = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_TABLE);
-            stm.setInt(2, reg_user.getId());
+            stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
@@ -145,11 +161,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM ? WHERE ID IN (SELECT LIST FROM ? WHERE REG_USER = ?)";
+        String query = "SELECT * FROM " + L_TABLE + " WHERE ID IN (SELECT LIST FROM " + L_SHARING_TABLE + " WHERE REG_USER = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_TABLE);
-            stm.setString(2, L_SHARING_TABLE);
-            stm.setInt(3, reg_user.getId());
+            stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
@@ -171,16 +185,15 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Cannot insert reg_user: it has arleady an id");
         }
 
-        String query = "INSERT INTO ?(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_REG_TABLE + "(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, reg_user.getEmail());
-            stm.setString(3, reg_user.getPassword());
-            stm.setString(4, reg_user.getSalt());
-            stm.setString(5, reg_user.getFirstname());
-            stm.setString(6, reg_user.getLastname());
-            stm.setBoolean(7, reg_user.getIs_admin());
-            stm.setString(8, reg_user.getAvatar());
+            stm.setString(1, reg_user.getEmail());
+            stm.setString(2, reg_user.getPassword());
+            stm.setString(3, reg_user.getSalt());
+            stm.setString(4, reg_user.getFirstname());
+            stm.setString(5, reg_user.getLastname());
+            stm.setBoolean(6, reg_user.getIs_admin());
+            stm.setString(7, reg_user.getAvatar());
             stm.executeUpdate();
 
             // This should avoid using an extra query for id retrieving
@@ -199,10 +212,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "DELETE FROM ? WHERE ID = ?";
+        String query = "DELETE FROM " + U_REG_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setInt(2, reg_user.getId());
+            stm.setInt(1, reg_user.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove reg_user", ex);
@@ -220,16 +232,15 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Reg_User is not valid", new NullPointerException("Reg_User id is null"));
         }
 
-        String query = "UPDATE ? SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
+        String query = "UPDATE " + U_REG_TABLE + " SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, U_REG_TABLE);
-            stm.setString(2, reg_user.getEmail());
-            stm.setString(3, reg_user.getPassword());
-            stm.setString(4, reg_user.getFirstname());
-            stm.setString(5, reg_user.getLastname());
-            stm.setBoolean(6, reg_user.getIs_admin());
-            stm.setString(7, reg_user.getAvatar());
-            stm.setInt(8, reg_user.getId());
+            stm.setString(1, reg_user.getEmail());
+            stm.setString(2, reg_user.getPassword());
+            stm.setString(3, reg_user.getFirstname());
+            stm.setString(4, reg_user.getLastname());
+            stm.setBoolean(5, reg_user.getIs_admin());
+            stm.setString(6, reg_user.getAvatar());
+            stm.setInt(7, reg_user.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {
