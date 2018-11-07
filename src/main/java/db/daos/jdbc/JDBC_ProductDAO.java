@@ -7,7 +7,6 @@ package db.daos.jdbc;
 
 import db.daos.ProductDAO;
 import static db.daos.jdbc.JDBC_utility.getCountFor;
-import static db.daos.jdbc.JDBC_utility.resultSetToNV_User;
 import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
 import db.entities.Product;
 import db.exceptions.DAOException;

@@ -7,7 +7,7 @@ package db.daos;
 
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shop_list;
+import db.entities.List_reg;
 import db.exceptions.DAOException;
 import java.util.List;
 
@@ -23,8 +23,8 @@ public interface Reg_UserDAO extends DAO<Reg_User, Integer> {
 
     public List<Product> getProductsCreated(Reg_User reg_user) throws DAOException;
 
-    public List<Shop_list> getOwningShopLists(Reg_User reg_user) throws DAOException;
+    public List<List_reg> getOwningShopLists(Reg_User reg_user) throws DAOException;
 
-    public List<Shop_list> getShopLists(Reg_User reg_user) throws DAOException;
+    public List<List_reg> getShopLists(Reg_User reg_user) throws DAOException;
 
 }

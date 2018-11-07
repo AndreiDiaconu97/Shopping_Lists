@@ -9,10 +9,8 @@ import db.daos.Reg_UserDAO;
 import static db.daos.jdbc.JDBC_utility.getCountFor;
 import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
 import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
-import static db.daos.jdbc.JDBC_utility.resultSetToShopping_list;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shop_list;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
+import db.entities.List_reg;
 
 /**
  *
@@ -129,7 +129,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
     }
 
     @Override
-    public List<Shop_list> getOwningShopLists(Reg_User reg_user) throws DAOException {
+    public List<List_reg> getOwningShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -138,9 +138,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.setInt(1, reg_user.getId());
 
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shop_list> shopping_lists = new ArrayList<>();
+                List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToList_reg(rs));
                 }
                 return shopping_lists;
             }
@@ -150,7 +150,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
     }
 
     @Override
-    public List<Shop_list> getShopLists(Reg_User reg_user) throws DAOException {
+    public List<List_reg> getShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -158,9 +158,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shop_list> shopping_lists = new ArrayList<>();
+                List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToList_reg(rs));
                 }
                 return shopping_lists;
             }

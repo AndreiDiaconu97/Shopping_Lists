@@ -11,21 +11,21 @@ import java.sql.Timestamp;
  *
  * @author Andrei Diaconu
  */
-public class Shop_list_NR {
+public class List_anonymous {
 
-    private Integer ID;
+    private Integer id;
     private String name;
     private String description;
-    private String image;
+    private String logo;
     private String category;
     private Timestamp last_seen;
 
-    public Integer getID() {
-        return ID;
+    public Integer getId() {
+        return id;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -44,12 +44,12 @@ public class Shop_list_NR {
         this.description = description;
     }
 
-    public String getImage() {
-        return image;
+    public String getLogo() {
+        return logo;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public String getCategory() {
