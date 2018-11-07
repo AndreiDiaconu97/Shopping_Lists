@@ -10,6 +10,7 @@ import db.entities.Product;
 import db.entities.Reg_User;
 import db.entities.List_reg;
 import db.entities.List_anonymous;
+import db.entities.List_category;
 import db.exceptions.DAOException;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -115,4 +116,11 @@ public class JDBC_utility {
         return list_anonymous;
     }
 
+    public static List_category resultSetToList_category(ResultSet rs) throws SQLException {
+        List_category list_category = new List_category();
+        list_category.setDescription(rs.getString("DESCRIPTION"));
+        list_category.setLogo(rs.getString("LOGO"));
+        list_category.setName(rs.getString("NAME"));
+        return list_category;
+    }
 }
