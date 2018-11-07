@@ -6,9 +6,7 @@
 package db.daos.jdbc;
 
 import db.daos.Reg_UserDAO;
-import static db.daos.jdbc.JDBC_utility.getCountFor;
-import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
-import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
+import static db.daos.jdbc.JDBC_utility.*;
 import db.entities.Product;
 import db.entities.Reg_User;
 import db.exceptions.DAOException;
@@ -34,22 +32,12 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
 
     @Override
     public Long getCount() throws DAOException {
-        return getCountFor("REG_USERS", CON);
+        return getCountFor(U_REG_TABLE, CON);
     }
 
     @Override
     public List<Reg_User> getAll() throws DAOException {
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM REG_USERS")) {
-            try (ResultSet rs = stm.executeQuery()) {
-                List<Reg_User> reg_users = new ArrayList<>();
-                while (rs.next()) {
-                    reg_users.add(resultSetToReg_User(rs));
-                }
-                return reg_users;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get users list", ex);
-        }
+        return getAllFor(U_REG_TABLE, CON, Reg_User.class);
     }
 
     @Override
@@ -64,7 +52,8 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (msg.length() > 1) {
             throw new DAOException(msg);
         }
-        String query = "SELECT * FROM REG_USERS WHERE EMAIL = '" + email + "'";
+        
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = '" + email + "'";
         String salt;
         String hashed_psw;
         try (Statement stm = CON.createStatement()) {
@@ -84,7 +73,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             System.err.println("HASH IS DIFFERENT");
             return null;
         }
-        query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
+        query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
@@ -100,7 +89,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (id == null) {
             throw new DAOException("Given id is empty");
         }
-        String query = "SELECT * FROM REG_USERS WHERE ID = ?";
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, id);
             try (ResultSet rs = stm.executeQuery()) {
@@ -116,7 +105,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if ("".equals(email) || email == null) {
             throw new DAOException("Given email is empty");
         }
-        String query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
@@ -132,10 +121,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM PRODUCTS WHERE CREATOR = ?";
+        String query = "SELECT * FROM " + P_TABLE + " WHERE CREATOR = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
-
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
                 while (rs.next()) {
@@ -153,10 +141,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM LISTS WHERE OWNER = ?";
+        String query = "SELECT * FROM " + L_TABLE + " WHERE OWNER = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
-
             try (ResultSet rs = stm.executeQuery()) {
                 List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
@@ -174,7 +161,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "SELECT * FROM LISTS WHERE ID IN (SELECT LIST FROM LISTS_SHARING WHERE REG_USER = ?)";
+        String query = "SELECT * FROM " + L_TABLE + " WHERE ID IN (SELECT LIST FROM " + L_SHARING_TABLE + " WHERE REG_USER = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
@@ -198,7 +185,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Cannot insert reg_user: it has arleady an id");
         }
 
-        String query = "INSERT INTO REG_USERS(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_REG_TABLE + "(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
             stm.setString(2, reg_user.getPassword());
@@ -225,7 +212,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
-        String query = "DELETE FROM REG_USERS WHERE ID = ?";
+        String query = "DELETE FROM " + U_REG_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
             stm.executeUpdate();
@@ -245,7 +232,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Reg_User is not valid", new NullPointerException("Reg_User id is null"));
         }
 
-        String query = "UPDATE REG_USERS SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
+        String query = "UPDATE " + U_REG_TABLE + " SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
             stm.setString(2, reg_user.getPassword());

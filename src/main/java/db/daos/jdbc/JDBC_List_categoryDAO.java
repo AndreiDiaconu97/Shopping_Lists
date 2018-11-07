@@ -6,10 +6,13 @@
 package db.daos.jdbc;
 
 import db.daos.List_categoryDAO;
-import static db.daos.jdbc.JDBC_utility.getCountFor;
+import static db.daos.jdbc.JDBC_utility.*;
 import db.entities.List_category;
 import db.exceptions.DAOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -24,32 +27,86 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
 
     @Override
     public Long getCount() throws DAOException {
-        return getCountFor("LISTS_CATEGORIES", CON);
+        return getCountFor(L_CAT_TABLE, CON);
     }
 
     @Override
     public List<List_category> getAll() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getAllFor(L_CAT_TABLE, CON, List_category.class);
     }
 
     @Override
-    public List_category getByPrimaryKey(String primaryKey) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List_category getByPrimaryKey(String name) throws DAOException {
+        if (name == null) {
+            throw new DAOException("name parameter is null");
+        }
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE NAME = ?")) {
+            stm.setString(1, L_CAT_TABLE);
+            stm.setString(2, name);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? JDBC_utility.resultSetToList_category(rs) : null;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the list_category for the passed id", ex);
+        }
     }
 
     @Override
-    public void insert(List_category entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void insert(List_category list_category) throws DAOException {
+        if (list_category == null) {
+            throw new DAOException("Given list_category is null");
+        }
+        String query = "INSERT INTO ?(name, description, logo) VALUES(?, ?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, L_CAT_TABLE);
+            stm.setString(2, list_category.getName());
+            stm.setString(3, list_category.getDescription());
+            stm.setString(4, list_category.getLogo());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to add list_category to DB", ex);
+        }
     }
 
     @Override
-    public void delete(List_category entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void delete(List_category list_category) throws DAOException {
+        if (list_category == null) {
+            throw new DAOException("Given list_category is null");
+        }
+        String query = "DELETE FROM ? WHERE NAME = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, L_CAT_TABLE);
+            stm.setString(2, list_category.getName());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove list_category", ex);
+        }
     }
 
     @Override
-    public void update(List_category entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void update(List_category list_category) throws DAOException {
+        if (list_category == null) {
+            throw new DAOException("Given list_category is null");
+        }
 
+        String list_regId = list_category.getName();
+        if (list_regId == null) {
+            throw new DAOException("List_category is not valid", new NullPointerException("List_category name is null"));
+        }
+        //!! cannot change name without extra argument or without adding an id as primary key !!//
+        String query = "UPDATE ? SET DESCRIPTION = ?, LOGO = ? WHERE NAME = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, L_CAT_TABLE);
+            stm.setString(2, list_category.getDescription());
+            stm.setString(3, list_category.getLogo());
+            stm.setString(4, list_category.getName());
+
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("list_category update affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the list_category", ex);
+        }
+    }
 }
