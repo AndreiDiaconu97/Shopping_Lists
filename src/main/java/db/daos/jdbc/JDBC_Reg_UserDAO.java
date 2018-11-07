@@ -70,7 +70,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         }
 
         if (!JDBC_utility.secureHashEquals(password, salt, hashed_psw)) {
-            System.err.println("HASH IS DIFFERENT");
+            System.err.println("HASH IS DIFFERENT (probably wrong password)");
             return null;
         }
         query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = ?";

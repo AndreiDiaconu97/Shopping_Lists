@@ -108,8 +108,8 @@ public class AuthenticationServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        // LOGOUT
         if (request.getParameter("logout") != null) {
+        // LOGOUT
             HttpSession session = request.getSession(false);
             if (session != null) {
                 Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
@@ -124,8 +124,8 @@ public class AuthenticationServlet extends HttpServlet {
                 response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
             }
 
-            // REGISTER  
         } else if (request.getParameter("register") != null) {
+            // REGISTER
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String firstname = request.getParameter("firstname");
@@ -158,7 +158,7 @@ public class AuthenticationServlet extends HttpServlet {
                     try {
                         msg.setFrom(new InternetAddress(m_username));
                         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(nv_user.getEmail(), false));
-                        msg.setSubject("Lab 10 - Simple Example");
+                        msg.setSubject("Registration to LopardoShopping");
                         msg.setText(message);
                         msg.setSentDate(new java.util.Date());
                         Transport.send(msg);
@@ -171,8 +171,8 @@ public class AuthenticationServlet extends HttpServlet {
             }
             request.getServletContext().log("REGISTERED " + email);
 
-            // LOGIN
         } else if (request.getParameter("login") != null) {
+            // LOGIN
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             // email and password can't be empty because input is "required"

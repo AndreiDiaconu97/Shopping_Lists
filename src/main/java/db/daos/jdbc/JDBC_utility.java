@@ -54,15 +54,10 @@ public class JDBC_utility {
 
     public static String secureHash(String password, String salt) {
         // should implement using slow hash function
-        System.err.println("pass h: " + DigestUtils.sha256Hex(password.concat(salt)));
-        System.err.println("Salt  : " + salt);
         return DigestUtils.sha256Hex(password.concat(salt));
     }
 
     public static boolean secureHashEquals(String password, String salt, String hashed) {
-        System.err.println("Hashed: " + hashed);
-        System.err.println("pass h: " + DigestUtils.sha256Hex(password.concat(salt)));
-        System.err.println("Salt  : " + salt);
         return hashed.equals(DigestUtils.sha256Hex(password.concat(salt)));
     }
 

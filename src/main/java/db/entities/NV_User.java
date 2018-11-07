@@ -77,7 +77,7 @@ public class NV_User {
         // this.salt = create random 200len string
         this.salt = JDBC_utility.randomString(SALT_SIZE);
         this.password = JDBC_utility.secureHash(password, this.salt);
-        System.err.println("CREATED PASSWORD = " + this.password + " USING " + password);
+        //System.err.println("CREATED PASSWORD = " + this.password + " USING " + password);
     }
 
     public String getSalt() {
