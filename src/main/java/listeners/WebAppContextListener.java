@@ -32,7 +32,8 @@ public class WebAppContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         String realPath = sce.getServletContext().getRealPath("/");
-        realPath = realPath.substring(0, realPath.lastIndexOf("\\target"));
+        System.err.println(realPath);
+        realPath = realPath.substring(0, realPath.lastIndexOf("/target"));
         String dburl = "jdbc:derby:" + realPath + "\\" + sce.getServletContext().getInitParameter("relative_dburl");
         dburl = dburl.replace('\\', '/');
         System.err.println("DBURL IS: " + dburl);
