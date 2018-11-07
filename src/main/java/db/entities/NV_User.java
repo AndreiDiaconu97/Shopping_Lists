@@ -22,15 +22,15 @@ public class NV_User {
     private String avatar;
     private String code;
     
-    private static final int salt_size = 100;
-    private static final int code_size = 50;
+    private static final int SALT_SIZE = 100;
+    private static final int CODE_SIZE = 50;
 
-    public static int getSalt_size() {
-        return salt_size;
+    public static int getSALT_SIZE() {
+        return SALT_SIZE;
     }
 
-    public static int getCode_size() {
-        return code_size;
+    public static int getCODE_SIZE() {
+        return CODE_SIZE;
     }
 
     public NV_User() {
@@ -41,7 +41,6 @@ public class NV_User {
         this.firstname = firstname;
         this.lastname = lastname;
         this.avatar = avatar;
-        this.code = code;
         setPassword(password);
     }
 
@@ -67,8 +66,7 @@ public class NV_User {
 
     public void setPassword(String password) {
         // this.salt = create random 200len string
-        this.salt = JDBC_utility.randomString(salt_size-5);
-        // this.password = hash64 on salt+password
+        this.salt = JDBC_utility.randomString(SALT_SIZE);
         this.password = JDBC_utility.secureHash(password, this.salt);
     }
 

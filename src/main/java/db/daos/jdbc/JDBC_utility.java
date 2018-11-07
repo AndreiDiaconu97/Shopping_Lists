@@ -8,13 +8,15 @@ package db.daos.jdbc;
 import db.entities.NV_User;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shop_list;
+import db.entities.List_reg;
+import db.entities.List_anonymous;
 import db.exceptions.DAOException;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -24,23 +26,23 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class JDBC_utility {
 
-    private static final String symbols = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";   
-    private static final Random random = new SecureRandom();
+    private static final String SYMBOLS = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";
+    private static final Random RANDOM = new SecureRandom();
 
     public static String randomString(int length) {
         char buf[] = new char[length];
         for (int idx = 0; idx < buf.length; ++idx) {
-            buf[idx] = symbols.charAt(random.nextInt(symbols.length()));
+            buf[idx] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
         }
         return new String(buf);
     }
-    
-    public static String secureHash(String password, String salt){
+
+    public static String secureHash(String password, String salt) {
         // should implement using slow hash function
         return DigestUtils.sha256Hex(password.concat(salt));
     }
-    
-    public static boolean secureHashEquals(String password, String salt, String hashed){
+
+    public static boolean secureHashEquals(String password, String salt, String hashed) {
         return hashed.equals(DigestUtils.sha512Hex(password.concat(salt)));
     }
 
@@ -68,7 +70,7 @@ public class JDBC_utility {
     public static Product resultSetToProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
         product.setCategory(rs.getString("CATEGORY"));
-        product.setCreator(rs.getString("CREATOR"));
+        product.setCreator(rs.getInt("CREATOR"));
         product.setDescription(rs.getString("DESCRIPTION"));
         product.setId(rs.getInt("ID"));
         product.setIs_public(rs.getBoolean("IS_PUBLIC"));
@@ -80,14 +82,14 @@ public class JDBC_utility {
         return product;
     }
 
-    public static Shop_list resultSetToShopping_list(ResultSet rs) throws SQLException {
-        Shop_list shopping_list = new Shop_list();
+    public static List_reg resultSetToList_reg(ResultSet rs) throws SQLException {
+        List_reg shopping_list = new List_reg();
         shopping_list.setCategory(rs.getString("CATEGORY"));
         shopping_list.setDescription(rs.getString("DESCRIPTION"));
         shopping_list.setId(rs.getInt("ID"));
-        shopping_list.setImage(rs.getString("LOGO"));
+        shopping_list.setLogo(rs.getString("LOGO"));
         shopping_list.setName(rs.getString("NAME"));
-        shopping_list.setOwner(rs.getString("OWNER"));
+        shopping_list.setOwner(rs.getInt("OWNER"));
         return shopping_list;
     }
 
@@ -101,4 +103,16 @@ public class JDBC_utility {
         nv_user.setCode(rs.getString("VERIFICATION_CODE"));
         return nv_user;
     }
+
+    public static List_anonymous resultSetToList_anonymous(ResultSet rs) throws SQLException {
+        List_anonymous list_anonymous = new List_anonymous();
+        list_anonymous.setCategory(rs.getString("CATEGORY"));
+        list_anonymous.setDescription(rs.getString("DESCRIPTION"));
+        list_anonymous.setId(rs.getInt("ID"));
+        list_anonymous.setLogo(rs.getString("LOGO"));
+        list_anonymous.setLast_seen(rs.getTimestamp("LAST_SEEN"));
+        list_anonymous.setName(rs.getString("NAME"));
+        return list_anonymous;
+    }
+
 }

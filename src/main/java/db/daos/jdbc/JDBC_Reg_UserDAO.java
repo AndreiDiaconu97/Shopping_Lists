@@ -9,10 +9,8 @@ import db.daos.Reg_UserDAO;
 import static db.daos.jdbc.JDBC_utility.getCountFor;
 import static db.daos.jdbc.JDBC_utility.resultSetToProduct;
 import static db.daos.jdbc.JDBC_utility.resultSetToReg_User;
-import static db.daos.jdbc.JDBC_utility.resultSetToShopping_list;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.Shop_list;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
+import db.entities.List_reg;
 
 /**
  *
@@ -129,7 +129,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
     }
 
     @Override
-    public List<Shop_list> getOwningShopLists(Reg_User reg_user) throws DAOException {
+    public List<List_reg> getOwningShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -138,9 +138,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.setInt(1, reg_user.getId());
 
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shop_list> shopping_lists = new ArrayList<>();
+                List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToList_reg(rs));
                 }
                 return shopping_lists;
             }
@@ -150,7 +150,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
     }
 
     @Override
-    public List<Shop_list> getShopLists(Reg_User reg_user) throws DAOException {
+    public List<List_reg> getSharedShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -158,9 +158,9 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, reg_user.getId());
             try (ResultSet rs = stm.executeQuery()) {
-                List<Shop_list> shopping_lists = new ArrayList<>();
+                List<List_reg> shopping_lists = new ArrayList<>();
                 while (rs.next()) {
-                    shopping_lists.add(resultSetToShopping_list(rs));
+                    shopping_lists.add(resultSetToList_reg(rs));
                 }
                 return shopping_lists;
             }
@@ -174,6 +174,10 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
+        if (reg_user.getId() != null) {
+            throw new DAOException("Cannot insert reg_user: it has arleady an id");
+        }
+        
         String query = "INSERT INTO REG_USERS(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
@@ -186,11 +190,11 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.executeUpdate();
 
             // This should avoid using an extra query for id retrieving
+            // OLD: reg_user.setId(getByEmail(reg_user.getEmail()).getId());
             ResultSet rs = stm.getGeneratedKeys();
             if (rs.next()) {
                 reg_user.setId(rs.getInt(1));
             }
-            // OLD: reg_user.setId(getByEmail(reg_user.getEmail()).getId());
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add reg_user to DB", ex);
         }
@@ -229,6 +233,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.setString(4, reg_user.getLastname());
             stm.setBoolean(5, reg_user.getIs_admin());
             stm.setString(6, reg_user.getAvatar());
+            stm.setInt(7, reg_user.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

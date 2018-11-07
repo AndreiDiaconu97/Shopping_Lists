@@ -6,12 +6,16 @@
 package db.daos;
 
 import db.entities.Product;
+import db.entities.List_anonymous;
 import db.exceptions.DAOException;
+import java.util.List;
 
 /**
  *
  * @author Andrei Diaconu
  */
-public interface ProductDAO extends DAO<Product, Integer> {
+public interface List_anonymousDAO extends DAO<List_anonymous, Integer> {
+
+    public List<Product> getProducts(List_anonymous list_anonymous) throws DAOException;
 
 }

@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,22 +180,19 @@ public class JDBC_NV_UserDAO extends JDBC_DAO<NV_User, String> implements NV_Use
     @Override
     public String generateCode(int code_size) throws DAOException {
         String code;
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE= ? ")) {
+        try (Statement stm = CON.createStatement()) {
             while (true) {
                 code = JDBC_utility.randomString(code_size);
-                stm.setString(1, code); 
-                try(ResultSet rs = stm.executeQuery()){
-                    if(rs.next()){
-                        //trovato un elemento con quel codice
-                    } else {
+                try (ResultSet rs = stm.executeQuery("SELECT * FROM NV_USERS WHERE VERIFICATION_CODE = " + code)) {
+                    if (!rs.next()) { // se non trovo elementi con quel code, ritorno
                         return code;
                     }
-                } catch (SQLException ex){
+                } catch (SQLException ex) {
                     System.err.println("FAILED GENERATING CODE, IN QUERY EXEC");
                     throw ex;
                 }
             }
-        } catch(SQLException ex){
+        } catch (SQLException ex) {
             throw new DAOException("Failed to generate verification code");
         }
     }
