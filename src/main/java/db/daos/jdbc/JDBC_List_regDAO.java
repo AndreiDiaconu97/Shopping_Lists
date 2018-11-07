@@ -5,9 +5,11 @@
  */
 package db.daos.jdbc;
 
+import db.daos.List_regDAO;
+import static db.daos.jdbc.JDBC_utility.*;
+import db.entities.List_reg;
 import db.entities.Product;
 import db.entities.Reg_User;
-import db.entities.List_reg;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,8 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import db.daos.List_regDAO;
-import static db.daos.jdbc.JDBC_utility.*;
 
 /**
  *

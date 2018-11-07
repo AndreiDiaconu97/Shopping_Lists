@@ -13,8 +13,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import java.util.List;
 
 /**
@@ -49,7 +47,7 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
                 return rs.next() ? JDBC_utility.resultSetToList_category(rs) : null;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the list_reg for the passed id", ex);
+            throw new DAOException("Impossible to get the list_category for the passed id", ex);
         }
     }
 
@@ -58,7 +56,6 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
         if (list_category == null) {
             throw new DAOException("Given list_category is null");
         }
-
         String query = "INSERT INTO ?(name, description, logo) VALUES(?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, L_CAT_TABLE);

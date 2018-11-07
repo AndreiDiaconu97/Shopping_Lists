@@ -5,9 +5,10 @@
  */
 package db.daos.jdbc;
 
+import db.daos.List_anonymousDAO;
 import static db.daos.jdbc.JDBC_utility.*;
-import db.entities.Product;
 import db.entities.List_anonymous;
+import db.entities.Product;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import db.daos.List_anonymousDAO;
 
 /**
  *
@@ -148,5 +148,4 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("Impossible to get the products for the passed list_anonymous", ex);
         }
     }
-
 }
