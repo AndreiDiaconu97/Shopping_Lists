@@ -16,10 +16,6 @@
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>servlets.LoginServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ShoppingListServlet</servlet-name>
-        <servlet-class>servlets.ShoppingListServlet</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login.handler</url-pattern>
@@ -48,14 +44,27 @@
         <servlet-name>Shop_list_jsp</servlet-name>
         <url-pattern>/restricted/shopping.lists.html</url-pattern>
     </servlet-mapping>
-    <listener>
-        <description>ServletContextListener</description>
-        <listener-class>listeners.WebAppContextListener</listener-class>
-    </listener>
+    <servlet>
+        <servlet-name>ShoppingListServlet</servlet-name>
+        <servlet-class>servlets.ShoppingListServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ShoppingListServlet</servlet-name>
         <url-pattern>/restricted/shopping.lists.handler</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>AuthenticationServlet</servlet-name>
+        <servlet-class>servlets.AuthenticationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthenticationServlet</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>listeners.WebAppContextListener</listener-class>
+    </listener>
+    
     <session-config>
         <session-timeout>
             30
