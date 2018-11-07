@@ -33,7 +33,11 @@ public class WebAppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         String realPath = sce.getServletContext().getRealPath("/");
         System.err.println(realPath);
-        realPath = realPath.substring(0, realPath.lastIndexOf("/target"));
+        int index = realPath.lastIndexOf("/target");
+        if(index == -1){
+            index = realPath.lastIndexOf("\\target");
+        }
+        realPath = realPath.substring(0, index);
         String dburl = "jdbc:derby:" + realPath + "\\" + sce.getServletContext().getInitParameter("relative_dburl");
         dburl = dburl.replace('\\', '/');
         System.err.println("DBURL IS: " + dburl);
