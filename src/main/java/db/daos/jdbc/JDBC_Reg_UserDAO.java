@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
 import db.entities.List_reg;
+import java.sql.Statement;
 
 /**
  *
@@ -63,10 +64,29 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (msg.length() > 1) {
             throw new DAOException(msg);
         }
-        String query = "SELECT * FROM REG_USERS WHERE EMAIL = ? AND PASSWORD = ?";
+        String query = "SELECT * FROM REG_USERS WHERE EMAIL = '" + email + "'";
+        String salt;
+        String hashed_psw;
+        try (Statement stm = CON.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(query)) {
+                if (rs.next()) {
+                    salt = rs.getString("SALT");
+                    hashed_psw = rs.getString("PASSWORD");
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the user for the passed email and password", ex);
+        }
+
+        if (!JDBC_utility.secureHashEquals(password, salt, hashed_psw)) {
+            System.err.println("HASH IS DIFFERENT");
+            return null;
+        }
+        query = "SELECT * FROM REG_USERS WHERE EMAIL = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, email);
-            stm.setString(2, password);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? resultSetToReg_User(rs) : null;
             }
@@ -177,7 +197,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user.getId() != null) {
             throw new DAOException("Cannot insert reg_user: it has arleady an id");
         }
-        
+
         String query = "INSERT INTO REG_USERS(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());

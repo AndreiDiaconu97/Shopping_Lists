@@ -36,12 +36,13 @@ public class NV_User {
     public NV_User() {
     }
     
-    public NV_User(String email, String password, String firstname, String lastname, String avatar, String code) {
+    public NV_User(String email, String normal_password, String firstname, String lastname, String avatar) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
         this.avatar = avatar;
-        setPassword(password);
+        generateCode();
+        createHashedPassword(normal_password);
     }
 
     public String getCode() {
@@ -63,11 +64,20 @@ public class NV_User {
     public String getPassword() {
         return password;
     }
+    
+    public void setPassword(String password){
+        this.password = password;
+    }
 
-    public void setPassword(String password) {
+    private void createHashedPassword(String password) {
+        if(password == null){
+            System.err.println("Creating hash for null psw!!");
+            return;
+        }
         // this.salt = create random 200len string
         this.salt = JDBC_utility.randomString(SALT_SIZE);
         this.password = JDBC_utility.secureHash(password, this.salt);
+        System.err.println("CREATED PASSWORD = " + this.password + " USING " + password);
     }
 
     public String getSalt() {
@@ -100,6 +110,10 @@ public class NV_User {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
+    }
+
+    private void generateCode() {
+        this.code = JDBC_utility.randomString(CODE_SIZE);
     }
 
 }
