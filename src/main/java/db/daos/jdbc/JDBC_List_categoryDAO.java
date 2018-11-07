@@ -40,9 +40,8 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
         if (name == null) {
             throw new DAOException("name parameter is null");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE NAME = ?")) {
-            stm.setString(1, L_CAT_TABLE);
-            stm.setString(2, name);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + L_CAT_TABLE + " WHERE NAME = ?")) {
+            stm.setString(1, name);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? JDBC_utility.resultSetToList_category(rs) : null;
             }
@@ -56,12 +55,11 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
         if (list_category == null) {
             throw new DAOException("Given list_category is null");
         }
-        String query = "INSERT INTO ?(name, description, logo) VALUES(?, ?, ?)";
+        String query = "INSERT INTO " + L_CAT_TABLE + "(name, description, logo) VALUES(?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_CAT_TABLE);
-            stm.setString(2, list_category.getName());
-            stm.setString(3, list_category.getDescription());
-            stm.setString(4, list_category.getLogo());
+            stm.setString(1, list_category.getName());
+            stm.setString(2, list_category.getDescription());
+            stm.setString(3, list_category.getLogo());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add list_category to DB", ex);
@@ -73,10 +71,9 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
         if (list_category == null) {
             throw new DAOException("Given list_category is null");
         }
-        String query = "DELETE FROM ? WHERE NAME = ?";
+        String query = "DELETE FROM " + L_CAT_TABLE + " WHERE NAME = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_CAT_TABLE);
-            stm.setString(2, list_category.getName());
+            stm.setString(1, list_category.getName());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove list_category", ex);
@@ -94,12 +91,11 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, String> imple
             throw new DAOException("List_category is not valid", new NullPointerException("List_category name is null"));
         }
         //!! cannot change name without extra argument or without adding an id as primary key !!//
-        String query = "UPDATE ? SET DESCRIPTION = ?, LOGO = ? WHERE NAME = ?";
+        String query = "UPDATE " + L_CAT_TABLE + " SET DESCRIPTION = ?, LOGO = ? WHERE NAME = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_CAT_TABLE);
-            stm.setString(2, list_category.getDescription());
-            stm.setString(3, list_category.getLogo());
-            stm.setString(4, list_category.getName());
+            stm.setString(1, list_category.getDescription());
+            stm.setString(2, list_category.getLogo());
+            stm.setString(3, list_category.getName());
 
             int count = stm.executeUpdate();
             if (count != 1) {

@@ -40,9 +40,8 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
         if (name == null) {
             throw new DAOException("name parameter is null");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE NAME = ?")) {
-            stm.setString(1, P_CAT_TABLE);
-            stm.setString(2, name);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + P_CAT_TABLE + " WHERE NAME = ?")) {
+            stm.setString(1, name);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? JDBC_utility.resultSetToProd_category(rs) : null;
             }
@@ -56,12 +55,11 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
         if (prod_category == null) {
             throw new DAOException("Given prod_category is null");
         }
-        String query = "INSERT INTO ?(name, description, logo) VALUES(?, ?, ?)";
+        String query = "INSERT INTO " + P_CAT_TABLE + "(name, description, logo) VALUES(?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, P_CAT_TABLE);
-            stm.setString(2, prod_category.getName());
-            stm.setString(3, prod_category.getDescription());
-            stm.setString(4, prod_category.getLogo());
+            stm.setString(1, prod_category.getName());
+            stm.setString(2, prod_category.getDescription());
+            stm.setString(3, prod_category.getLogo());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add prod_category to DB", ex);
@@ -73,10 +71,9 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
         if (prod_category == null) {
             throw new DAOException("Given prod_category is null");
         }
-        String query = "DELETE FROM ? WHERE NAME = ?";
+        String query = "DELETE FROM " + P_CAT_TABLE + " WHERE NAME = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, P_CAT_TABLE);
-            stm.setString(2, prod_category.getName());
+            stm.setString(1, prod_category.getName());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove prod_category", ex);
@@ -94,12 +91,11 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, String> imple
             throw new DAOException("Prod_category is not valid", new NullPointerException("Prod_category name is null"));
         }
         //!! cannot change name without extra argument or without adding an id as primary key !!//
-        String query = "UPDATE ? SET DESCRIPTION = ?, LOGO = ? WHERE NAME = ?";
+        String query = "UPDATE " + P_CAT_TABLE + " SET DESCRIPTION = ?, LOGO = ? WHERE NAME = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, P_CAT_TABLE);
-            stm.setString(2, prod_category.getDescription());
-            stm.setString(3, prod_category.getLogo());
-            stm.setString(4, prod_category.getName());
+            stm.setString(1, prod_category.getDescription());
+            stm.setString(2, prod_category.getLogo());
+            stm.setString(3, prod_category.getName());
 
             int count = stm.executeUpdate();
             if (count != 1) {

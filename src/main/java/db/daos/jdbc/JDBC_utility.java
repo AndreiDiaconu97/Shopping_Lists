@@ -62,8 +62,7 @@ public class JDBC_utility {
     }
 
     public static Long getCountFor(String table, Connection con) throws DAOException {
-        try (PreparedStatement stm = con.prepareStatement("SELECT COUNT(*) FROM ?")) {
-            stm.setString(1, table);
+        try (PreparedStatement stm = con.prepareStatement("SELECT COUNT(*) FROM " + table)) {
             ResultSet rs = stm.executeQuery();
             return rs.next() ? rs.getLong(1) : 0L;
         } catch (SQLException ex) {
@@ -72,8 +71,7 @@ public class JDBC_utility {
     }
 
     public static <T> List<T> getAllFor(String table, Connection con, Class<T> returnType) throws DAOException { // should be tested
-        try (PreparedStatement stm = con.prepareStatement("SELECT * FROM ?")) {
-            stm.setString(1, table);
+        try (PreparedStatement stm = con.prepareStatement("SELECT * FROM " + table)) {
             try (ResultSet rs = stm.executeQuery()) {
                 List<T> Tlist = new ArrayList<>();
                 if (returnType == List_anonymous.class) {

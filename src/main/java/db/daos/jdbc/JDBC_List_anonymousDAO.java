@@ -46,14 +46,13 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("Cannot insert list_anonymous: it has arleady an id");
         }
 
-        String query = "INSERT INTO ?(name, description, category, logo, last_seen) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + L_ANONYM_TABLE + "(name, description, category, logo, last_seen) VALUES(?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_ANONYM_TABLE);
-            stm.setString(2, list_anonymous.getName());
-            stm.setString(3, list_anonymous.getDescription());
-            stm.setString(4, list_anonymous.getCategory());
-            stm.setString(5, list_anonymous.getLogo());
-            stm.setTimestamp(6, list_anonymous.getLast_seen());
+            stm.setString(1, list_anonymous.getName());
+            stm.setString(2, list_anonymous.getDescription());
+            stm.setString(3, list_anonymous.getCategory());
+            stm.setString(4, list_anonymous.getLogo());
+            stm.setTimestamp(5, list_anonymous.getLast_seen());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -70,10 +69,9 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         if (list_anonymous == null) {
             throw new DAOException("Given list_anonymous is null");
         }
-        String query = "DELETE FROM ? WHERE ID = ?";
+        String query = "DELETE FROM " + L_ANONYM_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_ANONYM_TABLE);
-            stm.setInt(2, list_anonymous.getId());
+            stm.setInt(1, list_anonymous.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to remove list_anonymous", ex);
@@ -91,15 +89,14 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("List_anonymous is not valid", new NullPointerException("List_anonymous id is null"));
         }
 
-        String query = "UPDATE ? SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, LOGO = ?, LAST_SEEN = ? WHERE ID = ?";
+        String query = "UPDATE " + L_ANONYM_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, LOGO = ?, LAST_SEEN = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, L_ANONYM_TABLE);
-            stm.setString(2, list_anonymous.getName());
-            stm.setString(3, list_anonymous.getDescription());
-            stm.setString(4, list_anonymous.getCategory());
-            stm.setString(5, list_anonymous.getLogo());
-            stm.setTimestamp(6, list_anonymous.getLast_seen());
-            stm.setInt(7, list_anonymous.getId());
+            stm.setString(1, list_anonymous.getName());
+            stm.setString(2, list_anonymous.getDescription());
+            stm.setString(3, list_anonymous.getCategory());
+            stm.setString(4, list_anonymous.getLogo());
+            stm.setTimestamp(5, list_anonymous.getLast_seen());
+            stm.setInt(6, list_anonymous.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {
@@ -115,9 +112,8 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         if (id == null) {
             throw new DAOException("id parameter is null");
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM ? WHERE ID = ?")) {
-            stm.setString(1, L_ANONYM_TABLE);
-            stm.setInt(2, id);
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + L_ANONYM_TABLE + " WHERE ID = ?")) {
+            stm.setInt(1, id);
             try (ResultSet rs = stm.executeQuery()) {
                 return rs.next() ? JDBC_utility.resultSetToList_anonymous(rs) : null;
             }
@@ -131,11 +127,9 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         if (list_anonymous == null) {
             throw new DAOException("list_anonymous parameter is null");
         }
-        String query = "SELECT * FROM ? WHERE ID IN (SELECT PRODUCT FROM ? WHERE LIST_ANONYMOUS = ?)";
+        String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, P_TABLE);
-            stm.setString(2, L_ANONYM_P_TABLE);
-            stm.setInt(3, list_anonymous.getId());
+            stm.setInt(1, list_anonymous.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
 
