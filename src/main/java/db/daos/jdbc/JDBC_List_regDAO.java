@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static db.daos.jdbc.JDBC_utility.getCountFor;
 import db.daos.List_regDAO;
+import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
 
 /**
  *
@@ -35,12 +36,17 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
 
     @Override
     public List<List_reg> getAll() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean linkShoppingListToReg_User(List shoppingList, Reg_User user) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS")) {
+            try (ResultSet rs = stm.executeQuery()) {
+                List<List_reg> lists_reg = new ArrayList<>();
+                while (rs.next()) {
+                    lists_reg.add(resultSetToList_reg(rs));
+                }
+                return lists_reg;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get all the list_reg", ex);
+        }
     }
 
     @Override
@@ -64,7 +70,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("owner parameter is null");
         }
         try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM LISTS WHERE OWNER = ?")) {
-            stm.setInt(1, owner); // QUESTO DA CAMBIARE
+            stm.setInt(1, owner);
             try (ResultSet rs = stm.executeQuery()) {
                 List<List_reg> shopping_lists = new ArrayList<>();
 
@@ -79,28 +85,120 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
-    public List<Reg_User> getUsers(List shopping_list) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void shareShoppingListToReg_User(List_reg list_reg, Reg_User reg_user) throws DAOException {
+        String msg = "";
+        if ((list_reg == null) || (list_reg.getId() == null)) {
+            msg += "Given list_reg is empty or non valid. ";
+        }
+        if (reg_user == null || (reg_user.getId() == null)) {
+            msg += "Given user is empty or non valid. ";
+        }
+        if (msg.length()
+                > 1) {
+            throw new DAOException(msg);
+        }
+
+        if (list_reg.getOwner() == reg_user.getId()) {
+            throw new DAOException("Reg_user is arleady owner of the given list_reg.");
+        }
+
+        String query = "INSERT INTO LISTS_SHARING(list, reg_user) VALUES(?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, reg_user.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the shopping_list for the passed id", ex);
+        }
     }
 
     @Override
-    public List<Product> getProducts(List shopping_list) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Product> getProducts(List_reg list_reg) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("list_reg parameter is null");
+        }
+        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM PRODUCTS WHERE ID IN (SELECT PRODUCT FROM LISTS_PRODUCTS WHERE LIST = ?)")) {
+            stm.setInt(1, list_reg.getId());
+            try (ResultSet rs = stm.executeQuery()) {
+                List<Product> products = new ArrayList<>();
+
+                while (rs.next()) {
+                    products.add(JDBC_utility.resultSetToProduct(rs));
+                }
+                return products;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the products for the passed list_reg", ex);
+        }
     }
 
     @Override
-    public void delete(List_reg entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void delete(List_reg list_reg) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("Given list_reg is null");
+        }
+        String query = "DELETE FROM LISTS WHERE ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove list_reg", ex);
+        }
     }
 
     @Override
-    public void insert(List_reg entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void insert(List_reg list_reg) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("Given list_reg is null");
+        }
+        if (list_reg.getId() != null) {
+            throw new DAOException("Cannot insert list_reg: it has arleady an id");
+        }
+
+        String query = "INSERT INTO LISTS(name, description, category, owner, logo) VALUES(?, ?, ?, ?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, list_reg.getName());
+            stm.setString(2, list_reg.getDescription());
+            stm.setString(3, list_reg.getCategory());
+            stm.setInt(4, list_reg.getOwner());
+            stm.setString(5, list_reg.getLogo());
+            stm.executeUpdate();
+
+            ResultSet rs = stm.getGeneratedKeys();
+            if (rs.next()) {
+                list_reg.setId(rs.getInt(1));
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to add list_reg to DB", ex);
+        }
     }
 
     @Override
-    public void update(List_reg entity) throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void update(List_reg list_reg) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("Given list_reg is null");
+        }
 
+        Integer reg_userId = list_reg.getId();
+        if (reg_userId == null) {
+            throw new DAOException("Reg_User is not valid", new NullPointerException("Reg_User id is null"));
+        }
+
+        String query = "UPDATE LISTS SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, OWNER = ?, LOGO = ? WHERE ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, list_reg.getName());
+            stm.setString(1, list_reg.getDescription());
+            stm.setString(1, list_reg.getCategory());
+            stm.setInt(1, list_reg.getOwner());
+            stm.setString(1, list_reg.getLogo());
+            stm.setInt(7, list_reg.getId());
+
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("list_reg update affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the list_reg", ex);
+        }
+    }
 }

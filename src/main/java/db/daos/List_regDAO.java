@@ -17,11 +17,9 @@ import java.util.List;
  */
 public interface List_regDAO extends DAO<List_reg, Integer> {
 
-    public boolean linkShoppingListToReg_User(List shoppingList, Reg_User user) throws DAOException;
+    public void shareShoppingListToReg_User(List_reg shoppingList, Reg_User user) throws DAOException;
 
     public List<List_reg> getByOwner(Integer owner) throws DAOException;
 
-    public List<Reg_User> getUsers(List shopping_list) throws DAOException;
-
-    public List<Product> getProducts(List shopping_list) throws DAOException;
+    public List<Product> getProducts(List_reg list_reg) throws DAOException;
 }

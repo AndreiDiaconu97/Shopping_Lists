@@ -16,6 +16,6 @@ import java.util.List;
  */
 public interface List_anonymousDAO extends DAO<List_anonymous, Integer> {
 
-    public List<Product> getProducts(List_anonymous shop_list_nr) throws DAOException;
+    public List<Product> getProducts(List_anonymous list_anonymous) throws DAOException;
 
 }

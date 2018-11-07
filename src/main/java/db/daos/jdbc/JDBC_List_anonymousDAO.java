@@ -44,7 +44,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
                 return lists_anonymous;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get all the ", ex);
+            throw new DAOException("Impossible to get all the list_anonymous", ex);
         }
     }
 
@@ -69,7 +69,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     }
 
     @Override
-    public List<Product> getProducts(List_anonymous shop_list_nr) throws DAOException {
+    public List<Product> getProducts(List_anonymous list_anonymous) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

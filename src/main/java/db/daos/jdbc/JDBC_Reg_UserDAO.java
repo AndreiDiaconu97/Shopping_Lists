@@ -150,7 +150,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
     }
 
     @Override
-    public List<List_reg> getShopLists(Reg_User reg_user) throws DAOException {
+    public List<List_reg> getSharedShopLists(Reg_User reg_user) throws DAOException {
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
@@ -174,6 +174,10 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         if (reg_user == null) {
             throw new DAOException("Given reg_user is null");
         }
+        if (reg_user.getId() != null) {
+            throw new DAOException("Cannot insert reg_user: it has arleady an id");
+        }
+
         String query = "INSERT INTO REG_USERS(email, salt, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
@@ -186,11 +190,11 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             stm.executeUpdate();
 
             // This should avoid using an extra query for id retrieving
+            // OLD: reg_user.setId(getByEmail(reg_user.getEmail()).getId());
             ResultSet rs = stm.getGeneratedKeys();
             if (rs.next()) {
                 reg_user.setId(rs.getInt(1));
             }
-            // OLD: reg_user.setId(getByEmail(reg_user.getEmail()).getId());
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add reg_user to DB", ex);
         }

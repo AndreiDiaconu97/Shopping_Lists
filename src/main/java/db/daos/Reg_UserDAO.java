@@ -25,6 +25,6 @@ public interface Reg_UserDAO extends DAO<Reg_User, Integer> {
 
     public List<List_reg> getOwningShopLists(Reg_User reg_user) throws DAOException;
 
-    public List<List_reg> getShopLists(Reg_User reg_user) throws DAOException;
+    public List<List_reg> getSharedShopLists(Reg_User reg_user) throws DAOException;
 
 }

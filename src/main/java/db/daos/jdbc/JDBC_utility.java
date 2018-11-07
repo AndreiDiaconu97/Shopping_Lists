@@ -89,7 +89,7 @@ public class JDBC_utility {
         shopping_list.setId(rs.getInt("ID"));
         shopping_list.setLogo(rs.getString("LOGO"));
         shopping_list.setName(rs.getString("NAME"));
-        shopping_list.setOwner(rs.getString("OWNER"));
+        shopping_list.setOwner(rs.getInt("OWNER"));
         return shopping_list;
     }
 

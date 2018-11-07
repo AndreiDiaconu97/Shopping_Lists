@@ -13,7 +13,7 @@ public class List_reg {
 
     private Integer id;
     private String name;
-    private String owner;
+    private Integer owner;
     private String category;
     private String description;
     private String logo;
@@ -34,11 +34,11 @@ public class List_reg {
         this.name = name;
     }
 
-    public String getOwner() {
+    public Integer getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(Integer owner) {
         this.owner = owner;
     }
 
