@@ -4,10 +4,11 @@
     Author     : Stefano Chirico &lt;chirico dot stefano at parcoprogetti dot com&gt;
 --%>
 
+<%@page import="db.entities.List_reg"%>
+<%@page import="db.daos.List_regDAO"%>
 <%@page import="java.util.List"%>
-<%@page import="db.entities.Shop_list"%>
 <%@page import="db.exceptions.DAOException"%>
-<%@page import="db.daos.Shop_listDAO"%>
+<%@page import="db.daos.List_regDAO"%>
 <%@page import="db.entities.Reg_User"%>
 <%@page import="db.exceptions.DAOFactoryException"%>
 <%@page import="db.factories.DAOFactory"%>
@@ -15,7 +16,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%!
     private Reg_UserDAO reg_userDao;
-    private Shop_listDAO shop_listDao;
+    private List_regDAO list_regDao;
 
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
@@ -28,7 +29,7 @@
             throw new RuntimeException(new ServletException("Impossible to get dao for reg_user", ex));
         }
         try {
-            shop_listDao = daoFactory.getDAO(Shop_listDAO.class);
+            list_regDao = daoFactory.getDAO(List_regDAO.class);
         } catch (DAOFactoryException ex) {
             throw new RuntimeException(new ServletException("Impossible to get the dao for shop_list", ex));
         }
@@ -38,8 +39,8 @@
         if (reg_userDao != null) {
             reg_userDao = null;
         }
-        if (shop_listDao != null) {
-            shop_listDao = null;
+        if (list_regDao != null) {
+            list_regDao = null;
         }
     }
 %>
@@ -64,7 +65,7 @@
     }
 
     try {
-        List<Shop_list> shoppingLists = reg_userDao.getShopLists(reg_user);
+        List<List_reg> shoppingLists = reg_userDao.getOwningShopLists(reg_user);
 %>
 <!DOCTYPE html>
 <html>
@@ -101,7 +102,7 @@
                     <%
                     } else {
                         int index = 1;
-                        for (Shop_list shoppingList : shoppingLists) {
+                        for (List_reg shoppingList : shoppingLists) {
                     %>
                     <div class="card">
                         <div class="card-header" id="heading<%=index%>">
