@@ -4,6 +4,8 @@
     Author     : Stefano Chirico &lt;chirico dot stefano at parcoprogetti dot com&gt;
 --%>
 
+<%@page import="db.entities.List_category"%>
+<%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.entities.List_reg"%>
 <%@page import="db.daos.List_regDAO"%>
 <%@page import="java.util.List"%>
@@ -17,6 +19,7 @@
 <%!
     private Reg_UserDAO reg_userDao;
     private List_regDAO list_regDao;
+    private List_categoryDAO list_catDao;
 
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
@@ -33,6 +36,11 @@
         } catch (DAOFactoryException ex) {
             throw new RuntimeException(new ServletException("Impossible to get the dao for shop_list", ex));
         }
+        try {
+            list_catDao = daoFactory.getDAO(List_categoryDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new RuntimeException(new ServletException("Impossible to get the dao for list_cat", ex));
+        }
     }
 
     public void jspDestroy() {
@@ -41,6 +49,9 @@
         }
         if (list_regDao != null) {
             list_regDao = null;
+        }
+        if (list_catDao != null) {
+            list_catDao = null;
         }
     }
 %>
@@ -57,7 +68,7 @@
     if (session != null) {
         reg_user = (Reg_User) session.getAttribute("reg_user");
     }
-    
+
     if (reg_user == null) {
         if (!response.isCommitted()) {
             response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
@@ -66,6 +77,7 @@
 
     try {
         List<List_reg> shoppingLists = reg_userDao.getOwningShopLists(reg_user);
+        List<List_category> categories = list_catDao.getAll();
 %>
 <!DOCTYPE html>
 <html>
@@ -146,6 +158,11 @@
                                 <input type="text" name="description" id="description" class="form-control" placeholder="Description" required>
                                 <label for="description">Description</label>
                             </div>
+                            <select>
+                                <% for (List_category cat : categories) {%>
+                                <option value="<%=cat.getName()%>"><%=cat.getName()%></option>
+                                <% } %>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" id="editDialogSubmit">Create</button>
