@@ -59,6 +59,6 @@ public abstract class JDBC_DAO<ENTITY_CLASS, PRIMARY_KEY_CLASS> implements DAO<E
      */
     @Override
     public <DAO_CLASS extends DAO> DAO_CLASS getDAO(Class<DAO_CLASS> daoClass) throws DAOFactoryException {
-        return (DAO_CLASS) FRIEND_DAOS.get(daoClass);
+        return daoClass.cast(FRIEND_DAOS.get(daoClass));
     }
 }

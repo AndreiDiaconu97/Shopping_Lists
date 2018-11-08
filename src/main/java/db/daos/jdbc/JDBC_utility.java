@@ -76,31 +76,31 @@ public class JDBC_utility {
                 List<T> Tlist = new ArrayList<>();
                 if (returnType == List_anonymous.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToList_anonymous(rs));
+                        Tlist.add(returnType.cast(resultSetToList_anonymous(rs)));
                     }
                 } else if (returnType == List_category.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToList_category(rs));
+                        Tlist.add(returnType.cast(resultSetToList_category(rs)));
                     }
                 } else if (returnType == List_reg.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToList_reg(rs));
+                        Tlist.add(returnType.cast(resultSetToList_reg(rs)));
                     }
                 } else if (returnType == NV_User.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToNV_User(rs));
+                        Tlist.add(returnType.cast(resultSetToNV_User(rs)));
                     }
                 } else if (returnType == Prod_category.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToProd_category(rs));
+                        Tlist.add(returnType.cast(resultSetToProd_category(rs)));
                     }
                 } else if (returnType == Product.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToProduct(rs));
+                        Tlist.add(returnType.cast(resultSetToProduct(rs)));
                     }
                 } else if (returnType == Reg_User.class) {
                     while (rs.next()) {
-                        Tlist.add((T) resultSetToReg_User(rs));
+                        Tlist.add(returnType.cast(resultSetToReg_User(rs)));
                     }
                 } else {
                     throw new Error("Invalid class of argument!");

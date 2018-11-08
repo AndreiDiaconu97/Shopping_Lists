@@ -123,22 +123,22 @@ public class JDBCDAOFactory implements DAOFactory {
     public <DAO_CLASS extends DAO> DAO_CLASS getDAO(Class<DAO_CLASS> daoInterface) throws DAOFactoryException {
         DAO dao = DAO_CACHE.get(daoInterface);
         if (dao != null) {
-            return (DAO_CLASS) dao;
+            return daoInterface.cast(dao);
         }
         
         Package pkg = daoInterface.getPackage();
         String prefix = pkg.getName() + ".jdbc.JDBC_";
         
         try {
-            Class daoClass = Class.forName(prefix + daoInterface.getSimpleName());
-            
-            Constructor<DAO_CLASS> constructor = daoClass.getConstructor(Connection.class);
-            DAO_CLASS daoInstance = constructor.newInstance(CON);
+            Class<?> daoClass = Class.forName(prefix + daoInterface.getSimpleName());
+            Class<?>[] types = new Class[] {Connection.class};
+            Constructor<?> constructor = daoClass.getConstructor(types);
+            Object daoInstance = constructor.newInstance(CON);
             if (!(daoInstance instanceof JDBC_DAO)) {
                 throw new DAOFactoryException("The daoInterface passed as parameter doesn't extend JDBCDAO class");
             }
-            DAO_CACHE.put(daoInterface, daoInstance);
-            return daoInstance;
+            DAO_CACHE.put(daoInterface, (DAO) daoInstance);
+            return daoInterface.cast(daoInstance);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException ex) {
             throw new DAOFactoryException("Impossible to return the DAO", ex);
         }
