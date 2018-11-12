@@ -20,6 +20,17 @@ public class List_reg implements Serializable{
     private String description;
     private String logo;
 
+    public List_reg() {
+    }
+
+    public List_reg(String name, Integer owner, String category, String description, String logo) {
+        this.name = name;
+        this.owner = owner;
+        this.category = category;
+        this.description = description;
+        this.logo = logo;
+    }
+    
     public Integer getId() {
         return id;
     }

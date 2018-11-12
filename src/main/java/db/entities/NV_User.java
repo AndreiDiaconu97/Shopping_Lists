@@ -25,6 +25,8 @@ public class NV_User implements Serializable{
     
     private static final int SALT_SIZE = 100;
     private static final int CODE_SIZE = 50;
+    
+    
 
     public static int getSALT_SIZE() {
         return SALT_SIZE;

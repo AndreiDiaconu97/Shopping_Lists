@@ -17,6 +17,15 @@ public class Prod_category implements Serializable{
     private String description;
     private String logo;
 
+    public Prod_category() {
+    }
+
+    public Prod_category(String name, String description, String logo) {
+        this.name = name;
+        this.description = description;
+        this.logo = logo;
+    }
+
     public String getName() {
         return name;
     }

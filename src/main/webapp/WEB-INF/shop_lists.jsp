@@ -202,35 +202,11 @@
     </body>
 </html>
 <%
-} catch (DAOException ex) {
+} catch (Exception ex) {
 %>
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Lab 08: Shopping Lists</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
-    </head>
-    <body>
-        <div class="jumbotron">
-            <div class="container">
-                <div class="card border-danger">
-                    <div class="card-header bg-danger text-white">
-                        <h3 class="card-title">Users</h3>
-                    </div>
-                    <div class="card-body">
-                        Error in retriving shopping lists: <%=ex.getMessage()%><br>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
-    </body>
-</html>
+<jsp:forward page="/error.html">
+    <jsp:param name="error" value="shop_list"/>
+</jsp:forward>
 <%
     }
 %>

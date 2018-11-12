@@ -17,6 +17,15 @@ public class List_category implements Serializable{
     private String description;
     private String logo;
 
+    public List_category() {
+    }
+
+    public List_category(String name, String description, String logo) {
+        this.name = name;
+        this.description = description;
+        this.logo = logo;
+    }
+    
     public String getName() {
         return name;
     }

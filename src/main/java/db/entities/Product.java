@@ -24,6 +24,19 @@ public class Product implements Serializable{
     private Integer num_votes;
     private Boolean is_public;
 
+    public Product() {
+    }
+
+    public Product(String name, String category, Integer creator, String description, String logo, String photo, Boolean is_public) {
+        this.name = name;
+        this.category = category;
+        this.creator = creator;
+        this.description = description;
+        this.logo = logo;
+        this.photo = photo;
+        this.is_public = is_public;
+    }
+    
     public String getName() {
         return name;
     }

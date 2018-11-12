@@ -28,10 +28,10 @@ public class ShoppingListServlet extends HttpServlet {
     private Reg_UserDAO reg_userDao;
     private NV_UserDAO nv_userDao;
     private List_regDAO list_regDao;
-    
+
     @Override
     public void init() throws ServletException {
-        
+
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
         if (daoFactory == null) {
             throw new ServletException("Impossible to get dao factory");
@@ -54,26 +54,22 @@ public class ShoppingListServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-       
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String contextPath = getServletContext().getContextPath();
+        if (!contextPath.endsWith("/")) {
+            contextPath += "/";
+        }
+
         if (request.getParameter("create") != null) {
             HttpSession session = request.getSession(false);
             Reg_User reg_user = null;
-            if (session != null) {
-                reg_user = (Reg_User) session.getAttribute("reg_user");
-                //reg_user cannot be null cause filter /restricted
-            }
+            reg_user = (Reg_User) session.getAttribute("reg_user");
             Integer id = reg_user.getId();
             String name = request.getParameter("name");
             String description = request.getParameter("description");
             String category = request.getParameter("category");
 
-            List_reg list = new List_reg();
-            list.setName(name);
-            list.setDescription(description);
-            list.setCategory(category);
-            list.setOwner(id);
+            List_reg list = new List_reg(name, id, category, description, null);
 
             try {
                 list_regDao.insert(list);
@@ -81,7 +77,27 @@ public class ShoppingListServlet extends HttpServlet {
             } catch (Exception e) {
                 System.err.println("Errore. Id della lista inserita:" + list.getId());
             }
+            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        }
 
+        if (request.getParameter("update") != null) {
+            HttpSession session = request.getSession(false);
+            Reg_User reg_user = null;
+            reg_user = (Reg_User) session.getAttribute("reg_user");
+            Integer id = reg_user.getId();
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+            String category = request.getParameter("category");
+
+            List_reg list = new List_reg(name, id, category, description, null);
+
+            try {
+                list_regDao.update(list);
+                System.err.println("Ok, lista modificata:" + list.getId());
+            } catch (Exception e) {
+                System.err.println("Errore. Lista inserita:" + list.getId());
+            }
+            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
         }
     }
 

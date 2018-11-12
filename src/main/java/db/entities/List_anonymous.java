@@ -21,6 +21,17 @@ public class List_anonymous implements Serializable{
     private String category;
     private Timestamp last_seen;
 
+    public List_anonymous() {
+    }
+    
+    public List_anonymous(String name, String description, String logo, String category, Timestamp last_seen) {
+        this.name = name;
+        this.description = description;
+        this.logo = logo;
+        this.category = category;
+        this.last_seen = last_seen;
+    }
+
     public Integer getId() {
         return id;
     }
