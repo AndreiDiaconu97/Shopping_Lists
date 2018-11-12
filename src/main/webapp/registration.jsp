@@ -5,10 +5,9 @@
 <%
     // status: alreadyregistered, needtoverify, error, mailerror, dberror, success
     String status = request.getParameter("status");
-    //if(status==null){
-    //  status="normal";
-    //return;
-    //}
+    if(status==null){
+        status="normal";
+    }
     Boolean error = status.contains("error");
     pageContext.setAttribute("status", status);
     pageContext.setAttribute("error", error);
