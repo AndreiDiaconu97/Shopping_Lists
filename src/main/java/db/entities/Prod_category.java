@@ -5,11 +5,13 @@
  */
 package db.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Andrei Diaconu
  */
-public class Prod_category {
+public class Prod_category implements Serializable{
 
     private String name;
     private String description;

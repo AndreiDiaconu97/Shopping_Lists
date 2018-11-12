@@ -5,11 +5,13 @@
  */
 package db.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Andrei Diaconu
  */
-public class List_reg {
+public class List_reg implements Serializable{
 
     private Integer id;
     private String name;

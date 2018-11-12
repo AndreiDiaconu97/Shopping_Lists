@@ -6,13 +6,14 @@
 package db.entities;
 
 import db.daos.jdbc.JDBC_utility;
+import java.io.Serializable;
 import java.security.SecureRandom;
 
 /**
  *
  * @author Andrei Diaconu
  */
-public class NV_User {
+public class NV_User implements Serializable{
 
     private String email;
     private String password;

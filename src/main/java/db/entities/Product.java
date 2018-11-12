@@ -5,11 +5,13 @@
  */
 package db.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Andrei Diaconu
  */
-public class Product {
+public class Product implements Serializable{
 
     private Integer id;
     private String name;

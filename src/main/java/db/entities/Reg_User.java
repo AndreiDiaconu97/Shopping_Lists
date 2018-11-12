@@ -5,11 +5,13 @@
  */
 package db.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Andrei Diaconu
  */
-public class Reg_User {
+public class Reg_User implements Serializable{
 
     private Integer id;
     private String email;

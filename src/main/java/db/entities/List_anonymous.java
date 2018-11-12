@@ -5,13 +5,14 @@
  */
 package db.entities;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  *
  * @author Andrei Diaconu
  */
-public class List_anonymous {
+public class List_anonymous implements Serializable{
 
     private Integer id;
     private String name;
