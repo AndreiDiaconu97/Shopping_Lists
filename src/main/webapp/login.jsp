@@ -1,3 +1,14 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    String status = request.getParameter("status");
+    if(status==null){
+        status="normal";
+    }
+    Boolean error = status.contains("error");
+    pageContext.setAttribute("status", status);
+    pageContext.setAttribute("error", error);
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,6 +26,7 @@
 
     </head>
     <body>
+        <c:if test="${status=='validated'}"><div class="alert-success" role="alert">Registrato! login now<br></div></c:if>
         <form class="form-signin" action="auth" method="POST">
             <div class="text-center mb-4">
                 <img class="mb-4" src="images/unitn_logo_1024.png" alt="UNITN Logo" width="128" height="128">
@@ -28,6 +40,7 @@
             <div class="form-label-group">
                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                 <label for="password">Password</label>
+                <c:if test="${status=='wrongpsw'}"><div class="alert-danger" role="alert">Password sbagliata<br></div></c:if>
             </div>
             <div class="checkbox mb-3">
                 <label>

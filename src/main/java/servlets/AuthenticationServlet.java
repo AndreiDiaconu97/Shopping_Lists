@@ -14,8 +14,6 @@ import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -87,6 +85,7 @@ public class AuthenticationServlet extends HttpServlet {
             contextPath += "/";
         }
 
+        // VALIDATE
         if (request.getParameter("validate") != null) {
             String code = request.getParameter("code");
             try {
@@ -96,6 +95,8 @@ public class AuthenticationServlet extends HttpServlet {
                 return;
             }
             request.getServletContext().log("Validated user");
+            response.sendRedirect(contextPath + "Shopping/login.html?status=validated");
+            return;
         } else {
             // bad request
         }
@@ -135,10 +136,12 @@ public class AuthenticationServlet extends HttpServlet {
             try {
                 if (reg_userDao.getByEmail(email) != null) {
                     // already registered
-                    response.sendRedirect(contextPath + "registration.html?alreadyRegistered=true");
+                    response.sendRedirect(contextPath + "registration.html?status=alreadyregistered");
+                    return;
                 } else if (nv_userDao.getByEmail(email) != null) {
                     // already registered, need verification
-                    response.sendRedirect(contextPath + "registration.html?needToVerify=true");
+                    response.sendRedirect(contextPath + "registration.html?status=needtoverify");
+                    return;
                 } else {
                     NV_User nv_user = new NV_User(email, password, firstname, lastname, null);
                     String code = nv_user.getCode();
@@ -146,6 +149,7 @@ public class AuthenticationServlet extends HttpServlet {
                         nv_userDao.insert(nv_user);
                     } catch (DAOException ex) {
                         request.getServletContext().log("Impossible to register user");
+                        response.sendRedirect(contextPath + "registration.html?status=error");
                         return;
                     }
                     // send email with code
@@ -164,13 +168,17 @@ public class AuthenticationServlet extends HttpServlet {
                         Transport.send(msg);
                     } catch (MessagingException me) {
                         me.printStackTrace(System.err);
+                        response.sendRedirect(contextPath + "registration.html?status=mailerror");
                     }
                 }
             } catch (DAOException ex) {
                 request.getServletContext().log("Impossible to check if user is already registered", ex);
+                response.sendRedirect(contextPath + "registration.html?status=dberror");
             }
             request.getServletContext().log("REGISTERED " + email);
-
+            response.sendRedirect(contextPath + "registration.html?status=success");
+            
+            
         } else if (request.getParameter("login") != null) {
             // LOGIN
             String email = request.getParameter("email");
@@ -183,16 +191,15 @@ public class AuthenticationServlet extends HttpServlet {
 
                     if (reg_userDao.getByEmail(email) != null) {
                         // wrong password
-                        System.err.println("WRONG PASSWORD");
+                        response.sendRedirect(contextPath + "login.html?status=wrongpsw");
                     } else if (nv_userDao.getByEmail(email) != null) {
                         // need to verify
-                        System.err.println("NEED TO VERIFY");
+                        response.sendRedirect(contextPath + "login.html?status=needtoverify");
                     } else {
                         // need to register
-                        System.err.println("NEED TO REGISTER");
+                        response.sendRedirect(contextPath + "login.html?status=needtoregister");
                     }
 
-                    //response.sendRedirect(response.encodeRedirectURL(contextPath + "login.handler"));
                 } else {
                     request.getSession().setAttribute("reg_user", reg_user);
                     if (reg_user.getIs_admin()) {
@@ -203,9 +210,10 @@ public class AuthenticationServlet extends HttpServlet {
                 }
             } catch (DAOException ex) {
                 request.getServletContext().log("Impossible to retrieve the user", ex);
+                response.sendRedirect(contextPath + "login.html?status=dberror");
             }
 
-            // CHANge PASSWORD
+            // CHANGE PASSWORD
         } else if (request.getParameter("changepsw") != null) {
 
         } else {

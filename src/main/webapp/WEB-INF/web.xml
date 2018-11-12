@@ -21,6 +21,22 @@
         <url-pattern>/restricted/shopping.lists.html</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>Registration_jsp</servlet-name>
+        <jsp-file>/registration.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Registration_jsp</servlet-name>
+        <url-pattern>/registration.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>Login_jsp</servlet-name>
+        <jsp-file>/login.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Login_jsp</servlet-name>
+        <url-pattern>/login.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>ShoppingListServlet</servlet-name>
         <servlet-class>servlets.ShoppingListServlet</servlet-class>
     </servlet>
