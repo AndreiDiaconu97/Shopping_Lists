@@ -52,6 +52,14 @@
         <servlet-name>AuthenticationServlet</servlet-name>
         <url-pattern>/auth</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>Error_jsp</servlet-name>
+        <jsp-file>/WEB-INF/error.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Error_jsp</servlet-name>
+        <url-pattern>/error.html</url-pattern>
+    </servlet-mapping>
     <listener>
         <description>ServletContextListener</description>
         <listener-class>listeners.WebAppContextListener</listener-class>
