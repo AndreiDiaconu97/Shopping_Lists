@@ -186,7 +186,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         }
 
         String query = "INSERT INTO " + U_REG_TABLE + "(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, reg_user.getEmail());
             stm.setString(2, reg_user.getPassword());
             stm.setString(3, reg_user.getSalt());

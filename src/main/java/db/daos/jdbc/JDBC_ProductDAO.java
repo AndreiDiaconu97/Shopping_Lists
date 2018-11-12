@@ -45,7 +45,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         }
 
         String query = "INSERT INTO " + P_TABLE + "(name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setString(3, product.getCategory());

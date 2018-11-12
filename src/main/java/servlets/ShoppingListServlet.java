@@ -77,8 +77,9 @@ public class ShoppingListServlet extends HttpServlet {
 
             try {
                 list_regDao.insert(list);
+                System.err.println("Ok. Id della lista inserita:" + list.getId());
             } catch (Exception e) {
-                System.err.println(list.getId());
+                System.err.println("Errore. Id della lista inserita:" + list.getId());
             }
 
         }

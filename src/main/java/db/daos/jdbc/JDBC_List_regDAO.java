@@ -146,18 +146,17 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         }
 
         String query = "INSERT INTO " + L_TABLE + "(name, description, category, owner, logo) VALUES(?, ?, ?, ?, ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_reg.getName());
             stm.setString(2, list_reg.getDescription());
             stm.setString(3, list_reg.getCategory());
             stm.setInt(4, list_reg.getOwner());
-            stm.setString(5, list_reg.getLogo());          
-            stm.executeUpdate();           
+            stm.setString(5, list_reg.getLogo());
+            stm.executeUpdate();
             
             try(ResultSet rs = stm.getGeneratedKeys()){
                 if (rs.next()) {
-
-                    list_reg.setId(rs.getInt("id"));
+                    list_reg.setId(rs.getInt(1));
                 }
             } catch (SQLException ex){
                 System.err.println("Errore in rs:" + ex);

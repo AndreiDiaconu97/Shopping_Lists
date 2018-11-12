@@ -47,7 +47,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         }
 
         String query = "INSERT INTO " + L_ANONYM_TABLE + "(name, description, category, logo, last_seen) VALUES(?, ?, ?, ?, ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
             stm.setString(3, list_anonymous.getCategory());
