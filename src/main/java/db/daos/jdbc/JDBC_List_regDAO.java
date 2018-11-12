@@ -151,14 +151,19 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setString(2, list_reg.getDescription());
             stm.setString(3, list_reg.getCategory());
             stm.setInt(4, list_reg.getOwner());
-            stm.setString(5, list_reg.getLogo());
-            stm.executeUpdate();
+            stm.setString(5, list_reg.getLogo());          
+            stm.executeUpdate();           
+            
+            try(ResultSet rs = stm.getGeneratedKeys()){
+                if (rs.next()) {
 
-            ResultSet rs = stm.getGeneratedKeys();
-            if (rs.next()) {
-                list_reg.setId(rs.getInt(1));
+                    list_reg.setId(rs.getInt("id"));
+                }
+            } catch (SQLException ex){
+                System.err.println("Errore in rs:" + ex);
             }
         } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
             throw new DAOException("Impossible to add list_reg to DB", ex);
         }
     }

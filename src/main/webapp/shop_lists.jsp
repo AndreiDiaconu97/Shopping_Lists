@@ -158,13 +158,14 @@
                                 <input type="text" name="description" id="description" class="form-control" placeholder="Description" required>
                                 <label for="description">Description</label>
                             </div>
-                            <select>
+                            <select name="category">
                                 <% for (List_category cat : categories) {%>
                                 <option value="<%=cat.getName()%>"><%=cat.getName()%></option>
                                 <% } %>
                             </select>
                         </div>
                         <div class="modal-footer">
+                            <input type="hidden" name="create" value="create"><br> 
                             <button type="submit" class="btn btn-primary" id="editDialogSubmit">Create</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </div>
