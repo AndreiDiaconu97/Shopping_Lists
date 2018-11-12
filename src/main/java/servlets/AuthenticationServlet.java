@@ -92,10 +92,11 @@ public class AuthenticationServlet extends HttpServlet {
                 nv_userDao.validateUsingCode(code);
             } catch (DAOException ex) {
                 request.getServletContext().log("Unable to validate user", ex);
+                response.sendRedirect(contextPath + "registration.html?status=error");
                 return;
             }
             request.getServletContext().log("Validated user");
-            response.sendRedirect(contextPath + "Shopping/login.html?status=validated");
+            response.sendRedirect(contextPath + "login.html?status=validated");
             return;
         } else {
             // bad request

@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
+    // status: alreadyregistered, needtoverify, error, mailerror, dberror, success
     String status = request.getParameter("status");
     //if(status==null){
     //  status="normal";
