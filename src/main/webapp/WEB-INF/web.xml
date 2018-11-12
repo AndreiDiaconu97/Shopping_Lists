@@ -14,7 +14,7 @@
     </filter-mapping>
     <servlet>
         <servlet-name>Shop_list_jsp</servlet-name>
-        <jsp-file>/shop_lists.jsp</jsp-file>
+        <jsp-file>/WEB-INF/shop_lists.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>Shop_list_jsp</servlet-name>
@@ -22,7 +22,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>Registration_jsp</servlet-name>
-        <jsp-file>/registration.jsp</jsp-file>
+        <jsp-file>/WEB-INF/registration.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>Registration_jsp</servlet-name>
@@ -30,7 +30,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>Login_jsp</servlet-name>
-        <jsp-file>/login.jsp</jsp-file>
+        <jsp-file>/WEB-INF/login.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>Login_jsp</servlet-name>
