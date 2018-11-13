@@ -10,6 +10,7 @@ import db.daos.NV_UserDAO;
 import db.daos.ProductDAO;
 import db.daos.Reg_UserDAO;
 import db.entities.List_reg;
+import db.entities.Product;
 import db.entities.Reg_User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
@@ -110,6 +111,24 @@ public class ShoppingListServlet extends HttpServlet {
         if(request.getParameter("add") != null){
             String name = request.getParameter("object_name");
             String id = request.getParameter("list_id");
+            Product product = new Product();
+            List_reg list_reg = new List_reg();
+           
+            try{
+                list_reg = list_regDao.getByPrimaryKey(Integer.parseInt(id));
+                product = productDao.getByName(name);
+            }catch(Exception e){
+                System.err.println(e);
+            }
+            
+            if(product != null){
+                try{
+                    list_regDao.insert_product(list_reg, product);   
+                }catch (DAOException e){
+                    System.err.println("Impossible to insert given product");
+                }
+            }      
+            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
             
             
         }

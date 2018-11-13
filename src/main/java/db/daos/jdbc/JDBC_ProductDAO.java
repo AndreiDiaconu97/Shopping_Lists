@@ -127,4 +127,19 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
             throw new DAOException("Impossible to get the product for the passed id", ex);
         }
     }
+    
+    @Override
+    public Product getByName(String name) throws DAOException{
+        if(name == null){
+            throw new DAOException("Given name is empty");
+        }
+        try(PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + P_TABLE + " WHERE NAME = ?")){
+            stm.setString(1, name);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next() ? resultSetToProduct(rs) : null;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the product for the passed name", ex);
+        }
+    }
 }
