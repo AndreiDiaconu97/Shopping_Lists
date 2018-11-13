@@ -128,6 +128,14 @@
                         <div id="collapse<%=index%>" class="collapse<%=(index == 1 ? " show" : "")%>" aria-labelledby="heading<%=(index++)%>" data-parent="#accordion">
                             <div class="card-body">
                                 <%=shoppingList.getDescription()%>
+                                <form action="shopping.lists.handler" method="POST">
+                                <div class="form-label-group">
+                                    <input type="text" name="object_name"><br>
+                                    <input type="hidden" name="add" value="add"><br>
+                                    <input type="hidden" name="list_id" value="<%=shoppingList.getId()%>"><br>                                     
+                                    <button type="add" class="btn btn-primary" id="editDialogSubmit">Add</button>
+                                </div>
+                            </form>
                             </div>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ package servlets;
 
 import db.daos.List_regDAO;
 import db.daos.NV_UserDAO;
+import db.daos.ProductDAO;
 import db.daos.Reg_UserDAO;
 import db.entities.List_reg;
 import db.entities.Reg_User;
@@ -28,6 +29,7 @@ public class ShoppingListServlet extends HttpServlet {
     private Reg_UserDAO reg_userDao;
     private NV_UserDAO nv_userDao;
     private List_regDAO list_regDao;
+    private ProductDAO productDao;
 
     @Override
     public void init() throws ServletException {
@@ -50,6 +52,11 @@ public class ShoppingListServlet extends HttpServlet {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for reg_user", ex);
+        }
+        try {
+            productDao = daoFactory.getDAO(ProductDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new ServletException("Impossible to get dao for product", ex);
         }
     }
 
@@ -98,6 +105,13 @@ public class ShoppingListServlet extends HttpServlet {
                 System.err.println("Errore. Lista inserita:" + list.getId());
             }
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        }
+        
+        if(request.getParameter("add") != null){
+            String name = request.getParameter("object_name");
+            String id = request.getParameter("list_id");
+            
+            
         }
     }
 
