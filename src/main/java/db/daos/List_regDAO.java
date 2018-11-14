@@ -25,5 +25,5 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
 
     public List<Product> getProducts(List_reg list_reg) throws DAOException;
     
-    public void insert_product(List_reg list_reg, Product product) throws DAOException;
+    public void insertProduct(List_reg list_reg, Product product) throws DAOException;
 }

@@ -102,9 +102,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
     
     @Override
-    public void insert_product(List_reg list_reg, Product product) throws DAOException{
+    public void insertProduct(List_reg list_reg, Product product) throws DAOException{
         if(product == null){
             throw new DAOException("Product parameter is null");
+        }
+        if(list_reg == null){
+            throw new DAOException("List parameter is null");
         }
         String query = "INSERT INTO " + L_P_TABLE + "(LIST, PRODUCT) VALUES (?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -123,8 +126,11 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("list_reg parameter is null");
         }
         String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_P_TABLE + "WHERE LIST = ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setInt(1, list_reg.getId());
+        try {
+            System.err.println("test1");
+            PreparedStatement stm = CON.prepareStatement(query);
+            System.err.println("test2");
+            stm.setInt(1, list_reg.getId());            
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
 

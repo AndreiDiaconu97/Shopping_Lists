@@ -4,6 +4,9 @@
     Author     : Stefano Chirico &lt;chirico dot stefano at parcoprogetti dot com&gt;
 --%>
 
+<%@page import="db.daos.ProductDAO"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="db.entities.Product"%>
 <%@page import="db.entities.List_category"%>
 <%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.entities.List_reg"%>
@@ -20,6 +23,7 @@
     private Reg_UserDAO reg_userDao;
     private List_regDAO list_regDao;
     private List_categoryDAO list_catDao;
+    private ProductDAO productDao;
 
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
@@ -78,6 +82,7 @@
     try {
         List<List_reg> shoppingLists = reg_userDao.getOwningShopLists(reg_user);
         List<List_category> categories = list_catDao.getAll();
+        List<Product> products;         
 %>
 <!DOCTYPE html>
 <html>
@@ -128,14 +133,41 @@
                         <div id="collapse<%=index%>" class="collapse<%=(index == 1 ? " show" : "")%>" aria-labelledby="heading<%=(index++)%>" data-parent="#accordion">
                             <div class="card-body">
                                 <%=shoppingList.getDescription()%>
+                                
+                                
+                            <%  
+                               
+                                products = list_regDao.getProducts(shoppingList);
+                                if (products == null) {
+                                    
+                            %>                 
+                                <div class="card">
+                                    <div class="card-body">
+                                        This collection is empty.
+                                    </div>
+                                </div>            
+                            <%    
+                                }else{
+                                
+                                    for(Product product : products){
+                            %>
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <%=product.getName()%>
+                                            </div>
+                                        </div>                          
+                            <%
+                                    }
+                                }
+                            %>    
                                 <form action="shopping.lists.handler" method="POST">
-                                <div class="form-label-group">
-                                    <input type="text" name="object_name"><br>
-                                    <input type="hidden" name="add" value="add"><br>
-                                    <input type="hidden" name="list_id" value="<%=shoppingList.getId()%>"><br>                                     
-                                    <button type="add" class="btn btn-primary" id="editDialogSubmit">Add</button>
-                                </div>
-                            </form>
+                                    <div class="form-label-group">
+                                        <input type="text" name="object_name"><br>
+                                        <input type="hidden" name="add" value="add"><br>
+                                        <input type="hidden" name="list_id" value="<%=shoppingList.getId()%>"><br>                                     
+                                        <button type="add" class="btn btn-primary" id="editDialogSubmit">Add</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -211,6 +243,7 @@
 </html>
 <%
 } catch (Exception ex) {
+    System.err.println(ex);
 %>
 <jsp:forward page="/error.html">
     <jsp:param name="error" value="shop_list"/>

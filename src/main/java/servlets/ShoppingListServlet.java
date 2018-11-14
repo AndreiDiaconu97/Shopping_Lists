@@ -123,11 +123,12 @@ public class ShoppingListServlet extends HttpServlet {
             
             if(product != null){
                 try{
-                    list_regDao.insert_product(list_reg, product);   
+                    list_regDao.insertProduct(list_reg, product);   
                 }catch (DAOException e){
                     System.err.println("Impossible to insert given product");
                 }
             }      
+            
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
             
             
