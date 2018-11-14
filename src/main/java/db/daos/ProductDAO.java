@@ -13,5 +13,7 @@ import db.exceptions.DAOException;
  * @author Andrei Diaconu
  */
 public interface ProductDAO extends DAO<Product, Integer> {
+    
+    public Product getByName(String name) throws DAOException;
 
 }
