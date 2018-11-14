@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,10 +101,10 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to get the shopping_list for the passed id", ex);
         }
     }
-    
+
     @Override
-    public void insert_product(List_reg list_reg, Product product) throws DAOException{
-        if(product == null){
+    public void insert_product(List_reg list_reg, Product product) throws DAOException {
+        if (product == null) {
             throw new DAOException("Product parameter is null");
         }
         String query = "INSERT INTO " + L_P_TABLE + "(LIST, PRODUCT) VALUES (?, ?)";
@@ -115,19 +116,18 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to add new product", ex);
         }
     }
-    
-    
+
     @Override
     public List<Product> getProducts(List_reg list_reg) throws DAOException {
         if (list_reg == null) {
             throw new DAOException("list_reg parameter is null");
         }
-        String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_P_TABLE + "WHERE LIST = ?)";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setInt(1, list_reg.getId());
-            try (ResultSet rs = stm.executeQuery()) {
+        String query = "SELECT p.* FROM PRODUCTS p, LISTS_PRODUCTS l_p WHERE l_p.LIST=" + list_reg.getId() + " AND l_p.PRODUCT=p.ID";
+        try (Statement stm = CON.createStatement()) {
+            System.err.println("pronto");
+            try (ResultSet rs = stm.executeQuery(query)) {
+                System.err.println("eseguito");
                 List<Product> products = new ArrayList<>();
-
                 while (rs.next()) {
                     products.add(JDBC_utility.resultSetToProduct(rs));
                 }
@@ -169,12 +169,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setInt(4, list_reg.getOwner());
             stm.setString(5, list_reg.getLogo());
             stm.executeUpdate();
-            
-            try(ResultSet rs = stm.getGeneratedKeys()){
+
+            try (ResultSet rs = stm.getGeneratedKeys()) {
                 if (rs.next()) {
                     list_reg.setId(rs.getInt(1));
                 }
-            } catch (SQLException ex){
+            } catch (SQLException ex) {
                 System.err.println("Errore in rs:" + ex);
             }
         } catch (SQLException ex) {
