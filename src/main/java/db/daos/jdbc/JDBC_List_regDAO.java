@@ -114,7 +114,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         String query = "INSERT INTO " + L_P_TABLE + "(LIST, PRODUCT) VALUES (?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_reg.getId());
-            stm.setInt(2, list_reg.getId());
+            stm.setInt(2, product.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add new product", ex);

@@ -132,18 +132,14 @@
                         </div>
                         <div id="collapse<%=index%>" class="collapse<%=(index == 1 ? " show" : "")%>" aria-labelledby="heading<%=(index++)%>" data-parent="#accordion">
                             <div class="card-body">
-                                <%=shoppingList.getDescription()%>
-                                
-                                
-                            <%  
-                               
+                                <%=shoppingList.getDescription()%>                                
+                            <%                                 
                                 products = list_regDao.getProducts(shoppingList);
-                                if (products == null) {
-                                    
+                                if (products == null) {                            
                             %>                 
                                 <div class="card">
                                     <div class="card-body">
-                                        This collection is empty.
+                                        There are no products in this list.
                                     </div>
                                 </div>            
                             <%    

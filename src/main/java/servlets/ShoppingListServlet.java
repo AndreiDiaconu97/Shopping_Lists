@@ -117,6 +117,7 @@ public class ShoppingListServlet extends HttpServlet {
             try{
                 list_reg = list_regDao.getByPrimaryKey(Integer.parseInt(id));
                 product = productDao.getByName(name);
+                System.err.println(list_reg.getName());
             }catch(Exception e){
                 System.err.println(e);
             }
