@@ -82,7 +82,7 @@
     try {
         List<List_reg> shoppingLists = reg_userDao.getOwningShopLists(reg_user);
         List<List_category> categories = list_catDao.getAll();
-        List<Product> products;         
+        List<Product> products;
 %>
 <!DOCTYPE html>
 <html>
@@ -105,7 +105,6 @@
                 <div class="card-body">
                     The following table lists all the shopping-lists shared with &quot;<%=reg_user.getFirstname() + " " + reg_user.getLastname()%>&quot;.<br>
                 </div>
-
                 <!-- Shopping Lists cards -->
                 <div id="accordion">
                     <%
@@ -144,7 +143,6 @@
                                 </div>            
                             <%    
                                 }else{
-                                
                                     for(Product product : products){
                             %>
                                         <div class="card">
