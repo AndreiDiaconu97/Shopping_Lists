@@ -1,12 +1,5 @@
-<%-- 
-    Document   : shoppinglists
-    Created on : 14-apr-2018, 15.16.06
-    Author     : Stefano Chirico &lt;chirico dot stefano at parcoprogetti dot com&gt;
---%>
-
-<%@page import="db.daos.ProductDAO"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="db.entities.Product"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="db.entities.List_category"%>
 <%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.entities.List_reg"%>
@@ -23,7 +16,6 @@
     private Reg_UserDAO reg_userDao;
     private List_regDAO list_regDao;
     private List_categoryDAO list_catDao;
-    private ProductDAO productDao;
 
     public void jspInit() {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
@@ -79,169 +71,121 @@
         }
     }
 
+    List<List_reg> myLists;
+    List<List_reg> sharedLists;
+    List<List_category> categories;
     try {
-        List<List_reg> shoppingLists = reg_userDao.getOwningShopLists(reg_user);
-        List<List_category> categories = list_catDao.getAll();
-        List<Product> products;
+        myLists = reg_userDao.getOwningShopLists(reg_user);
+        sharedLists = reg_userDao.getSharedShopLists(reg_user);
+        categories = list_catDao.getAll();
+        pageContext.setAttribute("myLists", myLists);
+        pageContext.setAttribute("sharedLists", sharedLists);
+        pageContext.setAttribute("categories", categories);
+        pageContext.setAttribute("list_catDao", list_catDao);
+        pageContext.setAttribute("list_regDao", list_regDao);
+    } catch (DAOException ex) {
+        System.err.println("Error loading shopping lists (jsp)" + ex);
+        if (!response.isCommitted()) {
+            response.sendRedirect(contextPath + "error.html?error=");
+        }
+    }
 %>
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Lab 08: Shopping lists shared with<%=reg_user.getFirstname() + " " + reg_user.getLastname()%></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" crossorigin="anonymous">
-        <link rel="stylesheet" href="../css/floating-labels.css">
-        <link rel="stylesheet" href="../css/forms.css">
+        <title>My lists</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <div class="container-fluid">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title float-left">Shopping Lists</h5><span><a href="<%=contextPath%>restricted/export2PDF?id=<%=reg_user.getId()%>" class="far fa-file-pdf fa-2x text-light float-right" aria-hidden="true"></a></span><button type="button" class="btn btn-outline-light bg-light text-primary btn-sm float-right" data-toggle="modal" data-target="#editDialog"><i class="fas fa-plus" aria-hidden="true"></i></button>
+        <div class="jumbotron">
+            Created by me:<br>
+            <c:forEach var='list' items='${myLists}'>
+                <button class='btn' data-toggle='collapse' data-target='#collapse${list.getId()}'>${list.getName()} (Id: ${list.getId()})</button>
+                <br>
+                <div id='collapse${list.getId()}' class='collapse'>
+                    Description:<br>${list.getDescription()}<br>
+                    Products<ul>
+                        <c:forEach var='product' items='${list_regDao.getProducts(list)}'>
+                            <li>${product.getName()}</li>
+                        </c:forEach>
+                    </ul>
+                    <button class="btn" data-toggle='modal' data-target='#editListModal' onclick='
+                        document.getElementById("editListModalTitle").innerHTML = "Edit ${list.getName()}";
+                        document.getElementById("editDescriptionInput").value = "${list.getDescription()}";
+                        document.getElementById("editCategorySelect").selectedIndex = "${categories.indexOf(list_catDao.getByPrimaryKey(list.getCategory()))}";
+                    '>edit</button>
                 </div>
-                <div class="card-body">
-                    The following table lists all the shopping-lists shared with &quot;<%=reg_user.getFirstname() + " " + reg_user.getLastname()%>&quot;.<br>
-                </div>
-                <!-- Shopping Lists cards -->
-                <div id="accordion">
-                    <%
-                        if (shoppingLists.isEmpty()) {
-                    %>
-                    <div class="card">
-                        <div class="card-body">
-                            This collection is empty.
+            </c:forEach>
+
+            <div class="modal" id="editListModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="editListModalTitle">Edit</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="shopping.lists.handler" method="POST">
+                                Description:<br><input type="text" name="description" id='editDescriptionInput' required><br>
+                                <select name="category" id="editCategorySelect" required>
+                                    <c:forEach var='cat' items='${categories}'>
+                                        <option value='${cat.getName()}'>${cat.getName()}</option>
+                                    </c:forEach>
+                                </select>
+                                <input type="hidden" name="edit" value="edit">
+                                <button type='submit' class='btn btn-primary'>Edit</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                         </div>
                     </div>
-                    <%
-                    } else {
-                        int index = 1;
-                        for (List_reg shoppingList : shoppingLists) {
-                    %>
-                    <div class="card">
-                        <div class="card-header" id="heading<%=index%>">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse<%=index%>" aria-expanded="true" aria-controls="collapse<%=index%>">
-                                    <%=shoppingList.getName()%>
-                                </button>
-                                <div class="float-right"><a href="<%=contextPath%>restricted/edit.shopping.list.html?id=<%=shoppingList.getId()%>" class="fas fa-pen-square" title="edit &quot;<%=shoppingList.getName()%>&quot; shopping list" data-toggle="modal" data-target="#editDialog" data-shopping-list-id="<%=shoppingList.getId()%>" data-shopping-list-name="<%=shoppingList.getName()%>" data-shopping-list-description="<%=shoppingList.getDescription()%>"></a></div>
-                            </h5>
+                </div>
+            </div>
+
+
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createListModal">Create list</button>
+            <div class="modal" id="createListModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Modal Heading</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
-                        <div id="collapse<%=index%>" class="collapse<%=(index == 1 ? " show" : "")%>" aria-labelledby="heading<%=(index++)%>" data-parent="#accordion">
-                            <div class="card-body">
-                                <%=shoppingList.getDescription()%>                                
-                            <%                                 
-                                products = list_regDao.getProducts(shoppingList);
-                                if (products == null) {                            
-                            %>                 
-                                <div class="card">
-                                    <div class="card-body">
-                                        There are no products in this list.
-                                    </div>
-                                </div>            
-                            <%    
-                                }else{
-                                    for(Product product : products){
-                            %>
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <%=product.getName()%>
-                                            </div>
-                                        </div>                          
-                            <%
-                                    }
-                                }
-                            %>    
-                                <form action="shopping.lists.handler" method="POST">
-                                    <div class="form-label-group">
-                                        <input type="text" name="object_name"><br>
-                                        <input type="hidden" name="add" value="add"><br>
-                                        <input type="hidden" name="list_id" value="<%=shoppingList.getId()%>"><br>                                     
-                                        <button type="add" class="btn btn-primary" id="editDialogSubmit">Add</button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div class="modal-body">
+                            <form action="shopping.lists.handler" method="POST">
+                                Name:<br><input type="text" name="name" required><br>
+                                Description:<br><input type="text" name="description" required><br>
+                                <select name="category" required>
+                                    <c:forEach var='cat' items='${categories}'>
+                                        <option value='${cat.getName()}'>${cat.getName()}</option>
+                                    </c:forEach>
+                                </select>
+                                <input type="hidden" name="create" value="create">
+                                <button type='submit' class='btn btn-primary'>Create</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                         </div>
                     </div>
-                    <%
-                            }
-                        }
-                    %>
                 </div>
             </div>
         </div>
-        <!-- create/edit shopping list modal dialog (#editDialog) -->
-        <form action="shopping.lists.handler" method="POST">
-            <div class="modal fade" id="editDialog" tabindex="-1" role="dialog" aria-labelledby="titleLabel">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3 class="modal-title" id="titleLabel">Create new/Edit Shopping List</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fas fa-window-close red-window-close"></i></span></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="idUser" value="<%=reg_user.getId()%>">
-                            <input type="hidden" name="idShoppingList" id="idShoppingList">
-                            <div class="form-label-group">
-                                <input type="text" name="name" id="name" class="form-control" placeholder="Name" required autofocus>
-                                <label for="name">Name</label>
-                            </div>
-                            <div class="form-label-group">
-                                <input type="text" name="description" id="description" class="form-control" placeholder="Description" required>
-                                <label for="description">Description</label>
-                            </div>
-                            <select name="category">
-                                <% for (List_category cat : categories) {%>
-                                <option value="<%=cat.getName()%>"><%=cat.getName()%></option>
-                                <% } %>
-                            </select>
-                        </div>
-                        <div class="modal-footer">
-                            <input type="hidden" name="create" value="create"><br> 
-                            <button type="submit" class="btn btn-primary" id="editDialogSubmit">Create</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        </div>
-                    </div>
+        <div class="jumbotron">
+            Shared with me:<br>
+            <c:forEach var='list' items='${sharedLists}'>
+                <button class='btn' data-toggle='collapse' data-target='#collapse${list.getId()}'>${list.getName()} (Id: ${list.getId()})</button>
+                <div id='collapse${list.getId()}' class='collapse'>
+                    Description:<br>${list.getDescription()}<br>
                 </div>
-            </div>
-        </form>
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
-        <script type="text/javascript">
-            $(function () {
-                $("#editDialog").on("show.bs.modal", function (e) {
-                    var target = $(e.relatedTarget);
-                    var shoppingListId = target.data("shopping-list-id");
-                    if (shoppingListId !== undefined) {
-                        var shoppingListName = target.data("shopping-list-name");
-                        var shoppingListDescription = target.data("shopping-list-description");
-
-                        $("#titleLabel").html("Edit Shopping List (" + shoppingListId + ")");
-                        $("#editDialogSubmit").html("Update");
-                        $("#idShoppingList").val(shoppingListId);
-                        $("#name").val(shoppingListName);
-                        $("#description").val(shoppingListDescription);
-                    } else {
-                        $("#titleLabel").html("Create new Shopping List");
-                        $("#editDialogSubmit").html("Create");
-                    }
-                });
-            });
-        </script>
-
+            </c:forEach>
+        </div>
     </body>
 </html>
-<%
-} catch (Exception ex) {
-    System.err.println(ex);
-%>
-<jsp:forward page="/error.html">
-    <jsp:param name="error" value="shop_list"/>
-</jsp:forward>
-<%
-    }
-%>

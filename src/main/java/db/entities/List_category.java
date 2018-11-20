@@ -49,4 +49,20 @@ public class List_category implements Serializable{
     public void setLogo(String logo) {
         this.logo = logo;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj==null){
+            return false;
+        }
+        List_category obj_c = (List_category) obj;
+        return this.getName().equals(obj_c.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getName().hashCode();
+    }
+    
+    
 }
