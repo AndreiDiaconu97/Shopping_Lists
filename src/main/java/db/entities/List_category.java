@@ -6,6 +6,7 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -51,18 +52,27 @@ public class List_category implements Serializable{
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj==null){
-            return false;
-        }
-        List_category obj_c = (List_category) obj;
-        return this.getName().equals(obj_c.getName());
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.name);
+        return hash;
     }
 
     @Override
-    public int hashCode() {
-        return this.getName().hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final List_category other = (List_category) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
     }
-    
-    
 }

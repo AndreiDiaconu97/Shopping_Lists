@@ -6,6 +6,7 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -48,5 +49,30 @@ public class Prod_category implements Serializable{
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Prod_category other = (Prod_category) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
     }
 }

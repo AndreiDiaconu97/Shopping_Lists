@@ -8,6 +8,7 @@ package db.entities;
 import db.daos.jdbc.JDBC_utility;
 import java.io.Serializable;
 import java.security.SecureRandom;
+import java.util.Objects;
 
 /**
  *
@@ -117,6 +118,31 @@ public class NV_User implements Serializable{
 
     private void generateCode() {
         this.code = JDBC_utility.randomString(CODE_SIZE);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + Objects.hashCode(this.email);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NV_User other = (NV_User) obj;
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        return true;
     }
 
 }
