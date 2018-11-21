@@ -109,14 +109,17 @@
                 <br>
                 <div id='collapse${list.getId()}' class='collapse'>
                     Description:<br>${list.getDescription()}<br>
+                    Category: ${list.getCategory()}<br>
                     Products<ul>
                         <c:forEach var='product' items='${list_regDao.getProducts(list)}'>
                             <li>${product.getName()}</li>
                         </c:forEach>
                     </ul>
                     <button class="btn" data-toggle='modal' data-target='#editListModal' onclick='
+                        document.getElementById("editModalListName").value = "${list.getName()}";
                         document.getElementById("editListModalTitle").innerHTML = "Edit ${list.getName()}";
                         document.getElementById("editDescriptionInput").value = "${list.getDescription()}";
+                        document.getElementById("editModalListID").value = ${list.getId()};
                         document.getElementById("editCategorySelect").selectedIndex = "${categories.indexOf(list_catDao.getByPrimaryKey(list.getCategory()))}";
                     '>edit</button>
                 </div>
@@ -131,12 +134,14 @@
                         </div>
                         <div class="modal-body">
                             <form action="shopping.lists.handler" method="POST">
+                                <input type="hidden" name="name" id="editModalListName" required>
                                 Description:<br><input type="text" name="description" id='editDescriptionInput' required><br>
                                 <select name="category" id="editCategorySelect" required>
                                     <c:forEach var='cat' items='${categories}'>
                                         <option value='${cat.getName()}'>${cat.getName()}</option>
                                     </c:forEach>
                                 </select>
+                                <input type="hidden" name="listID" id="editModalListID" required>
                                 <input type="hidden" name="edit" value="edit">
                                 <button type='submit' class='btn btn-primary'>Edit</button>
                             </form>
@@ -162,6 +167,7 @@
                             <form action="shopping.lists.handler" method="POST">
                                 Name:<br><input type="text" name="name" required><br>
                                 Description:<br><input type="text" name="description" required><br>
+                                Category: ${list.getCategory()}<br>
                                 <select name="category" required>
                                     <c:forEach var='cat' items='${categories}'>
                                         <option value='${cat.getName()}'>${cat.getName()}</option>

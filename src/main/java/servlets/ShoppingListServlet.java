@@ -88,7 +88,7 @@ public class ShoppingListServlet extends HttpServlet {
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
         }
 
-        if (request.getParameter("update") != null) {
+        if (request.getParameter("edit") != null) {
             HttpSession session = request.getSession(false);
             Reg_User reg_user = null;
             reg_user = (Reg_User) session.getAttribute("reg_user");
@@ -98,11 +98,11 @@ public class ShoppingListServlet extends HttpServlet {
             String category = request.getParameter("category");
 
             List_reg list = new List_reg(name, id, category, description, null);
-
+            list.setId(Integer.parseInt(request.getParameter("listID")));
             try {
                 list_regDao.update(list);
                 System.err.println("Ok, lista modificata:" + list.getId());
-            } catch (Exception e) {
+            } catch (DAOException ex) {
                 System.err.println("Errore. Lista inserita:" + list.getId());
             }
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
