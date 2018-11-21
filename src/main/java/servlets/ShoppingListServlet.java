@@ -108,6 +108,24 @@ public class ShoppingListServlet extends HttpServlet {
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
         }
         
+        if (request.getParameter("delete") != null) {
+            Integer id = Integer.parseInt(request.getParameter("list_id"));
+            try {
+                List_reg list = list_regDao.getByPrimaryKey(id);
+                try{
+                    list_regDao.delete(list);
+                    System.err.println("List deleted");
+                }catch (DAOException ex){
+                    System.err.println("Impossible to delete selected list");
+                }
+                
+            } catch (DAOException ex) {
+                System.err.println("Impossible to retrieve list by given ID");
+            }
+           
+            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        }
+        
         if(request.getParameter("add") != null){
             String name = request.getParameter("object_name");
             String id = request.getParameter("list_id");

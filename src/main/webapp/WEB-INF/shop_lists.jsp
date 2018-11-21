@@ -122,6 +122,11 @@
                         document.getElementById("editModalListID").value = ${list.getId()};
                         document.getElementById("editCategorySelect").selectedIndex = "${categories.indexOf(list_catDao.getByPrimaryKey(list.getCategory()))}";
                     '>edit</button>
+                    <form action="shopping.lists.handler" method="POST">
+                        <input type="hidden" name="list_id" value='${list.getId()}'>
+                        <input type="hidden" name="delete" value="delete">
+                        <button type="submit" class='btn btn-primary'>Delete</button>
+                    </form>
                 </div>
             </c:forEach>
 
