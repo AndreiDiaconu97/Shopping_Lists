@@ -13,6 +13,14 @@
         <url-pattern>/restricted/*</url-pattern>
     </filter-mapping>
     <servlet>
+        <servlet-name>ProductSearchServlet</servlet-name>
+        <servlet-class>servlets.ProductSearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductSearchServlet</servlet-name>
+        <url-pattern>/searchProduct</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>Shop_list_jsp</servlet-name>
         <jsp-file>/WEB-INF/shop_lists.jsp</jsp-file>
     </servlet>
