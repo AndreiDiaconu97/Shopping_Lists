@@ -15,7 +15,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -230,6 +229,29 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                     reg_users.add(JDBC_utility.resultSetToReg_User(rs));
                 }
                 return reg_users;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get the reg_users for the passed list_reg", ex);
+        }
+    }
+
+    @Override
+    public Boolean isPurchased(List_reg list_reg, Product product) throws DAOException {
+        if (list_reg == null) {
+            throw new DAOException("list_reg parameter is null");
+        }
+        if (product == null) {
+            throw new DAOException("product parameter is null");
+        }
+        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE ID IN (SELECT REG_USER FROM " + L_SHARING_TABLE + " WHERE LIST = ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            try (ResultSet rs = stm.executeQuery()) {
+                if(rs.next()){
+                    return rs.getBoolean(0);
+                } else {
+                    throw new DAOException("No boolean returned for isPurchased");
+                }
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the reg_users for the passed list_reg", ex);
