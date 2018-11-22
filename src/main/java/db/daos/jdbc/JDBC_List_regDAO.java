@@ -243,9 +243,10 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         if (product == null) {
             throw new DAOException("product parameter is null");
         }
-        String query = "SELECT * FROM " + U_REG_TABLE + " WHERE ID IN (SELECT REG_USER FROM " + L_SHARING_TABLE + " WHERE LIST = ?)";
+        String query = "SELECT PURCHASED FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
+            stm.setInt(2, product.getId());
             try (ResultSet rs = stm.executeQuery()) {
                 if(rs.next()){
                     return rs.getBoolean(0);
@@ -255,6 +256,29 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the reg_users for the passed list_reg", ex);
+        }
+    }
+    
+    @Override
+    public void purchase(List_reg list_reg, Product product, boolean purchased) throws DAOException{
+        if (list_reg == null) {
+            throw new DAOException("Given list_reg is null");
+        }
+        if (product == null) {
+            throw new DAOException("Product parameter is null");
+        }
+
+        String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=? WHERE LIST=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setBoolean(1, purchased);
+            stm.setInt(2, list_reg.getId());
+            stm.setInt(3, product.getId());
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("list_reg update affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the list_reg", ex);
         }
     }
 }

@@ -28,4 +28,6 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
     public void insertProduct(List_reg list_reg, Product product) throws DAOException;
     
     public Boolean isPurchased(List_reg list_reg, Product product) throws DAOException;
+    
+    public void purchase(List_reg list_reg, Product product, boolean purchased) throws DAOException;
 }
