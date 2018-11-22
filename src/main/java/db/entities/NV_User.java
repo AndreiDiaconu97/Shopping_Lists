@@ -9,6 +9,7 @@ import db.daos.jdbc.JDBC_utility;
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.Objects;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
  *
@@ -17,21 +18,13 @@ import java.util.Objects;
 public class NV_User implements Serializable{
 
     private String email;
-    private String password;
-    private String salt;
+    private String hashed_password;
     private String firstname;
     private String lastname;
     private String avatar;
     private String code;
     
-    private static final int SALT_SIZE = 100;
     private static final int CODE_SIZE = 50;
-    
-    
-
-    public static int getSALT_SIZE() {
-        return SALT_SIZE;
-    }
 
     public static int getCODE_SIZE() {
         return CODE_SIZE;
@@ -65,12 +58,12 @@ public class NV_User implements Serializable{
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHashed_password() {
+        return hashed_password;
     }
     
-    public void setPassword(String password){
-        this.password = password;
+    public void setHashed_password(String hashed_password){
+        this.hashed_password = hashed_password;
     }
 
     private void createHashedPassword(String password) {
@@ -78,18 +71,7 @@ public class NV_User implements Serializable{
             System.err.println("Creating hash for null psw!!");
             return;
         }
-        // this.salt = create random 200len string
-        this.salt = JDBC_utility.randomString(SALT_SIZE);
-        this.password = JDBC_utility.secureHash(password, this.salt);
-        //System.err.println("CREATED PASSWORD = " + this.password + " USING " + password);
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
+        this.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     public String getAvatar() {

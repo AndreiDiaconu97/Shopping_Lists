@@ -19,6 +19,7 @@ import java.util.List;
 import static db.daos.jdbc.JDBC_utility.resultSetToList_reg;
 import db.entities.List_reg;
 import java.sql.Statement;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
  *
@@ -54,12 +55,10 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         }
         
         String query = "SELECT * FROM " + U_REG_TABLE + " WHERE EMAIL = '" + email + "'";
-        String salt;
         String hashed_psw;
         try (Statement stm = CON.createStatement()) {
             try (ResultSet rs = stm.executeQuery(query)) {
                 if (rs.next()) {
-                    salt = rs.getString("SALT");
                     hashed_psw = rs.getString("PASSWORD");
                 } else {
                     return null;
@@ -69,7 +68,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Impossible to get the user for the passed email and password", ex);
         }
 
-        if (!JDBC_utility.secureHashEquals(password, salt, hashed_psw)) {
+        if (!BCrypt.checkpw(password, hashed_psw)) {
             System.err.println("HASH IS DIFFERENT (probably wrong password)");
             return null;
         }
@@ -185,15 +184,14 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
             throw new DAOException("Cannot insert reg_user: it has arleady an id");
         }
 
-        String query = "INSERT INTO " + U_REG_TABLE + "(email, password, salt, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_REG_TABLE + "(email, password, firstname, lastname, is_admin, avatar) VALUES(?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, reg_user.getEmail());
-            stm.setString(2, reg_user.getPassword());
-            stm.setString(3, reg_user.getSalt());
-            stm.setString(4, reg_user.getFirstname());
-            stm.setString(5, reg_user.getLastname());
-            stm.setBoolean(6, reg_user.getIs_admin());
-            stm.setString(7, reg_user.getAvatar());
+            stm.setString(2, reg_user.getHashed_password());
+            stm.setString(3, reg_user.getFirstname());
+            stm.setString(4, reg_user.getLastname());
+            stm.setBoolean(5, reg_user.getIs_admin());
+            stm.setString(6, reg_user.getAvatar());
             stm.executeUpdate();
 
             // This should avoid using an extra query for id retrieving
@@ -235,7 +233,7 @@ public class JDBC_Reg_UserDAO extends JDBC_DAO<Reg_User, Integer> implements Reg
         String query = "UPDATE " + U_REG_TABLE + " SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, reg_user.getEmail());
-            stm.setString(2, reg_user.getPassword());
+            stm.setString(2, reg_user.getHashed_password());
             stm.setString(3, reg_user.getFirstname());
             stm.setString(4, reg_user.getLastname());
             stm.setBoolean(5, reg_user.getIs_admin());

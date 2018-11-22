@@ -16,8 +16,7 @@ public class Reg_User implements Serializable{
 
     private Integer id;
     private String email;
-    private String password;
-    private String salt;
+    private String hashed_password;
     private String firstname;
     private String lastname;
     private String avatar;
@@ -49,20 +48,12 @@ public class Reg_User implements Serializable{
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHashed_password() {
+        return hashed_password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setHashed_password(String hashed_password) {
+        this.hashed_password = hashed_password;
     }
 
     public String getAvatar() {

@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
@@ -50,15 +49,6 @@ public class JDBC_utility {
             buf[idx] = SYMBOLS.charAt(RANDOM.nextInt(SYMBOLS.length()));
         }
         return new String(buf);
-    }
-
-    public static String secureHash(String password, String salt) {
-        // should implement using slow hash function
-        return DigestUtils.sha256Hex(password.concat(salt));
-    }
-
-    public static boolean secureHashEquals(String password, String salt, String hashed) {
-        return hashed.equals(DigestUtils.sha256Hex(password.concat(salt)));
     }
 
     public static Long getCountFor(String table, Connection con) throws DAOException {
@@ -116,8 +106,7 @@ public class JDBC_utility {
         Reg_User reg_user = new Reg_User();
         reg_user.setId(rs.getInt("ID"));
         reg_user.setEmail(rs.getString("EMAIL"));
-        reg_user.setPassword(rs.getString("PASSWORD"));
-        reg_user.setSalt(rs.getString("SALT"));
+        reg_user.setHashed_password(rs.getString("PASSWORD"));
         reg_user.setFirstname(rs.getString(("FIRSTNAME")));
         reg_user.setLastname(rs.getString("LASTNAME"));
         reg_user.setAvatar(rs.getString("AVATAR"));
@@ -154,8 +143,7 @@ public class JDBC_utility {
     public static NV_User resultSetToNV_User(ResultSet rs) throws SQLException {
         NV_User nv_user = new NV_User();
         nv_user.setEmail(rs.getString("EMAIL"));
-        nv_user.setPassword(rs.getString("PASSWORD"));
-        nv_user.setSalt(rs.getString("SALT"));
+        nv_user.setHashed_password(rs.getString("PASSWORD"));
         nv_user.setFirstname(rs.getString(("FIRSTNAME")));
         nv_user.setLastname(rs.getString("LASTNAME"));
         nv_user.setAvatar(rs.getString("AVATAR"));
