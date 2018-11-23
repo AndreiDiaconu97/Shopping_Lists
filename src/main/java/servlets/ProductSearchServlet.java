@@ -72,7 +72,7 @@ public class ProductSearchServlet extends HttpServlet {
                 searchedJSON = searchedJSON.substring(0, searchedJSON.length() - 2);
                 searchedJSON += "]}";
             }
-            //System.err.println("Searched: " + searchedJSON);
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().print(searchedJSON);
         } else {
             // ERROR
