@@ -110,115 +110,116 @@ public class AuthenticationServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        if (request.getParameter("logout") != null) {
-            // LOGOUT
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
-                if (reg_user != null) {
-                    session.setAttribute("reg_user", null);
-                    session.invalidate();
-                    reg_user = null;
+        String status = "";
+        String action = "";
+        if (request.getParameter("action") != null) {
+            action = request.getParameter("action");
+        }
+
+        switch (action) {
+            case "logout": {
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
+                    if (reg_user != null) {
+                        session.setAttribute("reg_user", null);
+                        session.invalidate();
+                        reg_user = null;
+                    }
                 }
-            }
-
-            if (!response.isCommitted()) {
-                response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
-            }
-
-        } else if (request.getParameter("register") != null) {
-            // REGISTER
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            String firstname = request.getParameter("firstname");
-            String lastname = request.getParameter("lastname");
-            request.getServletContext().log("REGISTERING " + email);
-            // email and password can't be empty because input is "required"
-            try {
-                if (reg_userDao.getByEmail(email) != null) {
-                    // already registered
-                    response.sendRedirect(contextPath + "registration.html?status=alreadyregistered");
+                if (!response.isCommitted()) {
+                    response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
                     return;
-                } else if (nv_userDao.getByEmail(email) != null) {
-                    // already registered, need verification
-                    response.sendRedirect(contextPath + "registration.html?status=needtoverify");
-                    return;
-                } else {
-                    NV_User nv_user = new NV_User(email, password, firstname, lastname, null);
-                    String code = nv_user.getCode();
-                    try {
-                        nv_userDao.insert(nv_user);
-                    } catch (DAOException ex) {
-                        request.getServletContext().log("Impossible to register user");
-                        response.sendRedirect(contextPath + "registration.html?status=error");
+                }
+                break;
+            }
+            case "register": {
+                String email = request.getParameter("email");
+                String password = request.getParameter("password");
+                String firstname = request.getParameter("firstname");
+                String lastname = request.getParameter("lastname");
+                request.getServletContext().log("REGISTERING " + email);
+                // email and password can't be empty because input is "required"
+                try {
+                    if (reg_userDao.getByEmail(email) != null) {
+                        status = "alreadyregistered";
+                    } else if (nv_userDao.getByEmail(email) != null) {
+                        status = "needtoverify";
+                    } else {
+                        NV_User nv_user = new NV_User(email, password, firstname, lastname, null);
+                        String code = nv_user.getCode();
+                        try {
+                            nv_userDao.insert(nv_user);
+                        } catch (DAOException ex) {
+                            request.getServletContext().log("Impossible to register user");
+                            status = "error";
+                            break;
+                        }
+                        // send email with code
+                        String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code
+                                + "\n\nYour pass is: " + password;
+                        request.getServletContext().log("Message is: " + message);
+
+                        Message msg = new MimeMessage(session);
+                        try {
+                            msg.setFrom(new InternetAddress(m_username));
+                            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(nv_user.getEmail(), false));
+                            msg.setSubject("Registration to LopardoShopping");
+                            msg.setText(message);
+                            msg.setSentDate(new java.util.Date());
+                            Transport.send(msg);
+                        } catch (MessagingException me) {
+                            me.printStackTrace(System.err);
+                            status = "mailerror";
+                            break;
+                        }
+                    }
+                } catch (DAOException ex) {
+                    request.getServletContext().log("Impossible to check if user is already registered", ex);
+                    status = "dberror";
+                    break;
+                }
+                request.getServletContext().log("REGISTERED " + email);
+                status = "success";
+                break;
+            }
+            case "login": {
+                String email = request.getParameter("email");
+                String password = request.getParameter("password");
+                // email and password can't be empty because input is "required"
+                try {
+                    Reg_User reg_user = reg_userDao.getByEmailAndPassword(email, password);
+                    if (reg_user == null) {
+                        if (reg_userDao.getByEmail(email) != null) {
+                            status = "wrongpsw";
+                        } else if (nv_userDao.getByEmail(email) != null) {
+                            status = "needtoverify";
+                        } else {    
+                            status = "needtoregister";
+                        }
+                    } else {
+                        request.getSession().setAttribute("reg_user", reg_user);
+                        if (reg_user.getIs_admin()) {
+                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin"));
+                        } else {
+                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.html"));
+                        }
                         return;
                     }
-                    // send email with code
-                    String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code + 
-                            "\n\nYour pass is: " + password;
-                    request.getServletContext().log("Message is: " + message);
-
-                    Message msg = new MimeMessage(session);
-                    try {
-                        msg.setFrom(new InternetAddress(m_username));
-                        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(nv_user.getEmail(), false));
-                        msg.setSubject("Registration to LopardoShopping");
-                        msg.setText(message);
-                        msg.setSentDate(new java.util.Date());
-                        Transport.send(msg);
-                    } catch (MessagingException me) {
-                        me.printStackTrace(System.err);
-                        response.sendRedirect(contextPath + "registration.html?status=mailerror");
-                    }
+                } catch (DAOException ex) {
+                    request.getServletContext().log("Impossible to retrieve the user", ex);
+                    status = "dberror";
                 }
-            } catch (DAOException ex) {
-                request.getServletContext().log("Impossible to check if user is already registered", ex);
-                response.sendRedirect(contextPath + "registration.html?status=dberror");
+                break;
             }
-            request.getServletContext().log("REGISTERED " + email);
-            response.sendRedirect(contextPath + "registration.html?status=success");
-            
-            
-        } else if (request.getParameter("login") != null) {
-            // LOGIN
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            // email and password can't be empty because input is "required"
-
-            try {
-                Reg_User reg_user = reg_userDao.getByEmailAndPassword(email, password);
-                if (reg_user == null) {
-
-                    if (reg_userDao.getByEmail(email) != null) {
-                        // wrong password
-                        response.sendRedirect(contextPath + "login.html?status=wrongpsw");
-                    } else if (nv_userDao.getByEmail(email) != null) {
-                        // need to verify
-                        response.sendRedirect(contextPath + "login.html?status=needtoverify");
-                    } else {
-                        // need to register
-                        response.sendRedirect(contextPath + "login.html?status=needtoregister");
-                    }
-
-                } else {
-                    request.getSession().setAttribute("reg_user", reg_user);
-                    if (reg_user.getIs_admin()) {
-                        response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin"));
-                    } else {
-                        response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.html"));
-                    }
-                }
-            } catch (DAOException ex) {
-                request.getServletContext().log("Impossible to retrieve the user", ex);
-                response.sendRedirect(contextPath + "login.html?status=dberror");
-            }
-
-            // CHANGE PASSWORD
-        } else if (request.getParameter("changepsw") != null) {
-
-        } else {
+            case "changepsw":
+                // nothing yet
+                break;
             // bad request
+            default:
+                break;
         }
+        response.sendRedirect(contextPath + "login.html" + (status.equals("") ? "" : "?status=") + status);
     }
 
     /**

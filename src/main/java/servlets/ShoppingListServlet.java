@@ -68,7 +68,7 @@ public class ShoppingListServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        String action = null;
+        String action = "";
         if (request.getParameter("action") != null) {
             action = request.getParameter("action");
         }

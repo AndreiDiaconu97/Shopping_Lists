@@ -18,34 +18,46 @@
     <head>
         <title>User registration</title>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
     </head>
 
     <body>
-        <div>TODO write content</div>
-        <form action="auth" method="POST">
-            Email:<br>
-            <input type="email" name="email" required><br>
-            First name:<br>
-            <input type="text" name="firstname" required><br>
-            Last name:<br>
-            <input type="text" name="lastname" required><br>
-            Password:<br>
-            <input type="password" name="password" required><br>
-            <input type="checkbox" required>I agree..<br>
-            <input type="submit" name="register" value="Register"><br>
-        </form>
-        <c:choose>
-            <c:when test="${param.status=='success'}">
-                Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br>
-            </c:when>
-            <c:when test= "${param.status=='alreadyregistered'}">
-                Già registrato! Vai a <a href="/Shopping/login.html">login</a><br>
-            </c:when>
-            <c:when test="${param.status=='needtoverify'}">
-                Devi verificare il tuo account. Controlla la tua mail<br>
-            </c:when>
-        </c:choose>
+        <div class="container">
+            <div class="jumbotron">
+                <div>TODO write content</div>
+                <form action="auth" method="POST">
+                    <div class="form-group">
+                        <label for="emailInput">Email</label>
+                        <input type="email" class="form-control" name="email" id='emailInput' placeholder="enter email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstnameInput">First name</label>
+                        <input type="text" class="form-control" name="firstname" id='firstnameInput' placeholder="enter your first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastnameInput">Last name</label>
+                        <input type="text" class="form-control" name="lastname" id='lastnameInput' placeholder="enter your last name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <input type="text" class="form-control" name="email" id='passwordInput' placeholder="enter yor password" required>
+                    </div>
+                    <input type="checkbox" required>I agree..<br>
+                    <input type="submit" name="action" value="register"><br>
+                </form>
+                <c:choose>
+                    <c:when test="${param.status=='success'}">
+                        Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br>
+                    </c:when>
+                    <c:when test= "${param.status=='alreadyregistered'}">
+                        Già registrato! Vai a <a href="/Shopping/login.html">login</a><br>
+                    </c:when>
+                    <c:when test="${param.status=='needtoverify'}">
+                        Devi verificare il tuo account. Controlla la tua mail<br>
+                    </c:when>
+                </c:choose>
+            </div>
+        </div>
     </body>
-
 </html>

@@ -27,11 +27,6 @@
     </head>
     <body>
         <div class="container">
-            <c:if test="${param.status=='validated'}">
-                <div class="alert-success" role="alert">
-                    Registrato! login now<br>
-                </div>
-            </c:if>
             <form class="form-signin" action="auth" method="POST">
                 <div class="text-center mb-4">
                     <img class="mb-4" src="images/unitn_logo_1024.png" alt="UNITN Logo" width="128" height="128">
@@ -56,9 +51,26 @@
                         <input type="checkbox" name="rememberMe" value="true"> Remember me
                     </label>
                 </div>
-                <input type="hidden" name="login" value="true"><br>
+                <input type="hidden" name="action" value="login"><br>
                 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             </form>
+            <c:choose>
+                <c:when test="${param.status=='validated'}">
+                    <div class="alert-success" role="alert">
+                        Registrato! login now.
+                    </div>
+                </c:when>
+                <c:when test="${param.status=='needtoverify'}">
+                    <div class="alert-danger" role="alert">
+                        Need to verify, check your Email.
+                    </div>
+                </c:when>
+                <c:when test="${param.status=='needtoregister'}">
+                    <div class="alert-danger" role="alert">
+                       Email not found, register first.
+                    </div>
+                </c:when>
+            </c:choose>
         </div>
     </body>
 </html>
