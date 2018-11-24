@@ -103,102 +103,119 @@
     </head>
     <body>
         <div class="container">
+            <div class="row">
+                <h1>Shopping lists manager</h1>
+            </div>
+            <div class="text-right">
+                logged in as <b>${reg_user.email}</b><br>
+                <form action="<%=contextPath%>auth" method="POST">
+                    <input type="hidden" name="action" value="logout" required>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                </form>
+            </div>   
             <div class ="row">
-                <div class ="col-sm">
+                <div class ="col-3">
                     <div class="jumbotron">
                         <!-- CREATED BY ME -->
                         Created by me:<br>
                         <c:forEach var='list' items='${myLists}'>
-                            <button class='btn' onclick='showList(${list.getId()})'>${list.getName()}, ID:${list.getId()}</button><br>
+                            <button class='btn' onclick='showList(${list.id})'>${list.name}, ID:${list.id}</button><br>
                         </c:forEach>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createListModal">Create list</button>
-
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createListModal">
+                            Create list
+                        </button>
                         <br><br>
                         <!-- SHARED WITH ME -->
                         Shared with me:<br>
                         <c:forEach var='list' items='${sharedLists}'>
-                            <button class='btn' onclick='showList(${list.getId()})'>${list.getName()}, ID:${list.getId()}</button><br>
+                            <button class='btn' onclick='showList(${list.id})'>${list.name}, ID:${list.id}</button><br>
                         </c:forEach>
                     </div>
                 </div>
-
-                <div class="col-sm">
+                <div class="col-5">
                     <div id='showListCollapse'></div>
                 </div>
-
                 <!-- SEARCH PRODUCTS -->
-                <div class ="col-sm">
+                <div class ="col-4">
                     <input type="text" id="searchBar" onkeyup="searchProducts()" placeholder="Search for products">
                     <div id="searchResult">
-
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- EDIT LIST MODAL -->
-            <div class="modal" id="editListModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="editListModalTitle">Edit</h4>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="shopping.lists.handler" method="POST">
-                                <input type="hidden" name="name" id="editModalListName" required>
-                                Description:<br><input type="text" name="description" id='editDescriptionInput' required><br>
-                                <select name="category" id="editCategorySelect" required>
-                                    <c:forEach var='cat' items='${categories}'>
-                                        <option value='${cat.getName()}'>${cat.getName()}</option>
-                                    </c:forEach>
-                                </select>
-                                <input type="hidden" name="listID" id="editModalListID" required>
-                                <input type="hidden" name="edit" value="edit">
-                                <button type='submit' class='btn btn-primary'>Edit</button>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- CREATE LIST MODAL -->
-            <div class="modal" id="createListModal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Modal Heading</h4>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="shopping.lists.handler" method="POST">
-                                Name:<br><input type="text" name="name" required><br>
-                                Description:<br><input type="text" name="description" required><br>
-                                Category: ${list.getCategory()}<br>
-                                <select name="category" required>
-                                    <c:forEach var='cat' items='${categories}'>
-                                        <option value='${cat.getName()}'>${cat.getName()}</option>
-                                    </c:forEach>
-                                </select>
-                                <input type="hidden" name="create" value="create">
-                                <button type='submit' class='btn btn-primary'>Create</button>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- // MODALS // -->
+        <div class="modal" id="editListModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="editListModalTitle">Edit</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="shopping.lists.handler" method="POST">
+                            <input type="hidden" name="name" id="editModalListName" required>
+                            <input type="hidden" name="listID" id="editModalListID" required>
+                            <input type="hidden" name="action" value="edit">
+                            <div class="form-group">
+                                <label for="editDescriptionInput">Description</label>
+                                <input type="text" class="form-control" name="description" id='editDescriptionInput' required>
+                            </div>
+                            <div class="form-group">  
+                                <label for="editCategorySelect">Category</label>
+                                <select name="category" class="form-control" id="editCategorySelect" required>
+                                    <c:forEach var='cat' items='${categories}'>
+                                        <option value='${cat.name}'>${cat.name}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type='submit' class='btn btn-primary'>Edit</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="modal" id="createListModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create list</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="shopping.lists.handler" method="POST">
+                            <input type="hidden" name="action" value="create">
+                            <div class="form-group">
+                                <label for="nameInput">Name</label>
+                                <input type="text" class="form-control" name="name" id='nameInput' placeholder="enter list name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="descriptionInput">Description</label>
+                                <input type="text" class="form-control" name="description" id='descriptionInput' placeholder="enter list description" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="categoryInput">Category: ${list.category}</label>
+                                <select name="category" id="categoryInput" class="form-control" required>
+                                    <c:forEach var='cat' items='${categories}'>
+                                        <option value='${cat.name}'>${cat.name}</option>
+                                    </c:forEach>
+                                </select>   
+                            </div>
+                            <div class="modal-footer">
+                                <button type='submit' class='btn btn-primary'>Create</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- // SCRIPTS // -->
         <script>
             function searchProducts() {
                 let text = document.getElementById("searchBar").value;
@@ -229,12 +246,13 @@
                         let list = JSON.parse(xmlHttp.responseText);
                         //console.log(JSON.stringify(obj));
                         let html = list.name + ", ID:" + list.id;
+                        html += "<br><button class='btn' data-toggle='modal' data-target='#editListModal' onclick='showEditModal(" + list.id + ")'>EDIT</button><br>";
                         html += "<div>Description:<br>" + list.description + "</div>";
                         html += "<div>Products:</div><br><ul>";
                         for (i in list.products) {
                             html += "<li class='media'><img class='mr-3' src='https://via.placeholder.com/64'>";
                             html += "<div class='media-body'><h5 class='mt-0 mb-1'>" + list.products[i].name + "</h5>";
-                            if(list.products[i].description.length < 200){
+                            if (list.products[i].description.length < 200) {
                                 html += list.products[i].description;
                             } else {
                                 html += list.products[i].description.toString().substr(0, 200) + "  . . . ";
@@ -243,6 +261,22 @@
                         }
                         html += "</ul>"
                         document.getElementById("showListCollapse").innerHTML = html;
+                    }
+                }
+                xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
+                xmlHttp.send(null);
+            }
+
+            function showEditModal(id) {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        let list = JSON.parse(xmlHttp.responseText);
+                        //console.log(JSON.stringify(obj));
+                        document.getElementById("editListModalTitle").value = "Editing " + list.name;
+                        document.getElementById("editModalListName").value = list.name;
+                        document.getElementById("editModalListID").value = list.id;
+                        document.getElementById("editDescriptionInput").value = list.description;
                     }
                 }
                 xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
