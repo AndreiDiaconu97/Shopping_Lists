@@ -229,6 +229,7 @@
                         let list = JSON.parse(xmlHttp.responseText);
                         //console.log(JSON.stringify(obj));
                         let html = list.name + ", ID:" + list.id;
+                        html += "<br><button class='btn' data-toggle='modal' data-target='#editListModal' onclick='showEditModal(" + list.id + ")'>EDIT</button><br>";
                         html += "<div>Description:<br>" + list.description + "</div>";
                         html += "<div>Products:</div><br><ul>";
                         for (i in list.products) {
@@ -243,6 +244,22 @@
                         }
                         html += "</ul>"
                         document.getElementById("showListCollapse").innerHTML = html;
+                    }
+                }
+                xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
+                xmlHttp.send(null);
+            }
+            
+            function showEditModal(id){
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        let list = JSON.parse(xmlHttp.responseText);
+                        //console.log(JSON.stringify(obj));
+                        document.getElementById("editListModalTitle").value = "Editing " + list.name;
+                        document.getElementById("editModalListName").value = list.name;
+                        document.getElementById("editModalListID").value = list.id;
+                        document.getElementById("editDescriptionInput").value = list.description;
                     }
                 }
                 xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
