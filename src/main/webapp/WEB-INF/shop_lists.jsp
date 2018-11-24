@@ -103,20 +103,33 @@
     </head>
     <body>
         <div class="container">
+            <div class="row">
+                <h1>Shopping lists manager</h1>
+            </div>
+            <div class="text-right">
+                logged in as <b>${reg_user.email}</b><br>
+                <form action="<%=contextPath%>auth" method="POST">
+                    <input type="hidden" name="logout" value="true" required>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                </form>
+            </div>     
             <div class ="row">
                 <div class ="col-sm">
                     <div class="jumbotron">
                         Created by me:<br>
                         <c:forEach var='list' items='${myLists}'>
-                            <button class='btn' data-toggle='collapse' data-target='#collapse${list.getId()}'>${list.getName()} (Id: ${list.getId()})</button>
-                            <br>
+                            <button class='btn' data-toggle='collapse' data-target='#collapse${list.getId()}'>
+                                ${list.getName()} (Id: ${list.getId()})
+                            </button>
                             <div id='collapse${list.getId()}' class='collapse'>
                                 Description:<br>${list.getDescription()}<br>
                                 Category: ${list.getCategory()}<br>
-                                Products<ul>
+                                Products
+                                <ul>
                                     <c:forEach var='product' items='${list_regDao.getProducts(list)}'>
-                                        <li>${product.getName()}</li>
-                                        </c:forEach>
+                                        <li>${product.getName()}
+                                        </li>
+                                    </c:forEach>
                                 </ul>
                                 <button class="btn" data-toggle='modal' data-target='#editListModal' onclick='
                                         document.getElementById("editModalListName").value = "${list.getName()}";
@@ -131,8 +144,8 @@
                                     <button type="submit" class='btn btn-primary'>Delete</button>
                                 </form>
                             </div>
-                        </c:forEach>
 
+                        </c:forEach>
                         <div class="modal" id="editListModal">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -205,7 +218,7 @@
                 <div class ="col-sm">
                     <input type="text" id="searchBar" onkeyup="searchProducts()" placeholder="Search for products">
                     <div id="searchResult">
-                        
+
                     </div>
                     <script>
                         function searchProducts() {
@@ -216,7 +229,7 @@
                                     let obj = JSON.parse(xmlHttp.responseText);
                                     console.log(JSON.stringify(obj));
                                     let html = "<ul class='list-unstyled'>";
-                                    for(i in obj.result){
+                                    for (i in obj.result) {
                                         html += "<li class='media'><img class='mr-3' src='https://via.placeholder.com/64'>";
                                         html += "<div class='media-body'><h5 class='mt-0 mb-1'>" + obj.result[i].name + "</h5>";
                                         html += obj.result[i].description;

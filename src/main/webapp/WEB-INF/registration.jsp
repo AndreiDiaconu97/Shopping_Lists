@@ -1,22 +1,22 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%
-    // status: alreadyregistered, needtoverify, error, mailerror, dberror, success
-    String status = request.getParameter("status");
-    if(status==null){
-        status="normal";
-    }
-    Boolean error = status.contains("error");
-    pageContext.setAttribute("status", status);
-    pageContext.setAttribute("error", error);
-%>
+
+<!-- alreadyregistered, needtoverify, error, mailerror, dberror, success -->
+<c:if test="${fn:contains(param.status, 'error')}">
+    <c:url value = "error.html" var = "errorURL">
+        <c:param name = "error" value = "${param.status}"/>
+    </c:url>
+    <c:redirect url="${errorURL}"/>
+</c:if>
+
 <!DOCTYPE html>
 <html>
 
     <head>
-        <title>TODO supply a title</title>
+        <title>User registration</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
@@ -35,10 +35,17 @@
             <input type="checkbox" required>I agree..<br>
             <input type="submit" name="register" value="Register"><br>
         </form>
-        <c:if test="${status=='success'}">Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br></c:if>
-        <c:if test= '${status=="alreadyregistered"}'>Già registrato! Vai a <a href="/Shopping/login.html">login</a><br></c:if>
-        <c:if test= '${status=="needtoverify"}'>Devi verificare il tuo account. Controlla la tua mail<br></c:if>
-        <c:if test="${error}">Errore!!(specificare?)<br></c:if>
+        <c:choose>
+            <c:when test="${param.status=='success'}">
+                Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br>
+            </c:when>
+            <c:when test= "${param.status=='alreadyregistered'}">
+                Già registrato! Vai a <a href="/Shopping/login.html">login</a><br>
+            </c:when>
+            <c:when test="${param.status=='needtoverify'}">
+                Devi verificare il tuo account. Controlla la tua mail<br>
+            </c:when>
+        </c:choose>
     </body>
 
 </html>

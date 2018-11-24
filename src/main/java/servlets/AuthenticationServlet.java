@@ -111,7 +111,7 @@ public class AuthenticationServlet extends HttpServlet {
         }
 
         if (request.getParameter("logout") != null) {
-        // LOGOUT
+            // LOGOUT
             HttpSession session = request.getSession(false);
             if (session != null) {
                 Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
@@ -154,7 +154,6 @@ public class AuthenticationServlet extends HttpServlet {
                         return;
                     }
                     // send email with code
-
                     String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code + 
                             "\n\nYour pass is: " + password;
                     request.getServletContext().log("Message is: " + message);
