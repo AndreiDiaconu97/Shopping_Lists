@@ -68,90 +68,86 @@ public class ShoppingListServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        if (request.getParameter("create") != null) {
-            HttpSession session = request.getSession(false);
-            Reg_User reg_user = null;
-            reg_user = (Reg_User) session.getAttribute("reg_user");
-            Integer id = reg_user.getId();
-            String name = request.getParameter("name");
-            String description = request.getParameter("description");
-            String category = request.getParameter("category");
-
-            List_reg list = new List_reg(name, id, category, description, null);
-
-            try {
-                list_regDao.insert(list);
-                System.err.println("Ok. Id della lista inserita:" + list.getId());
-            } catch (Exception e) {
-                System.err.println("Errore. Id della lista inserita:" + list.getId());
-            }
-            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        String action = null;
+        if (request.getParameter("action") != null) {
+            action = request.getParameter("action");
         }
 
-        if (request.getParameter("edit") != null) {
-            HttpSession session = request.getSession(false);
-            Reg_User reg_user = null;
-            reg_user = (Reg_User) session.getAttribute("reg_user");
-            Integer id = reg_user.getId();
-            String name = request.getParameter("name");
-            String description = request.getParameter("description");
-            String category = request.getParameter("category");
-
-            List_reg list = new List_reg(name, id, category, description, null);
-            list.setId(Integer.parseInt(request.getParameter("listID")));
-            try {
-                list_regDao.update(list);
-                System.err.println("Ok, lista modificata:" + list.getId());
-            } catch (DAOException ex) {
-                System.err.println("Errore. Lista inserita:" + list.getId());
-            }
-            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
-        }
-        
-        if (request.getParameter("delete") != null) {
-            Integer id = Integer.parseInt(request.getParameter("list_id"));
-            try {
-                List_reg list = list_regDao.getByPrimaryKey(id);
-                try{
-                    list_regDao.delete(list);
-                    System.err.println("List deleted");
-                }catch (DAOException ex){
-                    System.err.println("Impossible to delete selected list");
+        switch (action) {
+            case "create": {
+                HttpSession session = request.getSession(false);
+                Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
+                Integer id = reg_user.getId();
+                String name = request.getParameter("name");
+                String description = request.getParameter("description");
+                String category = request.getParameter("category");
+                List_reg list = new List_reg(name, id, category, description, null);
+                try {
+                    list_regDao.insert(list);
+                    System.err.println("Ok. Id della lista inserita:" + list.getId());
+                } catch (Exception e) {
+                    System.err.println("Errore. Id della lista inserita:" + list.getId());
                 }
-                
-            } catch (DAOException ex) {
-                System.err.println("Impossible to retrieve list by given ID");
+                break;
             }
-           
-            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
-        }
-        
-        if(request.getParameter("add") != null){
-            String name = request.getParameter("object_name");
-            String id = request.getParameter("list_id");
-            Product product = new Product();
-            List_reg list_reg = new List_reg();
-           
-            try{
-                list_reg = list_regDao.getByPrimaryKey(Integer.parseInt(id));
-                product = productDao.getByName(name);
-                System.err.println(list_reg.getName());
-            }catch(Exception e){
-                System.err.println(e);
-            }
-            
-            if(product != null){
-                try{
-                    list_regDao.insertProduct(list_reg, product);   
-                }catch (DAOException e){
-                    System.err.println("Impossible to insert given product");
+            case "edit": {
+                HttpSession session = request.getSession(false);
+                Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
+                Integer id = reg_user.getId();
+                String name = request.getParameter("name");
+                String description = request.getParameter("description");
+                String category = request.getParameter("category");
+                List_reg list = new List_reg(name, id, category, description, null);
+                list.setId(Integer.parseInt(request.getParameter("listID")));
+                try {
+                    list_regDao.update(list);
+                    System.err.println("Ok, lista modificata:" + list.getId());
+                } catch (DAOException ex) {
+                    System.err.println("Errore. Lista inserita:" + list.getId());
                 }
-            }      
-            
-            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
-            
-            
+                break;
+            }
+            case "delete": {
+                Integer id = Integer.parseInt(request.getParameter("list_id"));
+                try {
+                    List_reg list = list_regDao.getByPrimaryKey(id);
+                    try {
+                        list_regDao.delete(list);
+                        System.err.println("List deleted");
+                    } catch (DAOException ex) {
+                        System.err.println("Impossible to delete selected list");
+                    }
+                } catch (DAOException ex) {
+                    System.err.println("Impossible to retrieve list by given ID");
+                }
+                break;
+            }
+            case "add": {
+                String name = request.getParameter("object_name");
+                String id = request.getParameter("list_id");
+                Product product = new Product();
+                List_reg list_reg = new List_reg();
+                try {
+                    list_reg = list_regDao.getByPrimaryKey(Integer.parseInt(id));
+                    product = productDao.getByName(name);
+                    System.err.println(list_reg.getName());
+                } catch (Exception e) {
+                    System.err.println(e);
+                }
+                if (product != null) {
+                    try {
+                        list_regDao.insertProduct(list_reg, product);
+                    } catch (DAOException e) {
+                        System.err.println("Impossible to insert given product");
+                    }
+                }
+                break;
+            }
+            default:
+                System.err.println("ShoppingListServlet: unsupported parameter");
+                break;
         }
+        response.sendRedirect(contextPath + "restricted/shopping.lists.html");
     }
 
     @Override

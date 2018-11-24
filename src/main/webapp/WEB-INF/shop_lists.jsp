@@ -109,7 +109,7 @@
             <div class="text-right">
                 logged in as <b>${reg_user.email}</b><br>
                 <form action="<%=contextPath%>auth" method="POST">
-                    <input type="hidden" name="logout" value="true" required>
+                    <input type="hidden" name="action" value="logout" required>
                     <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
                 </form>
             </div>     
@@ -117,12 +117,13 @@
                 <div class ="col-sm">
                     <div class="jumbotron">
                         Created by me:<br>
+                        <!-- print user's lists -->
                         <c:forEach var='list' items='${myLists}'>
                             <button class='btn' data-toggle='collapse' data-target='#collapse${list.getId()}'>
                                 ${list.getName()} (Id: ${list.getId()})
-                            </button>
+                            </button><br>
                             <div id='collapse${list.getId()}' class='collapse'>
-                                Description:<br>${list.getDescription()}<br>
+                                Description: ${list.getDescription()}<br>
                                 Category: ${list.getCategory()}<br>
                                 Products
                                 <ul>
@@ -137,15 +138,17 @@
                                         document.getElementById("editDescriptionInput").value = "${list.getDescription()}";
                                         document.getElementById("editModalListID").value = ${list.getId()};
                                         document.getElementById("editCategorySelect").selectedIndex = "${categories.indexOf(list_catDao.getByPrimaryKey(list.getCategory()))}";
-                                        '>edit</button>
+                                        '>
+                                    edit
+                                </button>
                                 <form action="shopping.lists.handler" method="POST">
                                     <input type="hidden" name="list_id" value='${list.getId()}'>
-                                    <input type="hidden" name="delete" value="delete">
+                                    <input type="hidden" name="action" value="delete">
                                     <button type="submit" class='btn btn-primary'>Delete</button>
                                 </form>
                             </div>
-
                         </c:forEach>
+                        <!-- Edit list modal window -->
                         <div class="modal" id="editListModal">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -156,55 +159,69 @@
                                     <div class="modal-body">
                                         <form action="shopping.lists.handler" method="POST">
                                             <input type="hidden" name="name" id="editModalListName" required>
-                                            Description:<br><input type="text" name="description" id='editDescriptionInput' required><br>
-                                            <select name="category" id="editCategorySelect" required>
-                                                <c:forEach var='cat' items='${categories}'>
-                                                    <option value='${cat.getName()}'>${cat.getName()}</option>
-                                                </c:forEach>
-                                            </select>
                                             <input type="hidden" name="listID" id="editModalListID" required>
-                                            <input type="hidden" name="edit" value="edit">
-                                            <button type='submit' class='btn btn-primary'>Edit</button>
+                                            <input type="hidden" name="action" value="edit">
+                                            <div class="form-group">
+                                                <label for="editDescriptionInput">Description</label>
+                                                <input type="text" class="form-control" name="description" id='editDescriptionInput' required>
+                                            </div>
+                                            <div class="form-group">  
+                                                <label for="editCategorySelect">Category</label>
+                                                <select name="category" class="form-control" id="editCategorySelect" required>
+                                                    <c:forEach var='cat' items='${categories}'>
+                                                        <option value='${cat.getName()}'>${cat.getName()}</option>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type='submit' class='btn btn-primary'>Edit</button>
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            </div>
                                         </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-
-
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createListModal">Create list</button>
+                        <!-- Create list modal window -->
                         <div class="modal" id="createListModal">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title">Modal Heading</h4>
+                                        <h4 class="modal-title">Create list</h4>
                                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                                     </div>
                                     <div class="modal-body">
                                         <form action="shopping.lists.handler" method="POST">
-                                            Name:<br><input type="text" name="name" required><br>
-                                            Description:<br><input type="text" name="description" required><br>
-                                            Category: ${list.getCategory()}<br>
-                                            <select name="category" required>
-                                                <c:forEach var='cat' items='${categories}'>
-                                                    <option value='${cat.getName()}'>${cat.getName()}</option>
-                                                </c:forEach>
-                                            </select>
-                                            <input type="hidden" name="create" value="create">
-                                            <button type='submit' class='btn btn-primary'>Create</button>
+                                            <input type="hidden" name="action" value="create">
+                                            <div class="form-group">
+                                                <label for="nameInput">Name</label>
+                                                <input type="text" class="form-control" name="name" id='nameInput' required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="descriptionInput">Description</label>
+                                                <input type="text" class="form-control" name="description" id='descriptionInput' required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="categoryInput">Category: ${list.getCategory()}</label>
+                                                <select name="category" id="categoryInput" class="form-control" required>
+                                                    <c:forEach var='cat' items='${categories}'>
+                                                        <option value='${cat.getName()}'>${cat.getName()}</option>
+                                                    </c:forEach>
+                                                </select>   
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type='submit' class='btn btn-primary'>Create</button>
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            </div>
                                         </form>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- Shared with me lists -->
                     <div class="jumbotron">
                         Shared with me:<br>
                         <c:forEach var='list' items='${sharedLists}'>
@@ -215,10 +232,10 @@
                         </c:forEach>
                     </div>
                 </div>
+                <!-- products searchbar -->
                 <div class ="col-sm">
                     <input type="text" id="searchBar" onkeyup="searchProducts()" placeholder="Search for products">
                     <div id="searchResult">
-
                     </div>
                     <script>
                         function searchProducts() {
