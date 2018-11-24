@@ -6,9 +6,7 @@
 package servlets;
 
 import db.daos.List_regDAO;
-import db.daos.NV_UserDAO;
 import db.daos.ProductDAO;
-import db.daos.Reg_UserDAO;
 import db.entities.List_reg;
 import db.entities.Product;
 import db.entities.Reg_User;
@@ -16,19 +14,16 @@ import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ShoppingListServlet extends HttpServlet {
 
-    private Reg_UserDAO reg_userDao;
-    private NV_UserDAO nv_userDao;
     private List_regDAO list_regDao;
     private ProductDAO productDao;
 
@@ -38,16 +33,6 @@ public class ShoppingListServlet extends HttpServlet {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
         if (daoFactory == null) {
             throw new ServletException("Impossible to get dao factory");
-        }
-        try {
-            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
-        } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for reg_user", ex);
-        }
-        try {
-            nv_userDao = daoFactory.getDAO(NV_UserDAO.class);
-        } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for nv_user", ex);
         }
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
@@ -61,6 +46,37 @@ public class ShoppingListServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String contextPath = getServletContext().getContextPath();
+        if (!contextPath.endsWith("/")) {
+            contextPath += "/";
+        }
+        
+        if(request.getParameter("getList") != null){
+            int id = Integer.parseInt(request.getParameter("getList"));
+            try{
+                List_reg list = list_regDao.getByPrimaryKey(id);
+                JSONObject listJSON = new JSONObject();
+                listJSON.put("id", list.getId());
+                listJSON.put("name", list.getName());
+                listJSON.put("description", list.getDescription());
+                JSONArray productsJSON = new JSONArray();
+                for(Product p : list_regDao.getProducts(list)){
+                    JSONObject productJSON = new JSONObject();
+                    productJSON.put("name", p.getName());
+                    productJSON.put("description", p.getDescription());
+                    productsJSON.put(productJSON);
+                }
+                listJSON.put("products", productsJSON);
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().print(listJSON);
+            } catch(DAOException ex){
+                System.err.println("Impossible to get further info for list with id=" + id);
+            }
+        }
+    }
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contextPath = getServletContext().getContextPath();
@@ -82,7 +98,7 @@ public class ShoppingListServlet extends HttpServlet {
             try {
                 list_regDao.insert(list);
                 System.err.println("Ok. Id della lista inserita:" + list.getId());
-            } catch (Exception e) {
+            } catch (DAOException ex) {
                 System.err.println("Errore. Id della lista inserita:" + list.getId());
             }
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
