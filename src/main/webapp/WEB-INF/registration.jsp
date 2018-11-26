@@ -41,7 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label for="passwordInput">Password</label>
-                        <input type="text" class="form-control" name="email" id='passwordInput' placeholder="enter yor password" required>
+                        <input type="password" class="form-control" name="password" id='passwordInput' placeholder="enter yor password" required>
                     </div>
                     <input type="checkbox" required>I agree..<br>
                     <input type="submit" name="action" value="register"><br>

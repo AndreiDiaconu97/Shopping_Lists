@@ -114,7 +114,7 @@
                 </form>
             </div>   
             <div class ="row">
-                <div class ="col-3">
+                <div class ="col-xs-3">
                     <div class="jumbotron">
                         <!-- CREATED BY ME -->
                         Created by me:<br>
@@ -132,11 +132,11 @@
                         </c:forEach>
                     </div>
                 </div>
-                <div class="col-5">
+                <div class="col-md-5">
                     <div id='showListCollapse'></div>
                 </div>
                 <!-- SEARCH PRODUCTS -->
-                <div class ="col-4">
+                <div class ="col-md-4">
                     <input type="text" id="searchBar" onkeyup="searchProducts()" placeholder="Search for products">
                     <div id="searchResult">
                     </div>
