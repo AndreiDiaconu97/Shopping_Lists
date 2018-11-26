@@ -6,7 +6,9 @@
 package servlets;
 
 import db.daos.List_regDAO;
+import db.daos.NV_UserDAO;
 import db.daos.ProductDAO;
+import db.daos.Reg_UserDAO;
 import db.entities.List_reg;
 import db.entities.Product;
 import db.entities.Reg_User;
@@ -14,6 +16,16 @@ import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Authenticator;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,8 +36,15 @@ import org.json.JSONObject;
 
 public class ShoppingListServlet extends HttpServlet {
 
+    private Reg_UserDAO reg_userDao;
     private List_regDAO list_regDao;
     private ProductDAO productDao;
+    final String m_host = "smtp.gmail.com";
+    final String m_port = "465";
+    final String m_username = "test.progetto.lopardo@gmail.com";
+    final String m_password = "Abcde1234%";
+    Properties props;
+    Session session;
 
     @Override
     public void init() throws ServletException {
@@ -44,6 +63,26 @@ public class ShoppingListServlet extends HttpServlet {
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for product", ex);
         }
+        try {
+            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new ServletException("Impossible to get dao for product", ex);
+        }
+        
+        props = System.getProperties();
+        props.setProperty("mail.smtp.host", m_host);
+        props.setProperty("mail.smtp.port", m_port);
+        props.setProperty("mail.smtp.socketFactory.port", m_port);
+        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.setProperty("mail.smtp.auth", "true");
+        props.setProperty("mail.smtp.starttls.enable", "true");
+
+        session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(m_username, m_password);
+            }
+        });
     }
 
     @Override
@@ -74,6 +113,104 @@ public class ShoppingListServlet extends HttpServlet {
             } catch(DAOException ex){
                 System.err.println("Impossible to get further info for list with id=" + id);
             }
+        }
+        
+        if (request.getParameter("sharedlist") != null){
+            Integer id = Integer.parseInt(request.getParameter("sharedlist"));
+            String email = request.getParameter("email");
+            response.setCharacterEncoding("UTF-8");
+            String ownerEmail;
+            Reg_User owner;
+            Integer check = 1;
+            try{
+                List_reg list = list_regDao.getByPrimaryKey(id);
+                owner = reg_userDao.getByPrimaryKey(list.getOwner());
+                ownerEmail = owner.getEmail();
+                List<Reg_User> users = list_regDao.getReg_UsersSharedTo(list);
+                
+                for(Reg_User user : users){
+                    if(user.getEmail().equals(email)){                    
+                        check = 2;
+                    }
+                }
+                if(ownerEmail.equals(email)){
+                    check = 3;
+                }
+            }catch (DAOException ex){
+                System.err.println("errors");
+            }
+            
+            System.err.println(check);
+              
+            if(check == 2){
+                response.getWriter().print("already");
+            }else if(check == 3){
+                response.getWriter().print("same");
+            }
+            else{
+                List_reg list = new List_reg();
+                Reg_User Owner = new Reg_User();
+
+                try {
+                    list = list_regDao.getByPrimaryKey(id);
+                    Integer ownerId = list.getOwner();
+                    Owner = reg_userDao.getByPrimaryKey(ownerId);
+                } catch (DAOException ex) {
+                    System.err.println("");
+                }
+
+                String firstname = Owner.getFirstname();
+                String lastname = Owner.getLastname();
+                String message = "Ehi " + firstname + " invited you to join his list! Click on the link below to join!"
+                        + "\n\n http://localhost:8084/Shopping/restricted/shopping.lists.handler?share=true&list_id=" + id + "&email=" + email;
+
+                Message msg = new MimeMessage(session);
+                try {
+                    msg.setFrom(new InternetAddress(m_username));
+                    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
+                    msg.setSubject("Invite from " + firstname + " " + lastname);
+                    msg.setText(message);
+                    msg.setSentDate(new java.util.Date());
+                    Transport.send(msg);
+                } catch (MessagingException me) {
+                    me.printStackTrace(System.err);
+                    response.getWriter().print("error");
+                }
+                response.getWriter().print("success");
+                              
+            }
+        }
+        
+        if(request.getParameter("share") != null){
+            String email=request.getParameter("email");
+            Integer id= Integer.parseInt(request.getParameter("list_id"));
+            
+            try{
+                List_reg list = list_regDao.getByPrimaryKey(id);
+                Reg_User user = reg_userDao.getByEmail(email);
+                list_regDao.shareShoppingListToReg_User(list, user);
+                
+                
+            }catch(DAOException ex){
+                System.err.println("Cannot share the list");
+            }
+            
+            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        }
+        
+        if(request.getParameter("shareurl") != null){
+            Integer id = Integer.parseInt(request.getParameter("id"));
+            HttpSession session = request.getSession(false);
+            Reg_User reg_user = null;
+            reg_user = (Reg_User) session.getAttribute("reg_user");
+            
+            try{
+                List_reg list = list_regDao.getByPrimaryKey(id);
+                list_regDao.shareShoppingListToReg_User(list, reg_user);
+                
+            }catch(DAOException ex){
+                System.err.println("Cannot share the list");
+            }           
         }
     }
     

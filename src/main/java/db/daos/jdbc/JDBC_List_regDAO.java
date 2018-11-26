@@ -91,7 +91,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Reg_user is arleady owner of the given list_reg.");
         }
 
-        String query = "INSERT INTO " + L_SHARING_TABLE + "list, reg_user) VALUES(?, ?)";
+        String query = "INSERT INTO " + L_SHARING_TABLE + " (list, reg_user) VALUES (?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, reg_user.getId());

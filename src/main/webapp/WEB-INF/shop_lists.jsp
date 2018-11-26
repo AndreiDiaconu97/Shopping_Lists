@@ -214,6 +214,29 @@
                 </div>
             </div>
         </div>
+                                
+        <div class="modal" id="shareListModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="shareListModalTitle"></h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        Who do you want to invite to your list?
+                            <input type="email" name="email" id="shareListEmail" class="form-control" placeholder="email" required autofocus>
+                            <input type="hidden" name="listId" id="shareListId">
+                            <input type="hidden" name="ownerEmail" id="ownerEmail" value='${reg_user.getEmail()}'>
+                            <input type="hidden" name="action" value="invite">
+                            <button type="submit" class="btn btn-primary" id="inviteButton"  onclick="inviteFilter()">invite</button>                                                                                                            
+                            <div style="display:none" id="warning">You can't invite yourself!</div>
+                            <div style="display:none" id="warning2">User already invited!</div>
+                        <input type="url" name="shareurl" id="shareUrl" value="" size="45"  readonly>
+                        <button type="submit" class="btn btn-primary" onclick="copyFunction()" style="display:inline">Copy</button>
+                    </div>
+                </div>   
+            </div>                    
+        </div>                                
 
         <!-- // SCRIPTS // -->
         <script>
@@ -247,6 +270,7 @@
                         //console.log(JSON.stringify(obj));
                         let html = list.name + ", ID:" + list.id;
                         html += "<br><button class='btn' data-toggle='modal' data-target='#editListModal' onclick='showEditModal(" + list.id + ")'>EDIT</button><br>";
+                        html += "<br><button class='btn' data-toggle='modal' data-target='#shareListModal' onclick='shareListfunction(" + list.id + ")'>SHARE</button><br>";
                         html += "<div>Description:<br>" + list.description + "</div>";
                         html += "<div>Products:</div><br><ul>";
                         for (i in list.products) {
@@ -282,6 +306,51 @@
                 xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
                 xmlHttp.send(null);
             }
+            
+            function shareListfunction(id) {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        let list = JSON.parse(xmlHttp.responseText);
+                        document.getElementById("shareListModalTitle").innerHTML = "Share " + list.description;
+                        document.getElementById("shareListId").value = list.id;
+                        document.getElementById("inviteButton").onclick = function () { inviteFilter(list.id); };
+                        document.getElementById("shareUrl").value = "http://localhost:8084/Shopping/restricted/shopping.lists.handler?shareurl=true&id=" + id;
+                    }
+                }
+                xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?getList=" + id, true); // true for asynchronous 
+                xmlHttp.send(null);
+            }
+            
+            function inviteFilter(id) {
+                var email = document.getElementById("shareListEmail").value;
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        var result = xmlHttp.responseText;
+                        if(result.localeCompare("same") == 0){
+                            document.getElementById("warning2").style.display="none";
+                            document.getElementById("warning").style="display:inline";
+                        }else if(result.localeCompare("already") == 0){
+                            document.getElementById("warning").style.display="none";
+                            document.getElementById("warning2").style="display:inline";
+                        }else if(result.localeCompare("success") == 0){
+                            window.location.href = "<%=contextPath%>restricted/shopping.lists.html";
+                        }else if(result.localeCompare("error") == 0){
+                            window.location.href = "<%=contextPath%>registration.html?status=mailerror";
+                        }
+                    }
+                }
+                
+                xmlHttp.open("GET", "<%=contextPath%>restricted/shopping.lists.handler?sharedlist=" + id + "&email=" + email, true); // true for asynchronous 
+                xmlHttp.send(null);
+            }
+            
+            function copyFunction(){
+                var text = document.getElementById("shareUrl");
+                text.select();
+                document.execCommand("copy");
+            }           
         </script>
     </body>
 </html>
