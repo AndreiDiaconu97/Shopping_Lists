@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class Reg_User implements Serializable{
+public class User implements Serializable {
 
     private Integer id;
     private String email;
@@ -22,16 +22,16 @@ public class Reg_User implements Serializable{
     private String avatar;
     private Boolean is_admin;
 
-    public Reg_User() {
+    public User() {
     }
 
-    public Reg_User(String email, String firstname, String lastname, String avatar) {
+    public User(String email, String firstname, String lastname, String avatar) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
         this.avatar = avatar;
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -106,7 +106,7 @@ public class Reg_User implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Reg_User other = (Reg_User) obj;
+        final User other = (User) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

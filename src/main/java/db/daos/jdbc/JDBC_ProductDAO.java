@@ -37,19 +37,14 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public void insert(Product product) throws DAOException {
-        if (product == null) {
-            throw new DAOException("Given product is null");
-        }
-        if (product.getId() != null) {
-            throw new DAOException("Cannot insert product: it has arleady an id");
-        }
+        checkParam(product, false);
 
-        String query = "INSERT INTO " + P_TABLE + "(name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
-            stm.setString(3, product.getCategory());
-            stm.setInt(4, product.getCreator());
+            stm.setInt(3, product.getCategory().getId());
+            stm.setInt(4, product.getCreator().getId());
             stm.setBoolean(5, product.getIs_public());
             stm.setString(6, product.getLogo());
             stm.setString(7, product.getPhoto());
@@ -68,10 +63,9 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public void delete(Product product) throws DAOException {
-        if (product == null) {
-            throw new DAOException("Given product is null");
-        }
-        String query = "DELETE FROM " + P_TABLE + "WHERE ID = ?";
+        checkParam(product, true);
+        
+        String query = "DELETE FROM " + P_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, product.getId());
             stm.executeUpdate();
@@ -82,21 +76,14 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public void update(Product product) throws DAOException {
-        if (product == null) {
-            throw new DAOException("Given reg_user is null");
-        }
-
-        Integer productId = product.getId();
-        if (productId == null) {
-            throw new DAOException("Product is not valid", new NullPointerException("Product id is null"));
-        }
+        checkParam(product, true);
 
         String query = "UPDATE " + P_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, IS_PUBLIC = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
-            stm.setString(3, product.getCategory());
-            stm.setInt(4, product.getCreator());
+            stm.setInt(3, product.getCategory().getId());
+            stm.setInt(4, product.getCreator().getId());
             stm.setBoolean(5, product.getIs_public());
             stm.setString(6, product.getLogo());
             stm.setString(7, product.getPhoto());
@@ -115,31 +102,10 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public Product getByPrimaryKey(Integer id) throws DAOException {
-        if (id == null) {
-            throw new DAOException("Given id is empty");
-        }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + P_TABLE + " WHERE ID = ?")) {
-            stm.setInt(1, id);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? resultSetToProduct(rs) : null;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the product for the passed id", ex);
-        }
-    }
-    
-    @Override
-    public Product getByName(String name) throws DAOException{
-        if(name == null){
-            throw new DAOException("Given name is empty");
-        }
-        try(PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + P_TABLE + " WHERE NAME = ?")){
-            stm.setString(1, name);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? resultSetToProduct(rs) : null;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the product for the passed name", ex);
+        try{
+            return getProduct(id, CON);
+        } catch(SQLException ex){
+            throw new DAOException("Cannot get product by id " + id, ex);
         }
     }
 }

@@ -25,17 +25,18 @@ import java.util.logging.Logger;
  * @since 2018.03.31
  */
 public class JDBCDAOFactory implements DAOFactory {
+
     private final transient Connection CON;
     private final transient HashMap<Class, DAO> DAO_CACHE;
 
     private static JDBCDAOFactory instance;
-    
+
     /**
      * Call this method before use the instance of this class.
+     *
      * @param dbUrl the url to access to the database.
-     * @throws DAOFactoryException if an error occurred during dao factory
-     * configuration.
-     * 
+     * @throws DAOFactoryException if an error occurred during dao factory configuration.
+     *
      * @author Stefano Chirico
      * @since 1.0.180403
      */
@@ -46,13 +47,13 @@ public class JDBCDAOFactory implements DAOFactory {
             throw new DAOFactoryException("DAOFactory already configured. You can call configure only one time");
         }
     }
-    
+
     /**
      * Returns the singleton instace of this {@link DAOFactory}.
+     *
      * @return the singleton instance of this {@code DAOFactory}.
-     * @throws DAOFactoryException if an error occurred if this dao factory is
-     * not yet configured.
-     * 
+     * @throws DAOFactoryException if an error occurred if this dao factory is not yet configured.
+     *
      * @author Stefano Chirico
      * @since 1.0.180403
      */
@@ -62,14 +63,13 @@ public class JDBCDAOFactory implements DAOFactory {
         }
         return instance;
     }
-    
+
     /**
-     * The private constructor used to create the singleton instance of this
-     * {@code DAOFactory}.
+     * The private constructor used to create the singleton instance of this {@code DAOFactory}.
+     *
      * @param dbUrl the url to access the database.
-     * @throws DAOFactoryException if an error occurred during {@code DAOFactory}
-     * creation.
-     * 
+     * @throws DAOFactoryException if an error occurred during {@code DAOFactory} creation.
+     *
      * @author Stefano Chirico
      * @since 1.0.180403
      */
@@ -87,13 +87,13 @@ public class JDBCDAOFactory implements DAOFactory {
         } catch (SQLException sqle) {
             throw new DAOFactoryException("Cannot create connection", sqle);
         }
-        
+
         DAO_CACHE = new HashMap<>();
     }
 
     /**
      * Shutdowns the access to the storage system.
-     * 
+     *
      * @author Stefano Chirico
      * @since 1.0.180331
      */
@@ -107,13 +107,11 @@ public class JDBCDAOFactory implements DAOFactory {
     }
 
     /**
-     * Returns the concrete {@link DAO dao} which type is the class passed as
-     * parameter.
+     * Returns the concrete {@link DAO dao} which type is the class passed as parameter.
      *
      * @param <DAO_CLASS> the class name of the {@code dao} to get.
      * @param daoInterface the class instance of the {@code dao} to get.
-     * @return the concrete {@code dao} which type is the class passed as
-     * parameter.
+     * @return the concrete {@code dao} which type is the class passed as parameter.
      * @throws DAOFactoryException if an error occurred during the operation.
      *
      * @author Stefano Chirico
@@ -125,13 +123,13 @@ public class JDBCDAOFactory implements DAOFactory {
         if (dao != null) {
             return daoInterface.cast(dao);
         }
-        
+
         Package pkg = daoInterface.getPackage();
         String prefix = pkg.getName() + ".jdbc.JDBC_";
-        
+
         try {
             Class<?> daoClass = Class.forName(prefix + daoInterface.getSimpleName());
-            Class<?>[] types = new Class[] {Connection.class};
+            Class<?>[] types = new Class[]{Connection.class};
             Constructor<?> constructor = daoClass.getConstructor(types);
             Object daoInstance = constructor.newInstance(CON);
             if (!(daoInstance instanceof JDBC_DAO)) {

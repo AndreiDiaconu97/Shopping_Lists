@@ -6,7 +6,7 @@
 package db.daos;
 
 import db.entities.NV_User;
-import db.entities.Reg_User;
+import db.entities.User;
 import db.exceptions.DAOException;
 
 /**
@@ -16,11 +16,7 @@ import db.exceptions.DAOException;
 public interface NV_UserDAO extends DAO<NV_User, String> {
 
     public NV_User getByEmail(String email) throws DAOException;
-    
-    public NV_User getByCode(String code) throws DAOException;
-    
-    public Reg_User validateUsingCode(String code) throws DAOException;
-    
-    public String generateCode(int code_size) throws DAOException;
-    
+
+    public User validateUsingEmailAndCode(String email, String code) throws DAOException;
+
 }

@@ -12,26 +12,26 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class List_reg implements Serializable{
+public class List_reg implements Serializable {
 
     private Integer id;
     private String name;
-    private Integer owner;
-    private String category;
+    private User owner;
+    private List_category category;
     private String description;
     private String logo;
 
     public List_reg() {
     }
 
-    public List_reg(String name, Integer owner, String category, String description, String logo) {
+    public List_reg(String name, User owner, List_category category, String description, String logo) {
         this.name = name;
         this.owner = owner;
         this.category = category;
         this.description = description;
         this.logo = logo;
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -48,19 +48,19 @@ public class List_reg implements Serializable{
         this.name = name;
     }
 
-    public Integer getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(Integer owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 
-    public String getCategory() {
+    public List_category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(List_category category) {
         this.category = category;
     }
 

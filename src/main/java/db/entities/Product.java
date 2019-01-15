@@ -12,12 +12,12 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class Product implements Serializable{
+public class Product implements Serializable {
 
     private Integer id;
     private String name;
-    private String category;
-    private Integer creator;
+    private Prod_category category;
+    private User creator;
     private String description;
     private String logo;
     private String photo;
@@ -28,7 +28,7 @@ public class Product implements Serializable{
     public Product() {
     }
 
-    public Product(String name, String category, Integer creator, String description, String logo, String photo, Boolean is_public) {
+    public Product(String name, Prod_category category, User creator, String description, String logo, String photo, Boolean is_public) {
         this.name = name;
         this.category = category;
         this.creator = creator;
@@ -37,7 +37,7 @@ public class Product implements Serializable{
         this.photo = photo;
         this.is_public = is_public;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -46,19 +46,19 @@ public class Product implements Serializable{
         this.name = name;
     }
 
-    public String getCategory() {
+    public Prod_category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Prod_category category) {
         this.category = category;
     }
 
-    public Integer getCreator() {
+    public User getCreator() {
         return creator;
     }
 
-    public void setCreator(Integer creator) {
+    public void setCreator(User creator) {
         this.creator = creator;
     }
 

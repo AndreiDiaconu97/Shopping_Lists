@@ -12,8 +12,9 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class Prod_category implements Serializable{
+public class Prod_category implements Serializable {
 
+    private Integer id;
     private String name;
     private String description;
     private String logo;
@@ -25,6 +26,14 @@ public class Prod_category implements Serializable{
         this.name = name;
         this.description = description;
         this.logo = logo;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -70,7 +79,7 @@ public class Prod_category implements Serializable{
             return false;
         }
         final Prod_category other = (Prod_category) obj;
-        if (!Objects.equals(this.name, other.name)) {
+        if (!Objects.equals(this.id, other.id)) {
             return false;
         }
         return true;

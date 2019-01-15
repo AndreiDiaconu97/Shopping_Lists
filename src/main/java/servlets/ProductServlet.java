@@ -24,7 +24,7 @@ import org.json.JSONObject;
  *
  * @author andrea
  */
-public class ProductSearchServlet extends HttpServlet {
+public class ProductServlet extends HttpServlet {
 
     private ProductDAO productDao;
     private List<Product> allProducts;
@@ -39,7 +39,7 @@ public class ProductSearchServlet extends HttpServlet {
         try {
             productDao = daoFactory.getDAO(ProductDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for product", ex);
+            throw new ServletException("Impossible to get dao for products", ex);
         }
         try {
             allProducts = productDao.getAll();
@@ -63,7 +63,7 @@ public class ProductSearchServlet extends HttpServlet {
                     searched.add(p);
                 }
             }
-            
+
             JSONArray productArray = new JSONArray();
             for (Product p : searched) {
                 JSONObject productJSON = new JSONObject();

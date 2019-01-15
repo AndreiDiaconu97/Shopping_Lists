@@ -13,19 +13,19 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class List_anonymous implements Serializable{
+public class List_anonymous implements Serializable {
 
     private Integer id;
     private String name;
     private String description;
     private String logo;
-    private String category;
+    private List_category category;
     private Timestamp last_seen;
 
     public List_anonymous() {
     }
-    
-    public List_anonymous(String name, String description, String logo, String category, Timestamp last_seen) {
+
+    public List_anonymous(String name, String description, String logo, List_category category, Timestamp last_seen) {
         this.name = name;
         this.description = description;
         this.logo = logo;
@@ -65,11 +65,11 @@ public class List_anonymous implements Serializable{
         this.logo = logo;
     }
 
-    public String getCategory() {
+    public List_category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(List_category category) {
         this.category = category;
     }
 

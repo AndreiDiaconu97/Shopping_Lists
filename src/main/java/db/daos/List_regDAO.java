@@ -6,8 +6,9 @@
 package db.daos;
 
 import db.entities.Product;
-import db.entities.Reg_User;
+import db.entities.User;
 import db.entities.List_reg;
+import db.entities.Message;
 import db.exceptions.DAOException;
 import java.util.List;
 
@@ -17,17 +18,25 @@ import java.util.List;
  */
 public interface List_regDAO extends DAO<List_reg, Integer> {
 
-    public void shareShoppingListToReg_User(List_reg shoppingList, Reg_User user) throws DAOException;
+    public void shareListToUser(List_reg list_reg, User user) throws DAOException;
 
-    public List<Reg_User> getReg_UsersSharedTo(List_reg list_reg) throws DAOException;
+    public List<User> getUsersSharedTo(List_reg list_reg) throws DAOException;
 
-    public List<List_reg> getByOwner(Integer owner) throws DAOException;
+    public List<List_reg> getByOwner(User owner) throws DAOException;
 
     public List<Product> getProducts(List_reg list_reg) throws DAOException;
-    
-    public void insertProduct(List_reg list_reg, Product product) throws DAOException;
-    
-    public Boolean isPurchased(List_reg list_reg, Product product) throws DAOException;
-    
-    public void purchase(List_reg list_reg, Product product, boolean purchased) throws DAOException;
+
+    public void insertProduct(List_reg list_reg, Product product, Integer amount) throws DAOException;
+
+    public Integer getAmountTotal(List_reg list_reg, Product product) throws DAOException;
+
+    public Integer getAmountPurchased(List_reg list_reg, Product product) throws DAOException;
+
+    public void updateAmountTotal(List_reg list_reg, Product product, Integer total) throws DAOException;
+
+    public void updateAmountPurchased(List_reg list_reg, Product product, Integer purchased) throws DAOException;
+
+    public void insertMessage(Message message) throws DAOException;
+
+    public List<Message> getListMessages(List_reg list_reg) throws DAOException;
 }

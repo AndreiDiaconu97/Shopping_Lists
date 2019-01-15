@@ -7,11 +7,10 @@ package db.daos;
 
 import db.entities.Prod_category;
 
-
 /**
  *
  * @author Andrei Diaconu
  */
-public interface Prod_categoryDAO extends DAO<Prod_category, String> {
-    
+public interface Prod_categoryDAO extends DAO<Prod_category, Integer> {
+
 }

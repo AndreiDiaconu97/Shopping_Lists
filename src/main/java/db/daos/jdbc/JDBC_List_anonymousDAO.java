@@ -39,18 +39,13 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
 
     @Override
     public void insert(List_anonymous list_anonymous) throws DAOException {
-        if (list_anonymous == null) {
-            throw new DAOException("Given list_anonymous is null");
-        }
-        if (list_anonymous.getId() != null) {
-            throw new DAOException("Cannot insert list_anonymous: it has arleady an id");
-        }
+        checkParam(list_anonymous, false);
 
-        String query = "INSERT INTO " + L_ANONYM_TABLE + "(name, description, category, logo, last_seen) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + L_ANONYM_TABLE + " (name, description, category, logo, last_seen) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
-            stm.setString(3, list_anonymous.getCategory());
+            stm.setInt(3, list_anonymous.getCategory().getId());
             stm.setString(4, list_anonymous.getLogo());
             stm.setTimestamp(5, list_anonymous.getLast_seen());
             stm.executeUpdate();
@@ -66,9 +61,8 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
 
     @Override
     public void delete(List_anonymous list_anonymous) throws DAOException {
-        if (list_anonymous == null) {
-            throw new DAOException("Given list_anonymous is null");
-        }
+        checkParam(list_anonymous, true);
+        
         String query = "DELETE FROM " + L_ANONYM_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -80,20 +74,13 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
 
     @Override
     public void update(List_anonymous list_anonymous) throws DAOException {
-        if (list_anonymous == null) {
-            throw new DAOException("Given list_anonymous is null");
-        }
-
-        Integer list_anonymousId = list_anonymous.getId();
-        if (list_anonymousId == null) {
-            throw new DAOException("List_anonymous is not valid", new NullPointerException("List_anonymous id is null"));
-        }
+        checkParam(list_anonymous, true);
 
         String query = "UPDATE " + L_ANONYM_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, LOGO = ?, LAST_SEEN = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
-            stm.setString(3, list_anonymous.getCategory());
+            stm.setInt(3, list_anonymous.getCategory().getId());
             stm.setString(4, list_anonymous.getLogo());
             stm.setTimestamp(5, list_anonymous.getLast_seen());
             stm.setInt(6, list_anonymous.getId());
@@ -109,24 +96,33 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
 
     @Override
     public List_anonymous getByPrimaryKey(Integer id) throws DAOException {
-        if (id == null) {
-            throw new DAOException("id parameter is null");
+        try{
+            return getList_anonymous(id, CON);
+        } catch(SQLException ex){
+            throw new DAOException("Cannot get list_anonymous by id " + id, ex);
         }
-        try (PreparedStatement stm = CON.prepareStatement("SELECT * FROM " + L_ANONYM_TABLE + " WHERE ID = ?")) {
-            stm.setInt(1, id);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? JDBC_utility.resultSetToList_anonymous(rs) : null;
-            }
+    }
+
+    @Override
+    public void insertProduct(List_anonymous list_anonymous, Product product, Integer amount) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+        
+        String query = "INSERT INTO " + L_ANONYM_P_TABLE + " (LIST_ANONYMOUS, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stm.setInt(1, list_anonymous.getId());
+            stm.setInt(2, product.getId());
+            stm.setInt(3, amount);
+            stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the list_anonymous for the passed id", ex);
+            throw new DAOException("Impossible to add new product", ex);
         }
     }
 
     @Override
     public List<Product> getProducts(List_anonymous list_anonymous) throws DAOException {
-        if (list_anonymous == null) {
-            throw new DAOException("list_anonymous parameter is null");
-        }
+        checkParam(list_anonymous, true);
+        
         String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -134,12 +130,94 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
                 List<Product> products = new ArrayList<>();
 
                 while (rs.next()) {
-                    products.add(JDBC_utility.resultSetToProduct(rs));
+                    products.add(resultSetToProduct(rs, CON));
                 }
                 return products;
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to get the products for the passed list_anonymous", ex);
+        }
+    }
+
+    @Override
+    public Integer getAmountTotal(List_anonymous list_anonymous, Product product) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+        
+        String query = "SELECT AMOUNT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_anonymous.getId());
+            stm.setInt(2, product.getId());
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new DAOException("Total amount not found, list " + list_anonymous.getId() + ", product " + product.getId());
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get total amount", ex);
+        }
+    }
+
+    @Override
+    public Integer getAmountPurchased(List_anonymous list_anonymous, Product product) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+        
+        String query = "SELECT PURCHASED FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_anonymous.getId());
+            stm.setInt(2, product.getId());
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new DAOException("Purchased amount not found, list " + list_anonymous.getId() + ", product " + product.getId());
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get purchased amount", ex);
+        }
+    }
+
+    @Override
+    public void updateAmountTotal(List_anonymous list_anonymous, Product product, Integer total) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+        
+        String query = "UPDATE " + L_ANONYM_P_TABLE + " SET TOTAL=? WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, total);
+            stm.setInt(2, list_anonymous.getId());
+            stm.setInt(3, product.getId());
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("Total amount updated affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update total amount", ex);
+        }
+    }
+
+    @Override
+    public void updateAmountPurchased(List_anonymous list_anonymous, Product product, Integer purchased) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+        
+        String query = "UPDATE " + L_ANONYM_P_TABLE + " SET PURCHASED=? WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, purchased);
+            stm.setInt(2, list_anonymous.getId());
+            stm.setInt(3, product.getId());
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("Purchased amount updated affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update purchased amount", ex);
         }
     }
 }

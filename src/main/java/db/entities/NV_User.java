@@ -5,9 +5,8 @@
  */
 package db.entities;
 
-import db.daos.jdbc.JDBC_utility;
+import static db.daos.jdbc.JDBC_utility.randomString;
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.util.Objects;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
@@ -15,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
  *
  * @author Andrei Diaconu
  */
-public class NV_User implements Serializable{
+public class NV_User implements Serializable {
 
     private String email;
     private String hashed_password;
@@ -23,7 +22,7 @@ public class NV_User implements Serializable{
     private String lastname;
     private String avatar;
     private String code;
-    
+
     private static final int CODE_SIZE = 50;
 
     public static int getCODE_SIZE() {
@@ -31,8 +30,9 @@ public class NV_User implements Serializable{
     }
 
     public NV_User() {
+        generateCode();
     }
-    
+
     public NV_User(String email, String normal_password, String firstname, String lastname, String avatar) {
         this.email = email;
         this.firstname = firstname;
@@ -61,13 +61,13 @@ public class NV_User implements Serializable{
     public String getHashed_password() {
         return hashed_password;
     }
-    
-    public void setHashed_password(String hashed_password){
+
+    public void setHashed_password(String hashed_password) {
         this.hashed_password = hashed_password;
     }
 
     private void createHashedPassword(String password) {
-        if(password == null){
+        if (password == null) {
             System.err.println("Creating hash for null psw!!");
             return;
         }
@@ -99,7 +99,7 @@ public class NV_User implements Serializable{
     }
 
     private void generateCode() {
-        this.code = JDBC_utility.randomString(CODE_SIZE);
+        this.code = randomString(CODE_SIZE);
     }
 
     @Override

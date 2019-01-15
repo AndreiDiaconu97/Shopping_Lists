@@ -78,12 +78,6 @@ CREATE TABLE APP.PRODUCTS_CATEGORIES (
 	PRIMARY KEY (NAME)
 );
 
-CREATE TABLE APP.LISTS_PRODUCTS_CATEGORIES (
-	LIST_CAT VARCHAR(100) NOT NULL,
-	PRODUCT_CAT VARCHAR(100) NOT NULL,
-	UNIQUE (LIST_CAT, PRODUCT_CAT)
-);
-
 CREATE TABLE APP.REG_USERS (
 	ID INTEGER GENERATED ALWAYS AS IDENTITY(start with 1 increment by 1) NOT NULL,
 	EMAIL VARCHAR(100) NOT NULL UNIQUE,
@@ -113,20 +107,12 @@ ALTER TABLE APP.LISTS_SHARING ADD FOREIGN KEY (REG_USER) REFERENCES APP.REG_USER
 ALTER TABLE APP.PRODUCTS ADD FOREIGN KEY (CATEGORY) REFERENCES APP.PRODUCTS_CATEGORIES (NAME);
 ALTER TABLE APP.PRODUCTS ADD FOREIGN KEY (CREATOR) REFERENCES APP.REG_USERS (ID);
 
-ALTER TABLE APP.LISTS_PRODUCTS_CATEGORIES ADD FOREIGN KEY (LIST_CAT) REFERENCES APP.LISTS_CATEGORIES (NAME);
-ALTER TABLE APP.LISTS_PRODUCTS_CATEGORIES ADD FOREIGN KEY (PRODUCT_CAT) REFERENCES APP.PRODUCTS_CATEGORIES (NAME);
 
 
 
 
---   _    _    _____   ______   _____     _____ 
---  | |  | |  / ____| |  ____| |  __ \   / ____|
---  | |  | | | (___   | |__    | |__) | | (___  
---  | |  | |  \___ \  |  __|   |  _  /   \___ \ 
---  | |__| |  ____) | | |____  | | \ \   ____) |
---   \____/  |_____/  |______| |_|  \_\ |_____/ 
---                                              
-INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VALUES ('andrea.matte@studenti.unitn.it','$2a$10$zmo44mIGrEzF.2flUu13SOatFYW8LHaRoxSGPJeRRM.fe6IBfddCS','andrea','matto',false,NULL);
+
+--   _    _    _____   ______   _____     _____ --  | |  | |  / ____| |  ____| |  __ \   / ____|--  | |  | | | (___   | |__    | |__) | | (___  --  | |  | |  \___ \  |  __|   |  _  /   \___ \ --  | |__| |  ____) | | |____  | | \ \   ____) |--   \____/  |_____/  |______| |_|  \_\ |_____/ --                                              INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VALUES ('andrea.matte@studenti.unitn.it','$2a$10$zmo44mIGrEzF.2flUu13SOatFYW8LHaRoxSGPJeRRM.fe6IBfddCS','andrea','matto',false,NULL);
 INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VALUES ('andrei.diaconu@studenti.unitn.it','$2a$10$bek3pnCbDuA7YfLXHDpVi./CPITBTv.nPud1Q63WukdgtKsrr.NCe','andrei','kontorto',false,NULL);
 INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VALUES ('andrea.iossa@studenti.unitn.it','$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y','andrea','ioza',false,NULL);
 INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VALUES ('gianmaria.chi93@alice.it','$2y$10$4g/8zymTLbHTZJYT.44EDuMqAgDi.0v1/mjCLPABn1WakOUIfz.Ee','gianmaria','chi',false,NULL);
@@ -151,14 +137,7 @@ INSERT INTO APP.REG_USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN,AVATAR) VA
 
 
 
---   _____    _____     ____    _____    _    _    _____   _______          _____              _______   ______    _____    ____    _____    _____   ______    _____ 
---  |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|        / ____|     /\     |__   __| |  ____|  / ____|  / __ \  |  __ \  |_   _| |  ____|  / ____|
---  | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |          | |         /  \       | |    | |__    | |  __  | |  | | | |__) |   | |   | |__    | (___  
---  |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |          | |        / /\ \      | |    |  __|   | | |_ | | |  | | |  _  /    | |   |  __|    \___ \ 
---  | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |          | |____   / ____ \     | |    | |____  | |__| | | |__| | | | \ \   _| |_  | |____   ____) |
---  |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|           \_____| /_/    \_\    |_|    |______|  \_____|  \____/  |_|  \_\ |_____| |______| |_____/ 
---                                                                                                                                                                   
-INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Tutto per fido','nodesc',NULL);
+--   _____    _____     ____    _____    _    _    _____   _______          _____              _______   ______    _____    ____    _____    _____   ______    _____ --  |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|        / ____|     /\     |__   __| |  ____|  / ____|  / __ \  |  __ \  |_   _| |  ____|  / ____|--  | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |          | |         /  \       | |    | |__    | |  __  | |  | | | |__) |   | |   | |__    | (___  --  |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |          | |        / /\ \      | |    |  __|   | | |_ | | |  | | |  _  /    | |   |  __|    \___ \ --  | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |          | |____   / ____ \     | |    | |____  | |__| | | |__| | | | \ \   _| |_  | |____   ____) |--  |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|           \_____| /_/    \_\    |_|    |______|  \_____|  \____/  |_|  \_\ |_____| |______| |_____/ --                                                                                                                                                                   INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Tutto per fido','nodesc',NULL);
 INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Tecnologie comunicazione','nodesc',NULL);
 INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Tecnologie audio','nodesc',NULL);
 INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Prodotti da forno','nodesc',NULL);
@@ -186,14 +165,7 @@ INSERT INTO APP.PRODUCTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Libri e man
 
 
 
---   _____    _____     ____    _____    _    _    _____   _______    _____ 
---  |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|  / ____|
---  | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |    | (___  
---  |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |     \___ \ 
---  | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |     ____) |
---  |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|    |_____/ 
---                                                                                                                                                 
-INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO) VALUES ('Pollo e Riso 15 kg crocchette cane cucciolo  ','Crocchette per cani  MSCo è un alimento completo con pollo e riso studiato per l’alimentazione quotidiana di cuccioli di taglia media da 6 settimane a 12 mesi di età.È ricco di pollo di alta qualità, altamente digeribile.È formulato per favorire lo sviluppo del cagnolino e farlo crescere forte e sano.Composizione Cereali (di cui riso min. 5%), carni e derivati 28% (di cui pollo fresco min. 10%), oli e grassi, pesci e sottoprodotti dei pesci, sottoprodotti di origine vegetale (polpa di barbabietola 2%), lieviti (lievito di birra 1%), sostanze minerali, estratto di castagno, yucca schidigera, colina cloruro, fructo-oligosaccaridi F.O.S. 1 g/kg, vitamina EComponenti analitici  Proteina grezza 31,00%, Oli e grassi grezzi 16,00%, Fibra grezza 2,50%, Ceneri grezze 7,50%, Calcio 1,5%, Fosforo 1,1%. ...','Tutto per fido',1,TRUE,NULL,NULL);
+--   _____    _____     ____    _____    _    _    _____   _______    _____ --  |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|  / ____|--  | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |    | (___  --  |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |     \___ \ --  | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |     ____) |--  |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|    |_____/ --                                                                                                                                                 INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO) VALUES ('Pollo e Riso 15 kg crocchette cane cucciolo  ','Crocchette per cani  MSCo è un alimento completo con pollo e riso studiato per l’alimentazione quotidiana di cuccioli di taglia media da 6 settimane a 12 mesi di età.È ricco di pollo di alta qualità, altamente digeribile.È formulato per favorire lo sviluppo del cagnolino e farlo crescere forte e sano.Composizione Cereali (di cui riso min. 5%), carni e derivati 28% (di cui pollo fresco min. 10%), oli e grassi, pesci e sottoprodotti dei pesci, sottoprodotti di origine vegetale (polpa di barbabietola 2%), lieviti (lievito di birra 1%), sostanze minerali, estratto di castagno, yucca schidigera, colina cloruro, fructo-oligosaccaridi F.O.S. 1 g/kg, vitamina EComponenti analitici  Proteina grezza 31,00%, Oli e grassi grezzi 16,00%, Fibra grezza 2,50%, Ceneri grezze 7,50%, Calcio 1,5%, Fosforo 1,1%. ...','Tutto per fido',1,TRUE,NULL,NULL);
 INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO) VALUES ('Menu con Agnello Umido Cane Premium','Le ricette sono preparate con ingredienti idonei solo al pet food.tutta la gamma è priva di coloranti o conservanti. con le ricette dailymenu si ha la certezza di proporre un’alimentazione con la garanzia di qualità almo nature, a un prezzo ancora più conveniente!il consiglio nutrizionale di almo natureil cane beve spontaneamente e in abbondanza. il consiglio nutrizionale di almo nature per un equilibrio alimentare ottimale è quello di porre al centro dell’alimentazione del cane il cibo secco alternando tra crocchette di carne e pesce. L’associazione con una piccola percentuale di alimenti umidi serve a stimolare l’olfatto del cane rendendo il suo pasto altamente gratificante. Gli alimenti umidi sono fonte di micronutrienti utili al generale benessere del cane e in particolari condizioni fisiche e climatiche.','Tutto per fido',1,TRUE,NULL,NULL);
 INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO) VALUES ('Bocconi in Salsa controllo del peso con tacchino, cane e piselli, per Cani Fino A 10 Kg','Pasti di alta qualità in salsa, altamente digeribili e adatti alla piccola bocca del tuo cane di piccola taglia. Preparati con teneri bocconi e verdure, queste gustose ricette lo delizieranno ad ogni pasto. COMPOSIZIONE: Carni e derivati (di cui 4% tacchino),Ortaggi (carote 4% da carote disidratate, piselli 4% da piselli disidratati),Estratti di proteine vegetali,Pesci e sottoprodotti dei pesci,Sottoprodotti di origine vegetale,Sostanze minerali,Zuccheri,Oli e grassi ','Tutto per fido',1,TRUE,NULL,NULL);
 INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO) VALUES (' Cappotto impermeabile a cappuccio per cane','Borse spuntino intimi progettati per aiutare gli animali domestici facile da mangiare. Gli impermeabili cane da compagnia possono essere indossati in primavera, estate, autunno e inverno. Confortevole e caldo, non dare il vostro cane un senso di moderazione. Durevole, abbigliamento sportivo impermeabile per giorni acqua bagnato e antivento con protezione collo removibile. ','Tutto per fido',1,TRUE,NULL,NULL);
@@ -433,14 +405,7 @@ INSERT INTO APP.PRODUCTS (NAME,DESCRIPTION,CATEGORY,CREATOR,IS_PUBLIC,LOGO,PHOTO
 
 
 
---   _        _____    _____   _______          _____              _______   ______    _____    ____    _____    _____   ______    _____ 
---  | |      |_   _|  / ____| |__   __|        / ____|     /\     |__   __| |  ____|  / ____|  / __ \  |  __ \  |_   _| |  ____|  / ____|
---  | |        | |   | (___      | |          | |         /  \       | |    | |__    | |  __  | |  | | | |__) |   | |   | |__    | (___  
---  | |        | |    \___ \     | |          | |        / /\ \      | |    |  __|   | | |_ | | |  | | |  _  /    | |   |  __|    \___ \ 
---  | |____   _| |_   ____) |    | |          | |____   / ____ \     | |    | |____  | |__| | | |__| | | | \ \   _| |_  | |____   ____) |
---  |______| |_____| |_____/     |_|           \_____| /_/    \_\    |_|    |______|  \_____|  \____/  |_|  \_\ |_____| |______| |_____/ 
---                                                                                                                                       
-INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Regali di natale','nodesc',NULL);
+--   _        _____    _____   _______          _____              _______   ______    _____    ____    _____    _____   ______    _____ --  | |      |_   _|  / ____| |__   __|        / ____|     /\     |__   __| |  ____|  / ____|  / __ \  |  __ \  |_   _| |  ____|  / ____|--  | |        | |   | (___      | |          | |         /  \       | |    | |__    | |  __  | |  | | | |__) |   | |   | |__    | (___  --  | |        | |    \___ \     | |          | |        / /\ \      | |    |  __|   | | |_ | | |  | | |  _  /    | |   |  __|    \___ \ --  | |____   _| |_   ____) |    | |          | |____   / ____ \     | |    | |____  | |__| | | |__| | | | \ \   _| |_  | |____   ____) |--  |______| |_____| |_____/     |_|           \_____| /_/    \_\    |_|    |______|  \_____|  \____/  |_|  \_\ |_____| |______| |_____/ --                                                                                                                                       INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Regali di natale','nodesc',NULL);
 INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Fai da te','nodesc',NULL);
 INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Lista della spesa','nodesc',NULL);
 INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Informatica','nodesc',NULL);
@@ -448,14 +413,7 @@ INSERT INTO APP.LISTS_CATEGORIES (NAME,DESCRIPTION,LOGO) VALUES ('Informatica','
 
 
 
---   _        _____    _____   _______    _____ 
---  | |      |_   _|  / ____| |__   __|  / ____|
---  | |        | |   | (___      | |    | (___  
---  | |        | |    \___ \     | |     \___ \ 
---  | |____   _| |_   ____) |    | |     ____) |
---  |______| |_____| |_____/     |_|    |_____/ 
---                                              
-INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista1','nodesc','Regali di natale', 10,'list1');
+--   _        _____    _____   _______    _____ --  | |      |_   _|  / ____| |__   __|  / ____|--  | |        | |   | (___      | |    | (___  --  | |        | |    \___ \     | |     \___ \ --  | |____   _| |_   ____) |    | |     ____) |--  |______| |_____| |_____/     |_|    |_____/ --                                              INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista1','nodesc','Regali di natale', 10,'list1');
 INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista2','nodesc','Regali di natale', 7,'list1');
 INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista3','nodesc','Regali di natale', 17,'list1');
 INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista4','nodesc','Regali di natale', 18,'list1');
@@ -539,14 +497,7 @@ INSERT INTO APP.LISTS (NAME,DESCRIPTION,CATEGORY,OWNER,LOGO) VALUES ('lista80','
 
 
 
---   _        _____    _____   _______         _    _               _____         _____    _____     ____    _____    _    _    _____   _______    _____ 
---  | |      |_   _|  / ____| |__   __|       | |  | |     /\      / ____|       |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|  / ____|
---  | |        | |   | (___      | |          | |__| |    /  \    | (___         | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |    | (___  
---  | |        | |    \___ \     | |          |  __  |   / /\ \    \___ \        |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |     \___ \ 
---  | |____   _| |_   ____) |    | |          | |  | |  / ____ \   ____) |       | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |     ____) |
---  |______| |_____| |_____/     |_|          |_|  |_| /_/    \_\ |_____/        |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|    |_____/ 
---                                                                                                                                                       
-INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (35,214,FALSE);
+--   _        _____    _____   _______         _    _               _____         _____    _____     ____    _____    _    _    _____   _______    _____ --  | |      |_   _|  / ____| |__   __|       | |  | |     /\      / ____|       |  __ \  |  __ \   / __ \  |  __ \  | |  | |  / ____| |__   __|  / ____|--  | |        | |   | (___      | |          | |__| |    /  \    | (___         | |__) | | |__) | | |  | | | |  | | | |  | | | |         | |    | (___  --  | |        | |    \___ \     | |          |  __  |   / /\ \    \___ \        |  ___/  |  _  /  | |  | | | |  | | | |  | | | |         | |     \___ \ --  | |____   _| |_   ____) |    | |          | |  | |  / ____ \   ____) |       | |      | | \ \  | |__| | | |__| | | |__| | | |____     | |     ____) |--  |______| |_____| |_____/     |_|          |_|  |_| /_/    \_\ |_____/        |_|      |_|  \_\  \____/  |_____/   \____/   \_____|    |_|    |_____/ --                                                                                                                                                       INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (35,214,FALSE);
 INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (67,147,FALSE);
 INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (59,62,FALSE);
 INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (2,126,FALSE);
@@ -1918,14 +1869,7 @@ INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,PURCHASED) VALUES (78,100,FALSE);
 
 
 
---   _        _____    _____   _______      _____   _    _              _____    _____   _   _    _____ 
---  | |      |_   _|  / ____| |__   __|    / ____| | |  | |     /\     |  __ \  |_   _| | \ | |  / ____|
---  | |        | |   | (___      | |      | (___   | |__| |    /  \    | |__) |   | |   |  \| | | |  __ 
---  | |        | |    \___ \     | |       \___ \  |  __  |   / /\ \   |  _  /    | |   | . ` | | | |_ |
---  | |____   _| |_   ____) |    | |       ____) | | |  | |  / ____ \  | | \ \   _| |_  | |\  | | |__| |
---  |______| |_____| |_____/     |_|      |_____/  |_|  |_| /_/    \_\ |_|  \_\ |_____| |_| \_|  \_____|
---                                                                                                      
-INSERT INTO APP.LISTS_SHARING (LIST,REG_USER) VALUES (1,5);
+--   _        _____    _____   _______      _____   _    _              _____    _____   _   _    _____ --  | |      |_   _|  / ____| |__   __|    / ____| | |  | |     /\     |  __ \  |_   _| | \ | |  / ____|--  | |        | |   | (___      | |      | (___   | |__| |    /  \    | |__) |   | |   |  \| | | |  __ --  | |        | |    \___ \     | |       \___ \  |  __  |   / /\ \   |  _  /    | |   | . ` | | | |_ |--  | |____   _| |_   ____) |    | |       ____) | | |  | |  / ____ \  | | \ \   _| |_  | |\  | | |__| |--  |______| |_____| |_____/     |_|      |_____/  |_|  |_| /_/    \_\ |_|  \_\ |_____| |_| \_|  \_____|--                                                                                                      INSERT INTO APP.LISTS_SHARING (LIST,REG_USER) VALUES (1,5);
 INSERT INTO APP.LISTS_SHARING (LIST,REG_USER) VALUES (2,15);
 INSERT INTO APP.LISTS_SHARING (LIST,REG_USER) VALUES (3,8);
 INSERT INTO APP.LISTS_SHARING (LIST,REG_USER) VALUES (4,1);

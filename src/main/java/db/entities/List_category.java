@@ -12,8 +12,9 @@ import java.util.Objects;
  *
  * @author Andrei Diaconu
  */
-public class List_category implements Serializable{
+public class List_category implements Serializable {
 
+    private Integer id;
     private String name;
     private String description;
     private String logo;
@@ -26,7 +27,15 @@ public class List_category implements Serializable{
         this.description = description;
         this.logo = logo;
     }
-    
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -70,7 +79,7 @@ public class List_category implements Serializable{
             return false;
         }
         final List_category other = (List_category) obj;
-        if (!Objects.equals(this.name, other.name)) {
+        if (!Objects.equals(this.id, other.id)) {
             return false;
         }
         return true;

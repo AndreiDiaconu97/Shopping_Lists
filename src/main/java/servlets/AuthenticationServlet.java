@@ -6,9 +6,8 @@
 package servlets;
 
 import db.daos.NV_UserDAO;
-import db.daos.Reg_UserDAO;
 import db.entities.NV_User;
-import db.entities.Reg_User;
+import db.entities.User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -27,6 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import db.daos.UserDAO;
 
 /**
  *
@@ -34,7 +34,7 @@ import javax.servlet.http.HttpSession;
  */
 public class AuthenticationServlet extends HttpServlet {
 
-    Reg_UserDAO reg_userDao;
+    UserDAO userDao;
     NV_UserDAO nv_userDao;
     final String m_host = "smtp.gmail.com";
     final String m_port = "465";
@@ -50,9 +50,9 @@ public class AuthenticationServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao factory");
         }
         try {
-            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
+            userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for reg_user", ex);
+            throw new ServletException("Impossible to get dao for user", ex);
         }
         try {
             nv_userDao = daoFactory.getDAO(NV_UserDAO.class);
@@ -87,9 +87,10 @@ public class AuthenticationServlet extends HttpServlet {
 
         // VALIDATE
         if (request.getParameter("validate") != null) {
+            String email = request.getParameter("email");
             String code = request.getParameter("code");
             try {
-                nv_userDao.validateUsingCode(code);
+                nv_userDao.validateUsingEmailAndCode(email, code);
             } catch (DAOException ex) {
                 request.getServletContext().log("Unable to validate user", ex);
                 response.sendRedirect(contextPath + "registration.html?status=error");
@@ -97,7 +98,6 @@ public class AuthenticationServlet extends HttpServlet {
             }
             request.getServletContext().log("Validated user");
             response.sendRedirect(contextPath + "login.html?status=validated");
-            return;
         } else {
             // bad request
         }
@@ -120,11 +120,11 @@ public class AuthenticationServlet extends HttpServlet {
             case "logout": {
                 HttpSession session = request.getSession(false);
                 if (session != null) {
-                    Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
-                    if (reg_user != null) {
-                        session.setAttribute("reg_user", null);
+                    User user = (User) session.getAttribute("user");
+                    if (user != null) {
+                        session.setAttribute("user", null);
                         session.invalidate();
-                        reg_user = null;
+                        user = null;
                     }
                 }
                 if (!response.isCommitted()) {
@@ -141,7 +141,7 @@ public class AuthenticationServlet extends HttpServlet {
                 request.getServletContext().log("REGISTERING " + email);
                 // email and password can't be empty because input is "required"
                 try {
-                    if (reg_userDao.getByEmail(email) != null) {
+                    if (userDao.getByEmail(email) != null) {
                         status = "alreadyregistered";
                     } else if (nv_userDao.getByEmail(email) != null) {
                         status = "needtoverify";
@@ -156,8 +156,7 @@ public class AuthenticationServlet extends HttpServlet {
                             break;
                         }
                         // send email with code
-                        String message = "http://localhost:8084/Shopping/auth?validate=true&code=" + code
-                                + "\n\nYour pass is: " + password;
+                        String message = "http://localhost:8084/Shopping/auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
                         request.getServletContext().log("Message is: " + message);
 
                         Message msg = new MimeMessage(session);
@@ -173,14 +172,13 @@ public class AuthenticationServlet extends HttpServlet {
                             status = "mailerror";
                             break;
                         }
+                        request.getServletContext().log("REGISTERED " + email);
+                        status = "success";
                     }
                 } catch (DAOException ex) {
                     request.getServletContext().log("Impossible to check if user is already registered", ex);
                     status = "dberror";
-                    break;
                 }
-                request.getServletContext().log("REGISTERED " + email);
-                status = "success";
                 break;
             }
             case "login": {
@@ -188,19 +186,19 @@ public class AuthenticationServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 // email and password can't be empty because input is "required"
                 try {
-                    Reg_User reg_user = reg_userDao.getByEmailAndPassword(email, password);
-                    if (reg_user == null) {
-                        if (reg_userDao.getByEmail(email) != null) {
+                    User user = userDao.getByEmailAndPassword(email, password);
+                    if (user == null) {
+                        if (userDao.getByEmail(email) != null) {
                             status = "wrongpsw";
                         } else if (nv_userDao.getByEmail(email) != null) {
                             status = "needtoverify";
-                        } else {    
+                        } else {
                             status = "needtoregister";
                         }
                     } else {
-                        request.getSession().setAttribute("reg_user", reg_user);
-                        if (reg_user.getIs_admin()) {
-                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin"));
+                        request.getSession().setAttribute("user", user);
+                        if (user.getIs_admin()) {
+                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin/admin.html"));
                         } else {
                             response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.html"));
                         }

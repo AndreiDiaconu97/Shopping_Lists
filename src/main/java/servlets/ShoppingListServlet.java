@@ -6,12 +6,10 @@
 package servlets;
 
 import db.daos.List_regDAO;
-import db.daos.NV_UserDAO;
 import db.daos.ProductDAO;
-import db.daos.Reg_UserDAO;
 import db.entities.List_reg;
 import db.entities.Product;
-import db.entities.Reg_User;
+import db.entities.User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
@@ -33,10 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import db.daos.UserDAO;
 
 public class ShoppingListServlet extends HttpServlet {
 
-    private Reg_UserDAO reg_userDao;
+    private UserDAO userDao;
     private List_regDAO list_regDao;
     private ProductDAO productDao;
     final String m_host = "smtp.gmail.com";
@@ -56,7 +55,7 @@ public class ShoppingListServlet extends HttpServlet {
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for reg_user", ex);
+            throw new ServletException("Impossible to get dao for user", ex);
         }
         try {
             productDao = daoFactory.getDAO(ProductDAO.class);
@@ -64,11 +63,11 @@ public class ShoppingListServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao for product", ex);
         }
         try {
-            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
+            userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for product", ex);
         }
-        
+
         props = System.getProperties();
         props.setProperty("mail.smtp.host", m_host);
         props.setProperty("mail.smtp.port", m_port);
@@ -91,17 +90,17 @@ public class ShoppingListServlet extends HttpServlet {
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
         }
-        
-        if(request.getParameter("getList") != null){
+
+        if (request.getParameter("getList") != null) {
             int id = Integer.parseInt(request.getParameter("getList"));
-            try{
+            try {
                 List_reg list = list_regDao.getByPrimaryKey(id);
                 JSONObject listJSON = new JSONObject();
                 listJSON.put("id", list.getId());
                 listJSON.put("name", list.getName());
                 listJSON.put("description", list.getDescription());
                 JSONArray productsJSON = new JSONArray();
-                for(Product p : list_regDao.getProducts(list)){
+                for (Product p : list_regDao.getProducts(list)) {
                     JSONObject productJSON = new JSONObject();
                     productJSON.put("name", p.getName());
                     productJSON.put("description", p.getDescription());
@@ -110,51 +109,50 @@ public class ShoppingListServlet extends HttpServlet {
                 listJSON.put("products", productsJSON);
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().print(listJSON);
-            } catch(DAOException ex){
+            } catch (DAOException ex) {
                 System.err.println("Impossible to get further info for list with id=" + id);
             }
         }
-        
-        if (request.getParameter("sharedlist") != null){
+
+        if (request.getParameter("sharedlist") != null) {
             Integer id = Integer.parseInt(request.getParameter("sharedlist"));
             String email = request.getParameter("email");
             response.setCharacterEncoding("UTF-8");
             String ownerEmail;
-            Reg_User owner;
+            User owner;
             Integer check = 1;
-            try{
+            try {
                 List_reg list = list_regDao.getByPrimaryKey(id);
-                owner = reg_userDao.getByPrimaryKey(list.getOwner());
+                owner = userDao.getByPrimaryKey(list.getOwner());
                 ownerEmail = owner.getEmail();
-                List<Reg_User> users = list_regDao.getReg_UsersSharedTo(list);
-                
-                for(Reg_User user : users){
-                    if(user.getEmail().equals(email)){                    
+                List<User> users = list_regDao.getUsersSharedTo(list);
+
+                for (User user : users) {
+                    if (user.getEmail().equals(email)) {
                         check = 2;
                     }
                 }
-                if(ownerEmail.equals(email)){
+                if (ownerEmail.equals(email)) {
                     check = 3;
                 }
-            }catch (DAOException ex){
+            } catch (DAOException ex) {
                 System.err.println("errors");
             }
-            
+
             System.err.println(check);
-              
-            if(check == 2){
+
+            if (check == 2) {
                 response.getWriter().print("already");
-            }else if(check == 3){
+            } else if (check == 3) {
                 response.getWriter().print("same");
-            }
-            else{
+            } else {
                 List_reg list = new List_reg();
-                Reg_User Owner = new Reg_User();
+                User Owner = new User();
 
                 try {
                     list = list_regDao.getByPrimaryKey(id);
                     Integer ownerId = list.getOwner();
-                    Owner = reg_userDao.getByPrimaryKey(ownerId);
+                    Owner = userDao.getByPrimaryKey(ownerId);
                 } catch (DAOException ex) {
                     System.err.println("");
                 }
@@ -177,43 +175,42 @@ public class ShoppingListServlet extends HttpServlet {
                     response.getWriter().print("error");
                 }
                 response.getWriter().print("success");
-                              
+
             }
         }
-        
-        if(request.getParameter("share") != null){
-            String email=request.getParameter("email");
-            Integer id= Integer.parseInt(request.getParameter("list_id"));
-            
-            try{
+
+        if (request.getParameter("share") != null) {
+            String email = request.getParameter("email");
+            Integer id = Integer.parseInt(request.getParameter("list_id"));
+
+            try {
                 List_reg list = list_regDao.getByPrimaryKey(id);
-                Reg_User user = reg_userDao.getByEmail(email);
-                list_regDao.shareShoppingListToReg_User(list, user);
-                
-                
-            }catch(DAOException ex){
+                User user = userDao.getByEmail(email);
+                list_regDao.shareListToUser(list, user);
+
+            } catch (DAOException ex) {
                 System.err.println("Cannot share the list");
             }
-            
+
             response.sendRedirect(contextPath + "restricted/shopping.lists.html");
         }
-        
-        if(request.getParameter("shareurl") != null){
+
+        if (request.getParameter("shareurl") != null) {
             Integer id = Integer.parseInt(request.getParameter("id"));
             HttpSession session = request.getSession(false);
-            Reg_User reg_user = null;
-            reg_user = (Reg_User) session.getAttribute("reg_user");
-            
-            try{
+            User user = null;
+            user = (User) session.getAttribute("user");
+
+            try {
                 List_reg list = list_regDao.getByPrimaryKey(id);
-                list_regDao.shareShoppingListToReg_User(list, reg_user);
-                
-            }catch(DAOException ex){
+                list_regDao.shareListToUser(list, user);
+
+            } catch (DAOException ex) {
                 System.err.println("Cannot share the list");
-            }           
+            }
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contextPath = getServletContext().getContextPath();
@@ -229,8 +226,8 @@ public class ShoppingListServlet extends HttpServlet {
         switch (action) {
             case "create": {
                 HttpSession session = request.getSession(false);
-                Reg_User reg_user = reg_user = (Reg_User) session.getAttribute("reg_user");
-                Integer id = reg_user.getId();
+                User user = user = (User) session.getAttribute("user");
+                Integer id = user.getId();
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 String category = request.getParameter("category");
@@ -247,8 +244,8 @@ public class ShoppingListServlet extends HttpServlet {
             }
             case "edit": {
                 HttpSession session = request.getSession(false);
-                Reg_User reg_user = (Reg_User) session.getAttribute("reg_user");
-                Integer id = reg_user.getId();
+                User user = (User) session.getAttribute("user");
+                Integer id = user.getId();
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 String category = request.getParameter("category");
