@@ -29,12 +29,20 @@
         <url-pattern>/searchProduct</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>Shop_list_jsp</servlet-name>
-        <jsp-file>/WEB-INF/shop_lists.jsp</jsp-file>
+        <servlet-name>Homepage_jsp</servlet-name>
+        <jsp-file>/WEB-INF/homepage.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Shop_list_jsp</servlet-name>
-        <url-pattern>/restricted/shopping.lists.html</url-pattern>
+        <servlet-name>Homepage_jsp</servlet-name>
+        <url-pattern>/restricted/homepage.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>Shop_list</servlet-name>
+        <jsp-file>/WEB-INF/shop_list.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Shop_list</servlet-name>
+        <url-pattern>/restricted/shopping.list.html</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>Registration_jsp</servlet-name>

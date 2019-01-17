@@ -191,8 +191,8 @@ public class ShoppingListServlet extends HttpServlet {
             } catch (DAOException ex) {
                 System.err.println("Cannot share the list");
             }
-
-            response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+            
+            response.sendRedirect(contextPath + "restricted/homepage.html");
         }
 
         if (request.getParameter("shareurl") != null) {
@@ -299,7 +299,7 @@ public class ShoppingListServlet extends HttpServlet {
                 System.err.println("ShoppingListServlet: unsupported parameter");
                 break;
         }
-        response.sendRedirect(contextPath + "restricted/shopping.lists.html");
+        response.sendRedirect(contextPath + "restricted/homepage.html");
     }
 
     @Override

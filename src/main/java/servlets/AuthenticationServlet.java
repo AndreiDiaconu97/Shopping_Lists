@@ -200,7 +200,7 @@ public class AuthenticationServlet extends HttpServlet {
                         if (user.getIs_admin()) {
                             response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin/admin.html"));
                         } else {
-                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/shopping.lists.html"));
+                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
                         }
                         return;
                     }

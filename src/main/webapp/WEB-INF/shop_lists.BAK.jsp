@@ -53,7 +53,7 @@
 %>
 <%
     if (response.isCommitted()) {
-        getServletContext().log("shopping.lists.html is already committed");
+        getServletContext().log("homepage.html is already committed");
     }
     String contextPath = getServletContext().getContextPath();
     if (!contextPath.endsWith("/")) {
@@ -335,7 +335,7 @@
                             document.getElementById("warning").style.display="none";
                             document.getElementById("warning2").style="display:inline";
                         }else if(result.localeCompare("success") == 0){
-                            window.location.href = "<%=contextPath%>restricted/shopping.lists.html";
+                            window.location.href = "<%=contextPath%>restricted/homepage.html";
                         }else if(result.localeCompare("error") == 0){
                             window.location.href = "<%=contextPath%>registration.html?status=mailerror";
                         }
