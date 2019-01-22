@@ -5,7 +5,9 @@
  */
 package servlets;
 
+import db.daos.List_categoryDAO;
 import db.daos.List_regDAO;
+import db.daos.Prod_categoryDAO;
 import db.daos.ProductDAO;
 import db.entities.List_reg;
 import db.entities.Product;
@@ -29,15 +31,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import db.daos.UserDAO;
+import db.entities.List_category;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ShoppingListServlet extends HttpServlet {
 
     private UserDAO userDao;
     private List_regDAO list_regDao;
+    private List_categoryDAO list_categoryDao;
     private ProductDAO productDao;
+    private Prod_categoryDAO prod_categoryDao;
     final String m_host = "smtp.gmail.com";
     final String m_port = "465";
     final String m_username = "test.progetto.lopardo@gmail.com";
@@ -55,7 +60,12 @@ public class ShoppingListServlet extends HttpServlet {
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for user", ex);
+            throw new ServletException("Impossible to get dao for list_reg", ex);
+        }
+        try {
+            list_categoryDao = daoFactory.getDAO(List_categoryDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new ServletException("Impossible to get dao for list_category", ex);
         }
         try {
             productDao = daoFactory.getDAO(ProductDAO.class);
@@ -63,9 +73,14 @@ public class ShoppingListServlet extends HttpServlet {
             throw new ServletException("Impossible to get dao for product", ex);
         }
         try {
+            prod_categoryDao = daoFactory.getDAO(Prod_categoryDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new ServletException("Impossible to get dao for prod_category", ex);
+        }
+        try {
             userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for product", ex);
+            throw new ServletException("Impossible to get dao for user", ex);
         }
 
         props = System.getProperties();
@@ -91,29 +106,6 @@ public class ShoppingListServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        if (request.getParameter("getList") != null) {
-            int id = Integer.parseInt(request.getParameter("getList"));
-            try {
-                List_reg list = list_regDao.getByPrimaryKey(id);
-                JSONObject listJSON = new JSONObject();
-                listJSON.put("id", list.getId());
-                listJSON.put("name", list.getName());
-                listJSON.put("description", list.getDescription());
-                JSONArray productsJSON = new JSONArray();
-                for (Product p : list_regDao.getProducts(list)) {
-                    JSONObject productJSON = new JSONObject();
-                    productJSON.put("name", p.getName());
-                    productJSON.put("description", p.getDescription());
-                    productsJSON.put(productJSON);
-                }
-                listJSON.put("products", productsJSON);
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(listJSON);
-            } catch (DAOException ex) {
-                System.err.println("Impossible to get further info for list with id=" + id);
-            }
-        }
-
         if (request.getParameter("sharedlist") != null) {
             Integer id = Integer.parseInt(request.getParameter("sharedlist"));
             String email = request.getParameter("email");
@@ -123,7 +115,7 @@ public class ShoppingListServlet extends HttpServlet {
             Integer check = 1;
             try {
                 List_reg list = list_regDao.getByPrimaryKey(id);
-                owner = userDao.getByPrimaryKey(list.getOwner());
+                owner = list.getOwner();
                 ownerEmail = owner.getEmail();
                 List<User> users = list_regDao.getUsersSharedTo(list);
 
@@ -151,8 +143,7 @@ public class ShoppingListServlet extends HttpServlet {
 
                 try {
                     list = list_regDao.getByPrimaryKey(id);
-                    Integer ownerId = list.getOwner();
-                    Owner = userDao.getByPrimaryKey(ownerId);
+                    Owner = list.getOwner();
                 } catch (DAOException ex) {
                     System.err.println("");
                 }
@@ -227,35 +218,32 @@ public class ShoppingListServlet extends HttpServlet {
             case "create": {
                 HttpSession session = request.getSession(false);
                 User user = user = (User) session.getAttribute("user");
-                Integer id = user.getId();
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
-                String category = request.getParameter("category");
-
-                List_reg list = new List_reg(name, id, category, description, null);
-
+                Integer cat_id = Integer.valueOf(request.getParameter("category"));
                 try {
+                    List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
+                    List_reg list = new List_reg(name, user, l_cat, description, null);
                     list_regDao.insert(list);
-                    System.err.println("Ok. Id della lista inserita:" + list.getId());
                 } catch (DAOException ex) {
-                    System.err.println("Errore. Id della lista inserita:" + list.getId());
+                    System.err.println("Cannot insert list");
                 }
                 break;
             }
             case "edit": {
                 HttpSession session = request.getSession(false);
                 User user = (User) session.getAttribute("user");
-                Integer id = user.getId();
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
-                String category = request.getParameter("category");
-                List_reg list = new List_reg(name, id, category, description, null);
-                list.setId(Integer.parseInt(request.getParameter("listID")));
+                Integer cat_id = Integer.parseInt(request.getParameter("category"));
                 try {
+                    List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
+                    List_reg list = new List_reg(name, user, l_cat, description, null);
+                    list.setId(Integer.parseInt(request.getParameter("listID")));
                     list_regDao.update(list);
                     System.err.println("Ok, lista modificata:" + list.getId());
                 } catch (DAOException ex) {
-                    System.err.println("Errore. Lista inserita:" + list.getId());
+                    System.err.println("Errore in modifica lista");
                 }
                 break;
             }
@@ -275,23 +263,15 @@ public class ShoppingListServlet extends HttpServlet {
                 break;
             }
             case "add": {
-                String name = request.getParameter("object_name");
-                String id = request.getParameter("list_id");
-                Product product = new Product();
-                List_reg list_reg = new List_reg();
+                Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
+                Integer amount = Integer.parseInt(request.getParameter("amount"));
                 try {
-                    list_reg = list_regDao.getByPrimaryKey(Integer.parseInt(id));
-                    product = productDao.getByName(name);
-                    System.err.println(list_reg.getName());
-                } catch (Exception e) {
-                    System.err.println(e);
-                }
-                if (product != null) {
-                    try {
-                        list_regDao.insertProduct(list_reg, product);
-                    } catch (DAOException e) {
-                        System.err.println("Impossible to insert given product");
-                    }
+                    List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
+                    Product product = productDao.getByPrimaryKey(prod_id);
+                    list_regDao.insertProduct(list_reg, product, amount);
+                } catch (DAOException ex){
+                    System.err.println("Cannot add product to list");
                 }
                 break;
             }

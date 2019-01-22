@@ -71,11 +71,12 @@ public class AdminServlet extends HttpServlet {
         switch (action) {
 
             case "listcat": {
+                Integer id = Integer.parseInt(request.getParameter("id"));
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
 
                 try {
-                    List_category cat = list_categoryDao.getByPrimaryKey(name);
+                    List_category cat = list_categoryDao.getByPrimaryKey(id);
                     if (cat == null) {
                         cat = new List_category(name, description, null);
                         list_categoryDao.insert(cat);
@@ -96,12 +97,13 @@ public class AdminServlet extends HttpServlet {
             case "productcat": {
                 HttpSession session = request.getSession(false);
                 User user = user = (User) session.getAttribute("user");
+                Integer id = Integer.parseInt(request.getParameter("id"));
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 String list_cat = request.getParameter("list_category");
 
                 try {
-                    Prod_category cat = prod_categoryDao.getByPrimaryKey(name);
+                    Prod_category cat = prod_categoryDao.getByPrimaryKey(id);
                     if (cat == null) {
                         //cat = new Prod_category(name, description, list_cat, null);
                     }
