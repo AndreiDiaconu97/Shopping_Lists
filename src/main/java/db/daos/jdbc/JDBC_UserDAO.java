@@ -52,33 +52,14 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
             throw new DAOException(msg);
         }
 
-        String query = "SELECT * FROM " + U_TABLE + " WHERE EMAIL = ?"; // '" + email + "'"
-        String hashed_psw;
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, email);
-            try (ResultSet rs = stm.executeQuery(query)) {
-                if (rs.next()) {
-                    hashed_psw = rs.getString("PASSWORD");
-                } else {
-                    return null;
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the user for the passed email and password", ex);
-        }
+        User user = getByEmail(email);
 
-        if (!BCrypt.checkpw(password, hashed_psw)) {
+        // CHECK IF HASH IS MATCHING
+        if (BCrypt.checkpw(password, user.getHashed_password())) {
+            return user;
+        } else {
             System.err.println("HASH IS DIFFERENT (probably wrong password)");
             return null;
-        }
-        query = "SELECT * FROM " + U_TABLE + " WHERE EMAIL = ?";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setString(1, email);
-            try (ResultSet rs = stm.executeQuery()) {
-                return rs.next() ? resultSetToUser(rs, CON) : null;
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the user for the passed email and password", ex);
         }
     }
 

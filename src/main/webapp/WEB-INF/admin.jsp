@@ -2,11 +2,11 @@
 <%@page import="db.exceptions.DAOFactoryException"%>
 <%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.daos.List_regDAO"%>
-<%@page import="db.daos.Reg_UserDAO"%>
-<%@page import="db.entities.Reg_User"%>
+<%@page import="db.daos.UserDAO"%>
+<%@page import="db.entities.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%!
-    private Reg_UserDAO reg_userDao;
+    private UserDAO userDao;
     private List_regDAO list_regDao;
     private List_categoryDAO list_catDao;
 
@@ -16,9 +16,9 @@
             throw new RuntimeException(new ServletException("Impossible to get dao factory"));
         }
         try {
-            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
+            userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new RuntimeException(new ServletException("Impossible to get dao for reg_user", ex));
+            throw new RuntimeException(new ServletException("Impossible to get dao for user", ex));
         }
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
@@ -33,8 +33,8 @@
     }
 
     public void jspDestroy() {
-        if (reg_userDao != null) {
-            reg_userDao = null;
+        if (userDao != null) {
+            userDao = null;
         }
         if (list_regDao != null) {
             list_regDao = null;
@@ -45,10 +45,10 @@
     }
 %>
 <%
-    Reg_User reg_user = null;
+    User user = null;
     if (session != null) {
-        reg_user = (Reg_User) session.getAttribute("reg_user");
-        pageContext.setAttribute("isAdmin", reg_user.getIs_admin());
+        user = (User) session.getAttribute("user");
+        pageContext.setAttribute("isAdmin", user.getIs_admin());
     }
 %>
 <!DOCTYPE html>

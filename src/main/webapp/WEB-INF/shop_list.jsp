@@ -120,7 +120,7 @@
                                     <button type="button" id="leftBtn${i}" class="btn btn-secondary btn-sm shadow-sm" onclick="changeValue(this.id, '-')">
                                         <i class="fa fa-chevron-left mr-auto"></i>
                                     </button>
-                                    <input type="number" id="buyProd${i}" class="form-control rounded shadow-sm" style="appearance: none; margin: 0"  name="quantity" min="0" max="5" placeholder="0" oninput="handleChange(this)"><br>
+                                    <input type="text" pattern="[0-9]" id="buyProd${i}" class="form-control rounded shadow-sm" style="appearance: none; margin: 0"  name="quantity" min="0" max="5" placeholder="0" oninput="handleChange(this)"><br>
                                     <div class="input-group-append">
                                         <span class="input-group-text" id="basic-addon2">5</span>
                                     </div>
