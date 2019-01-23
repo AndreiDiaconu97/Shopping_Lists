@@ -146,7 +146,6 @@ public abstract class JDBC_utility {
         product.setCreator(getUser(rs.getInt("CREATOR"), con));
         product.setDescription(rs.getString("DESCRIPTION"));
         product.setId(rs.getInt("ID"));
-        product.setIs_public(rs.getBoolean("IS_PUBLIC"));
         product.setLogo(rs.getString("LOGO"));
         product.setName(rs.getString("NAME"));
         product.setNum_votes(rs.getInt("NUM_VOTES"));
@@ -270,6 +269,12 @@ public abstract class JDBC_utility {
         READ,
         PRODUCTS,
         FULL
+    }
+    
+    public enum SortBy{
+        NAME,
+        RATING,
+        POPULARITY
     }
 
     public static AccessLevel intToAccessLevel(Integer a) {

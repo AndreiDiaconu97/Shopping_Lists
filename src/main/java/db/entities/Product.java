@@ -23,7 +23,6 @@ public class Product implements Serializable {
     private String photo;
     private Float rating;
     private Integer num_votes;
-    private Boolean is_public;
 
     public Product() {
     }
@@ -35,7 +34,6 @@ public class Product implements Serializable {
         this.description = description;
         this.logo = logo;
         this.photo = photo;
-        this.is_public = is_public;
     }
 
     public String getName() {
@@ -108,14 +106,6 @@ public class Product implements Serializable {
 
     public void setNum_votes(Integer num_votes) {
         this.num_votes = num_votes;
-    }
-
-    public Boolean getIs_public() {
-        return is_public;
-    }
-
-    public void setIs_public(Boolean is_public) {
-        this.is_public = is_public;
     }
 
     @Override

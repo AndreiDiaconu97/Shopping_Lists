@@ -7,12 +7,15 @@ package db.daos.jdbc;
 
 import db.daos.ProductDAO;
 import static db.daos.jdbc.JDBC_utility.*;
+import db.entities.Prod_category;
 import db.entities.Product;
+import db.entities.User;
 import db.exceptions.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,20 +39,78 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     }
 
     @Override
+    public List<Product> filterProducts(String name, Prod_category prod_category, User user, boolean includePublics, SortBy sortby) throws DAOException {
+        if (sortby == null) {
+            throw new DAOException("Passed sortby is null");
+        }
+        if(user!=null){
+            checkParam(user, true);
+        }
+        if (name == null) {
+            name = "";
+        }
+        String query = "";
+        if (sortby == SortBy.POPULARITY) {
+            query = "SELECT ID, NAME, DESCRIPTION, CATEGORY, CREATOR, LOGO, PHOTO, NUM_VOTES, RATING, FROM " + P_TABLE;
+            query += " LEFT OUTER JOIN " + L_P_TABLE + "\n";
+        } else {
+            query = "SELECT * FROM " + P_TABLE + "\n";
+        }
+        query += " WHERE NAME LIKE '%' || ? || '%'\n";
+        query += "AND (CREATOR = ? ";
+        if (includePublics) {
+            query += " OR CREATOR IN (SELECT ID FROM " + U_TABLE + " WHERE IS_ADMIN=TRUE ";
+        }
+        query += ")\n";
+        if (prod_category != null) {
+            checkParam(prod_category, true);
+            query += "AND CATEGORY = ?\n";
+        }
+        switch (sortby) {
+            case POPULARITY:
+                query += "GROUP BY ID, NAME, DESCRIPTION, CATEGORY, CREATOR, LOGO, PHOTO, NUM_VOTES, RATING\n";
+                query += "ORDER BY COALESCE(SUM(AMOUNT), 0) DESC";
+                break;
+            case NAME:
+                query += "ORDER BY RATING DESC";
+                break;
+            default:
+                query += "ORDER BY NAME";
+                break;
+        }
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setString(1, name);
+            stm.setInt(2, user==null ? -1 : user.getId());
+            if(prod_category!=null){
+                stm.setInt(3, prod_category.getId());
+            }
+            System.err.println("FilterProducts query:\n" + stm + "\n\n");
+            try(ResultSet rs = stm.executeQuery()){
+                List<Product> products = new ArrayList<>();
+                while(rs.next()){
+                    products.add(resultSetToProduct(rs, CON));
+                }
+                return products;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Cannot get fitered products", ex);
+        }
+    }
+
+    @Override
     public void insert(Product product) throws DAOException {
         checkParam(product, false);
 
-        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, is_public, logo, photo, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, logo, photo, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setInt(3, product.getCategory().getId());
             stm.setInt(4, product.getCreator().getId());
-            stm.setBoolean(5, product.getIs_public());
-            stm.setString(6, product.getLogo());
-            stm.setString(7, product.getPhoto());
-            stm.setInt(8, product.getNum_votes());
-            stm.setFloat(9, product.getRating());
+            stm.setString(5, product.getLogo());
+            stm.setString(6, product.getPhoto());
+            stm.setInt(7, product.getNum_votes());
+            stm.setFloat(8, product.getRating());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -64,7 +125,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     @Override
     public void delete(Product product) throws DAOException {
         checkParam(product, true);
-        
+
         String query = "DELETE FROM " + P_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, product.getId());
@@ -78,18 +139,17 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     public void update(Product product) throws DAOException {
         checkParam(product, true);
 
-        String query = "UPDATE " + P_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, IS_PUBLIC = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
+        String query = "UPDATE " + P_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setInt(3, product.getCategory().getId());
             stm.setInt(4, product.getCreator().getId());
-            stm.setBoolean(5, product.getIs_public());
-            stm.setString(6, product.getLogo());
-            stm.setString(7, product.getPhoto());
-            stm.setInt(8, product.getNum_votes());
-            stm.setFloat(9, product.getRating());
-            stm.setInt(10, product.getId());
+            stm.setString(5, product.getLogo());
+            stm.setString(6, product.getPhoto());
+            stm.setInt(7, product.getNum_votes());
+            stm.setFloat(8, product.getRating());
+            stm.setInt(9, product.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {
@@ -102,9 +162,9 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
 
     @Override
     public Product getByPrimaryKey(Integer id) throws DAOException {
-        try{
+        try {
             return getProduct(id, CON);
-        } catch(SQLException ex){
+        } catch (SQLException ex) {
             throw new DAOException("Cannot get product by id " + id, ex);
         }
     }

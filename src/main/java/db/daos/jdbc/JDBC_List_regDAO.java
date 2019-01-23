@@ -103,6 +103,21 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
+    public void removeProduct(List_reg list_reg, Product product) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(product, true);
+        
+        String query = "DELETE FROM " + L_P_TABLE + " WHERE LIST = ? AND PRODUCT = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, product.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove product from list", ex);
+        }
+    }
+
+    @Override
     public List<Product> getProducts(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
         
@@ -286,12 +301,13 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void insertMessage(Message message) throws DAOException {
         checkParam(message);
         
-        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, TIME, TEXT) VALUES (?,?,?,?)";
+        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, TIME, TEXT, IS_LOG) VALUES (?,?,?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, message.getList().getId());
             stm.setInt(2, message.getUser().getId());
             stm.setTimestamp(3, message.getTime());
             stm.setNString(4, message.getText());
+            stm.setBoolean(5, message.getIsLog());
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add message to list chat", ex);
@@ -313,6 +329,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                     m.setUser(getUser(rs.getInt("USER"), CON));
                     m.setTime(rs.getTimestamp("TIME"));
                     m.setText(rs.getNString("TEXT"));
+                    m.setIsLog(rs.getBoolean("IS_LOG"));
                     messages.add(m);
                 }
                 return messages;

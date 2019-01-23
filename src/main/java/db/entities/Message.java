@@ -18,6 +18,7 @@ public class Message {
     private User user;
     private Timestamp time;
     private String text;
+    private boolean isLog;
 
     public List_reg getList() {
         return list;
@@ -51,13 +52,22 @@ public class Message {
         this.text = text;
     }
 
+    public boolean getIsLog() {
+        return isLog;
+    }
+
+    public void setIsLog(boolean isLog) {
+        this.isLog = isLog;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 79 * hash + Objects.hashCode(this.list);
-        hash = 79 * hash + Objects.hashCode(this.user);
-        hash = 79 * hash + Objects.hashCode(this.time);
-        hash = 79 * hash + Objects.hashCode(this.text);
+        int hash = 7;
+        hash = 23 * hash + Objects.hashCode(this.list);
+        hash = 23 * hash + Objects.hashCode(this.user);
+        hash = 23 * hash + Objects.hashCode(this.time);
+        hash = 23 * hash + Objects.hashCode(this.text);
+        hash = 23 * hash + (this.isLog ? 1 : 0);
         return hash;
     }
 
@@ -73,6 +83,9 @@ public class Message {
             return false;
         }
         final Message other = (Message) obj;
+        if (this.isLog != other.isLog) {
+            return false;
+        }
         if (!Objects.equals(this.text, other.text)) {
             return false;
         }
@@ -87,4 +100,6 @@ public class Message {
         }
         return true;
     }
+    
+    
 }
