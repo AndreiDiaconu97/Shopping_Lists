@@ -130,26 +130,6 @@
                 </div>
             </div>
         </main>
-        <div class="container-fluid">
-            <div class="row ml-auto justify-content-around">
-                <div class="col-md-4 mb-3">
-                    <div class="dropdown">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Category
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="#">Chiodi&viti</a>
-                            <a class="dropdown-item active" href="#">SpesaVegan</a>
-                            <a class="dropdown-item" href="#">Vinili</a>
-                        </div>
-                    </div>
-                </div>
-                <form class="input-group col-md-4">
-                    <input class="form-control mr-sm-0" type="search" placeholder="Search list..." aria-label="Search">
-                    <button class="btn btn-outline-success mb-3" type="submit">Search</button>
-                </form>
-            </div>  
-        </div>
         <nav>
             <div class="nav nav-tabs nav-justified shadow-sm" id="nav-tab" role="tablist">
                 <a class="nav-item nav-link my-auto active" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab" aria-controls="nav-myLists" aria-selected="true">
@@ -165,16 +145,47 @@
         </nav>
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-myLists" role="tabpanel" aria-labelledby="nav-myLists">
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>sort by</option>
+                                    <option value="0">name [a-Z]</option>
+                                    <option value="1">name [Z-a]</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>all categories</option>
+                                    <option value="0">category 1</option>
+                                    <option value="1">category 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group">                            
+                                <input class="form-control" type="search" placeholder="your shopping lists..." aria-label="Search">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
+                                </button>   
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                    <i class="fa fa-plus mr-auto"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row justify-content-center mx-auto">
                     <c:forEach var="list" items="${myLists}" varStatus="i">
                         <a href="shopping.list.html?shop_listID=${list.id}" class="my-3 mx-4">
                             <div class="card text-dark" style="width: 16rem; display: inline-block">
-                                <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-text">
-                                        <c:out value="${list.name}"/>
-                                    </h5>
+                                <div class="card-header" style="font-weight: bold">
+                                    <c:out value="${list.name}"/>
                                 </div>
+                                <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">
                                 <div class="card-footer text-muted">
                                     <c:out value="${list.category.name}"/>
                                     <span class="badge badge-pill badge-secondary float-right">3/7</span>
@@ -185,15 +196,50 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="nav-sharedLists" role="tabpanel" aria-labelledby="nav-sharedLists">
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>sort by</option>
+                                    <option value="0">name [a-Z]</option>
+                                    <option value="1">name [Z-a]</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>all categories</option>
+                                    <option value="0">category 1</option>
+                                    <option value="1">category 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group">                            
+                                <input class="form-control" type="search" placeholder="shared shopping lists..." aria-label="Search">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
+                                </button>   
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                    <i class="fa fa-plus mr-auto"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row justify-content-center mx-auto">
                     <c:forEach var="list" items="${sharedLists}" varStatus="i">
                         <a href="shopping.list.html?shop_listID=${list.id}" class="my-3 mx-4">
                             <div class="card text-dark" style="width: 16rem; display: inline-block">
+                                <div class="card-header" style="font-weight: bold">
+                                    <c:out value="${list.name}"/>
+                                </div>
                                 <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">
-                                <div class="card-body">
-                                    <h5 class="card-text">
-                                        <c:out value="${list.name}"/>
-                                    </h5>
+                                <div class="card-body" style="font-size: 15px; text-align: right">
+                                    <c:out value="${list.owner.email}"/>
+                                    <i class="fa fa-user" style="font-size:20px;"></i>
                                 </div>
                                 <div class="card-footer text-muted">
                                     <c:out value="${list.category.name}"/>
@@ -205,7 +251,47 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="nav-myProducts" role="tabpanel" aria-labelledby="nav-myProducts">
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>sort by</option>
+                                    <option value="0">name [a-Z]</option>
+                                    <option value="1">name [Z-a]</option>
+                                    <option value="2">rating ++</option>
+                                    <option value="3">rating --</option>
+                                    <option value="4">popularity ++</option>
+                                    <option value="5">popularity --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select">
+                                    <option value="-1" selected>all categories</option>
+                                    <option value="0">category 1</option>
+                                    <option value="1">category 2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group">                            
+                                <input class="form-control" type="search" placeholder="your products..." aria-label="Search">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
+                                </button>   
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                    <i class="fa fa-plus mr-auto"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- add products -->
+                <div class="row">
+
+                </div>
             </div>
         </div>
     </div>

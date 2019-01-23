@@ -1,3 +1,5 @@
+<%@page import="db.daos.jdbc.JDBC_utility"%>
+<%@page import="db.daos.jdbc.JDBC_utility.AccessLevel"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.daos.UserDAO"%>
@@ -108,6 +110,12 @@
         }
         return;
     }
+
+    List<User> shared_to = list_regDao.getUsersSharedTo(shopping_list);
+    boolean isListOwner = (user.getId() == shopping_list.getOwner().getId());
+    pageContext.setAttribute("shared_to", shared_to);
+    pageContext.setAttribute("isListOwner", isListOwner);
+    pageContext.setAttribute("userDao", userDao);
 %>
 <!DOCTYPE html>
 <html>
@@ -150,24 +158,34 @@
 
         <!-- name and logo -->
         <div class="container-fluid pt-2 pb-3 mb-2 shadow">
-            <div class="row justify-content-center">
-                <div class="col-8 col-sm-2 px-0 mx-2">
-                    <img class="img-fluid rounded-circle shadow" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+            <div class="container-fluid mx-auto my-auto">
+                <div class="col-12 col-sm-7 col-md-3 mx-auto my-2">
+                    <img class="img-fluid rounded shadow mx-auto" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
                 </div>
-                <div class="text-center my-auto mx-2" style="text-shadow: 2px 2px 8px #bbbbbb;">
-                    <h2><c:out value="${shopping_list.name}"/></h2>
+                <div class="row">
+                    <div class="my-auto mr-2" style="text-shadow: 2px 2px 8px #bbbbbb;">
+                        <h2><c:out value="${shopping_list.name}"/></h2>
+                    </div>
+                    <h4>
+                        <small>
+                            <span class="badge badge-pill badge-secondary shadow mr-2">
+                                <c:out value="${shopping_list.category.name}"/>
+                            </span>
+                        </small>
+                    </h4>
+                    <c:if test="${isListOwner}">
+                        <button type="button" class="btn btn-secondary ml-auto" href="#listSettingsModal" data-toggle="modal">
+                            <i class="fa fa-cog" style="font-size:20px"></i>
+                        </button>
+                    </c:if>
                 </div>
-                <h4>
-                    <small>
-                        <span class="badge badge-pill badge-secondary shadow">
-                            <c:out value="${shopping_list.category.name}"/>
-                        </span>
-                    </small>
-                </h4>
+            </div>
+            <div class="row mx-auto">
+
             </div>
         </div>
 
-        <!-- owner + chat + participants -->
+        <!-- owner + chat + participants + share -->
         <div class="container-fluid mb-2 bg-dark text-white">
             <div class="row justify-content-between py-2 mx-auto">
                 <p class="font-weight-light mr-2 my-auto" style="color: grey">
@@ -184,6 +202,9 @@
                 </button>
                 <button type="button" class="btn btn-dark btn-sm mx-1" href="#participantsModal" data-toggle="modal">
                     <i class="fa fa-users" style="font-size:30px; color: graytext"></i>
+                </button>
+                <button type="button" class="btn btn-dark btn-sm mx-1" href="#shareModal" data-toggle="modal">
+                    <i class="fa fa-share-alt" style="font-size:30px; color: graytext"></i>
                 </button>
             </div>
         </div>
@@ -236,10 +257,15 @@
                             </div>
                             <div class="row ml-auto my-auto mr-1 pt-2">
                                 <div class="input-group">
+                                    <c:if test="${isListOwner}">
+                                        <button type="button" id="leftBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2">
+                                            <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
+                                        </button>
+                                    </c:if>
                                     <button type="button" id="leftBtn${i}" class="btn btn-secondary btn-sm shadow-sm" onclick="changeValue(this.id, '-')">
                                         <i class="fa fa-chevron-left mr-auto"></i>
                                     </button>
-                                    <input type="text" pattern="[0-9]" id="buyProd${i}" class="form-control rounded shadow-sm" style="appearance: none; margin: 0"  name="quantity" min="0" max="5" placeholder="0" oninput="handleChange(this)"><br>
+                                    <input type="number" id="buyProd${i}" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="0" max="5" placeholder="0" oninput="handleChange(this)"><br>
                                     <div class="input-group-append">
                                         <span class="input-group-text" id="basic-addon2">5</span>
                                     </div>
@@ -271,13 +297,65 @@
     </div>
     <!-- MODALS -->
 
+    <c:if test="${isListOwner}">
+        <!-- list settings -->
+        <div class="modal modal-fluid" id="listSettingsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
+                        <h5 class="modal-title">Shopping list edit</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-3">
+                            <i class="fa fa-image prefix grey-text"></i>
+                            <label data-error="error" data-success="success" for="defaultForm-email">Logo</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                            </div>
+                        </div>
+                        <div class="md-form mb-3">
+                            <i class="fa fa-bookmark prefix grey-text"></i>
+                            <label data-error="error" data-success="success" for="defaultForm-email">List name</label>
+                            <input type="text" class="form-control validate"/>
+                        </div>
+                        <div class="md-form mb-3">
+                            <i class="fa fa-align-left prefix grey-text"></i>
+                            <label data-error="error" data-success="success" for="defaultForm-email">Description</label>
+                            <textarea class="form-control validate"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-control">
+                                <option value="volvo" selected>Volvo</option>
+                                <option value="saab">Saab</option>
+                                <option value="mercedes">Mercedes</option>
+                                <option value="audi">Audi</option>
+                            </select>
+                            <div class="input-group-append">
+                                <span class="input-group-text">Category</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Confirm changes</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
     <!-- chat -->
     <div class="modal modal-fluid" id="chatModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header shadow">
-                    <i class="fa fa-comments mr-auto" style="font-size:30px;"></i>
-                    <h5 class="modal-title" id="exampleModalLongTitle">Group chat</h5>
+                    <i class="fa fa-comments my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Group chat</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -301,7 +379,7 @@
                     </c:forEach>
                 </div>
                 <div class="modal-footer form-horizontal">
-                    <input class="form-control mr-2" type="text" style="width: 92%" placeholder="write a message..." aria-label="wrile a message...">
+                    <input class="form-control mr-2" type="text" style="width: 92%" placeholder="write a message..." aria-label="write a message...">
                     <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
                 </div>
             </div>
@@ -313,29 +391,36 @@
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header shadow">
-                    <i class="fa fa-users mr-auto" style="font-size:30px;"></i>
-                    <h5 class="modal-title" id="exampleModalLongTitle">Participants</h5>
+                    <i class="fa fa-users my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Participants</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%" >
-                    <c:forEach var="i" begin="0" end="15">
+                    <c:forEach var="user" items="${shared_to}">
                         <div class="row mb-2 px-auto ml-0">
                             <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                            <p class="mr-2 my-auto">
+                                <c:out value="${user.firstname} ${user.lastname}"/>
+                            </p>
                             <p class="mr-2 my-auto" style="color: grey">
-                                User${i} can be a very long name too  
+                                <c:out value="(${user.email})"/> 
                             </p>
                             <div class="row ml-auto mx-2 my-2">
                                 <div class="input-group my-auto">
                                     <select class="custom-select" id="inputGroupSelect02">
-                                        <option value="1">buy only</option>
-                                        <option value="2" selected>can edit</option>
-                                        <option value="3">full control</option>
+                                        <%
+                                            pageContext.setAttribute("access_levels", AccessLevel.values());
+                                            pageContext.setAttribute("user_access_level", userDao.getAccessLevel(user, shopping_list));
+                                        %>
+                                        <c:forEach var="access_level" varStatus="i" items="${access_levels}">
+                                            <option value="${i.index}" <c:if test="${access_level == user_access_level}">selected</c:if>>${access_level}</option>
+                                        </c:forEach>
                                     </select>
                                     <div class="input-group-append">
                                         <label class="input-group-text" for="inputGroupSelect02">
-                                            <i class="fa fa-wrench" style="font-size:25px"></i>
+                                            <i class="fa fa-wrench"></i>
                                         </label>
                                     </div>
                                 </div>
@@ -355,13 +440,72 @@
         </div>
     </div>
 
+    <!-- share -->
+    <div class="modal modal-fluid" id="shareModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow">
+                    <i class="fa fa-share-alt my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title ml-2">Share your shopping list</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!-- BEWARE! following jtsl are only temporary templates -->
+                <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%" >
+                    <c:forEach var="user_sharing" varStatus="i" begin="0" end="10">
+                        <div class="row px-auto ml-0">
+                            <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                            <p class="mr-2 my-auto">
+                                <c:out value="firstname lastname"/>
+                            </p>
+                            <p class="mr-2 my-auto" style="color: grey">
+                                <c:out value="(email)"/> 
+                            </p>
+                            <div class="row ml-auto mx-2 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="sharePermssionsSelect${i.index}">
+                                        <%
+                                            pageContext.setAttribute("access_levels", AccessLevel.values());
+                                        %>
+                                        <c:forEach var="access_level" varStatus="i" items="${access_levels}">
+                                            <option value="${i.index}" <c:if test="${i.index == 0}">selected</c:if>>${access_level}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <label class="input-group-text" for="sharePermssionsSelect${i.index}">
+                                            <i class="fa fa-wrench"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" style="" data-toggle="button" aria-pressed="false">
+                                <i class="fa fa-user-plus" style="font-size:25px"></i>
+                            </button>
+                            <button type="button" class="btn btn-info my-auto mr-2 shadow-sm rounded" style="" data-toggle="button" aria-pressed="false">
+                                <i class="fa fa-clipboard" style="font-size:20px"></i>
+                            </button>
+                        </div>
+                        <hr>
+                    </c:forEach>
+                </div>
+                <div class="modal-footer">
+                    <input class="form-control mr-2" type="text" style="width: 92%" placeholder="insert user name..." aria-label="insert user name...">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa fa-search my-auto" style="font-size:23px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- add product -->
     <div class="modal modal-fluid" id="addProductModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header shadow">
-                    <i class="fa fa-cart-plus mr-auto" style="font-size:30px;"></i>
-                    <h5 class="modal-title" id="exampleModalLongTitle">Add product to list</h5>
+                    <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Add product to list</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -409,19 +553,24 @@
                     </c:forEach>
                 </div>
                 <div class="modal-footer form-horizontal">
-                    <div class="row ml-auto mx-2 my-2">
-                        <div class="input-group my-auto">
-                            <select class="custom-select" id="inputGroupSelect02">
-                                <option value="1">buy only</option>
-                                <option value="2" selected>TODO</option>
-                                <option value="3">full control</option>
-                            </select>
-                        </div>
+                    <div class="input-group my-auto mx-auto">
+                        <select class="custom-select" style="min-width: 90px">
+                            <option value="-1" selected>sort by</option>
+                            <option value="0">name [a-Z]</option>
+                            <option value="1">name [Z-a]</option>
+                        </select>
+                        <select class="custom-select" style="min-width: 135px">
+                            <option value="-1" selected>all categories</option>
+                            <option value="0">category 1</option>
+                            <option value="1">category 2</option>
+                        </select>
                     </div>
-                    <input class="form-control mr-2" type="text" style="width: 92%" placeholder="insert product name..." aria-label="wrile a message...">
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="fa fa-search my-auto" style="font-size:23px;"></i>
-                    </button>
+                    <div class="input-group my-auto">
+                        <input class="form-control mr-2 my-1" style="min-width: 90px" type="text" placeholder="insert product name..." aria-label="insert product name...">
+                        <button type="submit" class="btn btn-secondary mx-auto">
+                            <i class="fa fa-search my-auto" style="font-size:23px;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
