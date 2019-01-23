@@ -1,0 +1,84 @@
+:: Prog Web Project ::
+
+// ISSUES ///////////////////////////////////////
+	
+Back-end requirements:
+	- One the following two system of suggestions:
+		.1 suggestions about products to add to shopping lists
+			. considering cyclicity
+			. considering passed time 
+			. considering quantity (?)
+		.2 suggestions about nearby supermarkets of the same category as the shopping lists.
+		.# (suggestions are notified via Email and, optionally, via the website)
+
+	Anonymous user:
+		- anonymous user registration
+		- can have only one shopping list?
+		
+	Registered user:
+		- creates multiple shopping lists
+		- shopping list sharing		# Si riferisce all'owner di lista? Con che permessi condividerebbe il non owner?
+		- common chat for every shopping list
+		- can add products viewable only in the shared scope
+		- if list owner: shopping list sharing with customizable permissions for each user (modify properties, change products, delete list...)
+		
+	Admin
+		- manages shopping list categories
+		- manages product categories
+		- can add only public products
+		
+	- implement image upload
+	
+Front-end requirements:
+	- Homepage:
+		. menu/button for login
+		. filterable list of products to add in the shopping list
+		. list of products in the shopping list
+		.# quando un utente fa una lista prima di fare l'accesso, questa dovrebbe essere aggiunta all'account?
+	
+	- Registration form:
+		. Email
+		. Password (with check for security)
+		. Privacy check
+		. Register
+		. Cancel
+		
+	- Login form:
+		. Email
+		. Password
+		. Remember me
+		. Password reset option (non password dimenticata?)
+		. Login
+		. Cancel
+		
+	- Shopping list:
+		|| choice between dedicated page or not ||
+		. list of products in the actual shopping list (sottinteso?)
+		. product search form:
+			.. text field
+			.. search button (gets to the search results list)
+	
+	- Search results list:
+		|| choicee between dedicated page or not ||
+		. list of resulting products
+			.. Name
+			.. Description
+			.. Category
+			.. Icon
+		. order by category or by name options
+		. if no results: option to add a new product
+
+	
+// OTHER INFO /////////////////////////////////
+
+- RESPONSIVE DESIGN!!
+	. working on PC
+	. working on Tablet
+	. working on Smartphone
+- use 2 browsers to show features
+- use only RELATIVE file URIs
+- DON'T violate MVC pattern!!
+- schematic DOCUMENTATION (with words or diagrams) for:
+	. application architecture (page navigation, server components...)
+	. main classes
+	. DB

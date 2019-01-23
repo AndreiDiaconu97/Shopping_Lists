@@ -1,0 +1,6 @@
+TODOS:
+
+- add resources folder and needed icons
+- transform producs list in clickable cards with options for owner
+- implement add products modal
+- add confirm/cancel buttons for products list

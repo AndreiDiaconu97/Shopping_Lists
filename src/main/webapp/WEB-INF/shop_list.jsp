@@ -1,44 +1,151 @@
+<%@page import="java.util.Arrays"%>
+<%@page import="db.daos.List_categoryDAO"%>
+<%@page import="db.daos.UserDAO"%>
+<%@page import="db.entities.List_category"%>
+<%@page import="db.entities.List_reg"%>
+<%@page import="java.util.List"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="db.factories.DAOFactory"%>
+<%@page import="db.exceptions.DAOFactoryException"%>
+<%@page import="db.exceptions.DAOException"%>
+<%@page import="db.entities.User"%>
+<%@page import="db.daos.List_regDAO"%>
 
+
+<%!
+    private UserDAO userDao;
+    private List_regDAO list_regDao;
+    private List_categoryDAO list_catDao;
+
+    public void jspInit() {
+        DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
+        if (daoFactory == null) {
+            throw new RuntimeException(new ServletException("Impossible to get dao factory"));
+        }
+        try {
+            userDao = daoFactory.getDAO(UserDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new RuntimeException(new ServletException("Impossible to get dao for user", ex));
+        }
+        try {
+            list_regDao = daoFactory.getDAO(List_regDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new RuntimeException(new ServletException("Impossible to get the dao for shop_list", ex));
+        }
+        try {
+            list_catDao = daoFactory.getDAO(List_categoryDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new RuntimeException(new ServletException("Impossible to get the dao for list_cat", ex));
+        }
+    }
+
+    public void jspDestroy() {
+        if (userDao != null) {
+            userDao = null;
+        }
+        if (list_regDao != null) {
+            list_regDao = null;
+        }
+        if (list_catDao != null) {
+            list_catDao = null;
+        }
+    }
+%>
+<%
+    if (response.isCommitted()) {
+        getServletContext().log("shopping.list.html is already committed");
+    }
+
+    String contextPath = getServletContext().getContextPath();
+    if (!contextPath.endsWith("/")) {
+        contextPath += "/";
+    }
+
+    // check user
+    User user = null;
+    if (session != null) {
+        user = (User) session.getAttribute("user");
+    }
+    if (user == null) {
+        if (!response.isCommitted()) {
+            response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
+        }
+    }
+
+    // check shopping list
+    String shop_list_Param = request.getParameter("shop_listID");
+    if ((shop_list_Param == null) || (shop_list_Param.equals(""))) {
+        if (!response.isCommitted()) {
+            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+        }
+        return;
+    }
+    Integer shop_list_ID = Integer.parseInt(shop_list_Param);
+
+    // retrieve list
+    List_reg shopping_list = null;
+    try {
+        shopping_list = list_regDao.getByPrimaryKey(shop_list_ID);
+        pageContext.setAttribute("shopping_list", shopping_list);
+    } catch (DAOException ex) {
+        System.err.println("Error retrieving shopping lists (jsp)" + ex);
+        if (!response.isCommitted()) {
+            response.sendRedirect(contextPath + "error.html?error=");
+        }
+    }
+    if (shopping_list == null) {
+        if (!response.isCommitted()) {
+            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+        }
+        return;
+    }
+
+    //check visibility
+    if ((user.getId() != shopping_list.getOwner().getId()) && !(list_regDao.getUsersSharedTo(shopping_list)).contains(user)) {
+        if (!response.isCommitted()) {
+            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+        }
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
         <title>Shopping lists manager</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
         <!-- navbar -->
         <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
-            <div class="container-fluid">
-                <!-- Title -->
-                <div class="navbar-header">
-                    <a class="navbar-brand " href=""><h4>Shopping lists</h4></a>
-                </div>
-
-                <ul class="nav navbar-nav">
-                    <li class="nav" style="display: inline-block">
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="nav navbar-nav">
-                                <li class="dropdown pull-right">
-                                    <a class="nav-link" href="#">Sign in <i class="fa fa-sign-in" style="font-size:20px;"></i></a>
-                                </li>
-                                <li class="dropdown pull-right">
-                                    <a class="nav-link" href="#">Log in <i class="fa fa-user" style="font-size:20px;"></i></a>
-                                </li>
-                            </ul>
-                        </div> 
-                    </li>
-                </ul>
-            </div>
+            <!-- Title -->
+            <a class="navbar-brand" href="homepage.html">
+                <i class="fa fa-shopping-cart" style="font-size:30px"></i>
+                Shopping lists
+            </a>
+            <ul class="nav navbar-nav ml-auto">
+                <li class="nav" style="display: inline-block">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown pull-right">
+                                <a class="nav-link" href="#">Sign in <i class="fa fa-sign-in" style="font-size:20px;"></i></a>
+                            </li>
+                            <li class="dropdown pull-right">
+                                <a class="nav-link" href="#">Log in <i class="fa fa-user" style="font-size:20px;"></i></a>
+                            </li>
+                        </ul>
+                    </div> 
+                </li>
+            </ul>
         </nav>
 
         <!-- name and logo -->
@@ -48,9 +155,15 @@
                     <img class="img-fluid rounded-circle shadow" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
                 </div>
                 <div class="text-center my-auto mx-2" style="text-shadow: 2px 2px 8px #bbbbbb;">
-                    <h2>Shopping list name</h2>
+                    <h2><c:out value="${shopping_list.name}"/></h2>
                 </div>
-                <h4><small><span class="badge badge-pill badge-secondary shadow">Category</span></small></h4>
+                <h4>
+                    <small>
+                        <span class="badge badge-pill badge-secondary shadow">
+                            <c:out value="${shopping_list.category.name}"/>
+                        </span>
+                    </small>
+                </h4>
             </div>
         </div>
 
@@ -58,7 +171,13 @@
         <div class="container-fluid mb-2 bg-dark text-white">
             <div class="row justify-content-between py-2 mx-auto">
                 <p class="font-weight-light mr-2 my-auto" style="color: grey">
-                    Created by <span style="color: whitesmoke; font-size: 15pt">Cristos</span>  
+                    Created by
+                    <span style="color: whitesmoke; font-size: 15pt">
+                        <c:out value="${shopping_list.owner.firstname} ${shopping_list.owner.lastname}"/>
+                    </span>  
+                    <span style="color: gray; font-size: 10pt">
+                        <c:out value="(${shopping_list.owner.email})"/>
+                    </span>  
                 </p>
                 <button type="button" class="btn btn-dark btn-sm mx-1 ml-auto" href="#chatModal" data-toggle="modal">
                     <i class="fa fa-comments" style="font-size:30px; color: graytext"></i>
@@ -81,7 +200,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="text-justify mx-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget ante sed nisl semper bibendum vel id quam. Maecenas aliquam urna suscipit, posuere leo eu, efficitur arcu. Phasellus convallis vel odio vitae viverra. Quisque a ipsum sem. Duis interdum finibus iaculis. Nam metus eros, accumsan suscipit erat malesuada, dictum ullamcorper purus. Aliquam viverra imperdiet hendrerit. Maecenas condimentum massa non lectus elementum vestibulum. Nunc sodales nisl ullamcorper diam porta varius. Nam viverra feugiat malesuada. Vivamus mollis lectus quis metus egestas, eu molestie erat rutrum. Aliquam congue nisi sit amet mauris rhoncus, sed finibus nisi vulputate. Etiam at rhoncus justo.
+                        <c:out value="(${shopping_list.description})"/>
                     </div>
                 </div>
             </div>

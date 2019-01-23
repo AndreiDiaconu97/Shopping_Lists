@@ -7,13 +7,13 @@
 <%@page import="java.util.List"%>
 <%@page import="db.exceptions.DAOException"%>
 <%@page import="db.daos.List_regDAO"%>
-<%@page import="db.entities.Reg_User"%>
+<%@page import="db.entities.User"%>
 <%@page import="db.exceptions.DAOFactoryException"%>
 <%@page import="db.factories.DAOFactory"%>
-<%@page import="db.daos.Reg_UserDAO"%>
+<%@page import="db.daos.UserDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%!
-    private Reg_UserDAO reg_userDao;
+    private UserDAO userDao;
     private List_regDAO list_regDao;
     private List_categoryDAO list_catDao;
 
@@ -23,9 +23,9 @@
             throw new RuntimeException(new ServletException("Impossible to get dao factory"));
         }
         try {
-            reg_userDao = daoFactory.getDAO(Reg_UserDAO.class);
+            userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
-            throw new RuntimeException(new ServletException("Impossible to get dao for reg_user", ex));
+            throw new RuntimeException(new ServletException("Impossible to get dao for user", ex));
         }
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
@@ -40,8 +40,8 @@
     }
 
     public void jspDestroy() {
-        if (reg_userDao != null) {
-            reg_userDao = null;
+        if (userDao != null) {
+            userDao = null;
         }
         if (list_regDao != null) {
             list_regDao = null;
@@ -60,12 +60,12 @@
         contextPath += "/";
     }
 
-    Reg_User reg_user = null;
+    User user = null;
     if (session != null) {
-        reg_user = (Reg_User) session.getAttribute("reg_user");
+        user = (User) session.getAttribute("user");
     }
 
-    if (reg_user == null) {
+    if (user == null) {
         if (!response.isCommitted()) {
             response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
         }
@@ -75,8 +75,8 @@
     List<List_reg> sharedLists;
     List<List_category> categories;
     try {
-        myLists = reg_userDao.getOwningShopLists(reg_user);
-        sharedLists = reg_userDao.getSharedShopLists(reg_user);
+        myLists = userDao.getOwnedLists(user);
+        sharedLists = userDao.getSharedLists(user);
         categories = list_catDao.getAll();
         pageContext.setAttribute("myLists", myLists);
         pageContext.setAttribute("sharedLists", sharedLists);
@@ -107,7 +107,7 @@
                 <h1>Shopping lists manager</h1>
             </div>
             <div class="text-right">
-                logged in as <b>${reg_user.email}</b><br>
+                logged in as <b>${user.email}</b><br>
                 <form action="<%=contextPath%>auth" method="POST">
                     <input type="hidden" name="action" value="logout" required>
                     <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
@@ -226,7 +226,7 @@
                         Who do you want to invite to your list?
                             <input type="email" name="email" id="shareListEmail" class="form-control" placeholder="email" required autofocus>
                             <input type="hidden" name="listId" id="shareListId">
-                            <input type="hidden" name="ownerEmail" id="ownerEmail" value='${reg_user.getEmail()}'>
+                            <input type="hidden" name="ownerEmail" id="ownerEmail" value='${user.getEmail()}'>
                             <input type="hidden" name="action" value="invite">
                             <button type="submit" class="btn btn-primary" id="inviteButton"  onclick="inviteFilter()">invite</button>                                                                                                            
                             <div style="display:none" id="warning">You can't invite yourself!</div>

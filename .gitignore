@@ -8,3 +8,6 @@ src/test/
 db.sl/
 derby.log
 derby.properties
+
+#VScode
+.settings/

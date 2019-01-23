@@ -166,7 +166,6 @@ public class ShoppingListServlet extends HttpServlet {
                     response.getWriter().print("error");
                 }
                 response.getWriter().print("success");
-
             }
         }
 
