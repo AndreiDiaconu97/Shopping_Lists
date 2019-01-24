@@ -90,11 +90,11 @@
     </listener>
     <servlet-mapping>
         <servlet-name>AdminServlet</servlet-name>
-        <url-pattern>/restricted/admin/admin.handler</url-pattern>
+        <url-pattern>/admin/admin.handler</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Admin_jsp</servlet-name>
-        <url-pattern>/restricted/admin/admin.html</url-pattern>
+        <url-pattern>/admin/admin.html</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
  *
  * @author andrea
  */
-@WebFilter(filterName = "AdminFilter", urlPatterns = {"/restricted/admin/*"})
 public class AdminFilter implements Filter {
 
     private static final boolean debug = true;

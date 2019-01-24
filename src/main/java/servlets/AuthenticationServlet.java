@@ -156,7 +156,7 @@ public class AuthenticationServlet extends HttpServlet {
                             break;
                         }
                         // send email with code
-                        String message = "http://localhost:8084/Shopping/auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
+                        String message = contextPath + "auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
                         request.getServletContext().log("Message is: " + message);
 
                         Message msg = new MimeMessage(session);
@@ -198,7 +198,7 @@ public class AuthenticationServlet extends HttpServlet {
                     } else {
                         request.getSession().setAttribute("user", user);
                         if (user.getIs_admin()) {
-                            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/admin/admin.html"));
+                            response.sendRedirect(response.encodeRedirectURL(contextPath + "admin/admin.html"));
                         } else {
                             response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
                         }
