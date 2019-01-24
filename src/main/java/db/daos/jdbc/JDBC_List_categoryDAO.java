@@ -50,11 +50,10 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     public void insert(List_category list_category) throws DAOException {
         checkParam(list_category, false);
         
-        String query = "INSERT INTO " + L_CAT_TABLE + " (name, description, logo) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + L_CAT_TABLE + " (name, description) VALUES (?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_category.getName());
             stm.setString(2, list_category.getDescription());
-            stm.setString(3, list_category.getLogo());
             stm.executeUpdate();
 
             try (ResultSet rs = stm.getGeneratedKeys()) {
@@ -78,12 +77,11 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     public void update(List_category list_category) throws DAOException {
         checkParam(list_category, true);
 
-        String query = "UPDATE " + L_CAT_TABLE + " SET NAME = ?, DESCRIPTION = ?, LOGO = ? WHERE ID = ?";
+        String query = "UPDATE " + L_CAT_TABLE + " SET NAME = ?, DESCRIPTION = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, list_category.getName());
             stm.setString(2, list_category.getDescription());
-            stm.setString(3, list_category.getLogo());
-            stm.setInt(4, list_category.getId());
+            stm.setInt(3, list_category.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

@@ -52,14 +52,15 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (name == null) {
             name = "";
         }
+        name = name.toUpperCase();
         String query = "";
         if (sortby == SortBy.POPULARITY) {
-            query = "SELECT ID, NAME, DESCRIPTION, CATEGORY, CREATOR, LOGO, PHOTO, NUM_VOTES, RATING, FROM " + P_TABLE;
+            query = "SELECT ID, NAME, DESCRIPTION, CATEGORY, CREATOR, NUM_VOTES, RATING, FROM " + P_TABLE;
             query += " LEFT OUTER JOIN " + L_P_TABLE + "\n";
         } else {
             query = "SELECT * FROM " + P_TABLE + "\n";
         }
-        query += " WHERE NAME LIKE '%' || ? || '%'\n";
+        query += " WHERE UPPER_NAME LIKE '%' || ? || '%'\n";
         query += "AND (CREATOR = ? ";
         if (includePublics) {
             query += " OR CREATOR IN (SELECT ID FROM " + U_TABLE + " WHERE IS_ADMIN=TRUE ";
@@ -71,11 +72,11 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         }
         switch (sortby) {
             case POPULARITY:
-                query += "GROUP BY ID, NAME, DESCRIPTION, CATEGORY, CREATOR, LOGO, PHOTO, NUM_VOTES, RATING\n";
+                query += "GROUP BY ID, NAME, UPPER_NAME, DESCRIPTION, CATEGORY, CREATOR, NUM_VOTES, RATING\n";
                 query += "ORDER BY COALESCE(SUM(AMOUNT), 0) DESC";
                 break;
             case NAME:
-                query += "ORDER BY NAME";
+                query += "ORDER BY UPPER_NAME";
                 break;
             default:
                 query += "ORDER BY RATING DESC";
@@ -104,16 +105,14 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     public void insert(Product product) throws DAOException {
         checkParam(product, false);
 
-        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, logo, photo, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setInt(3, product.getCategory().getId());
             stm.setInt(4, product.getCreator().getId());
-            stm.setString(5, product.getLogo());
-            stm.setString(6, product.getPhoto());
-            stm.setInt(7, product.getNum_votes());
-            stm.setFloat(8, product.getRating());
+            stm.setInt(5, product.getNum_votes());
+            stm.setFloat(6, product.getRating());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -142,17 +141,14 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     public void update(Product product) throws DAOException {
         checkParam(product, true);
 
-        String query = "UPDATE " + P_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, CREATOR = ?, LOGO = ?, PHOTO = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
+        String query = "UPDATE " + P_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, NUM_VOTES = ?, RATING = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setInt(3, product.getCategory().getId());
-            stm.setInt(4, product.getCreator().getId());
-            stm.setString(5, product.getLogo());
-            stm.setString(6, product.getPhoto());
-            stm.setInt(7, product.getNum_votes());
-            stm.setFloat(8, product.getRating());
-            stm.setInt(9, product.getId());
+            stm.setInt(4, product.getNum_votes());
+            stm.setFloat(5, product.getRating());
+            stm.setInt(6, product.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

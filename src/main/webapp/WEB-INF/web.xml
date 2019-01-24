@@ -18,7 +18,7 @@
     </servlet>
     <servlet>
         <servlet-name>AdminServlet</servlet-name>
-        <servlet-class>servlets.AdminServlet</servlet-class>
+        <servlet-class>servlets.admin.AdminServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Admin_jsp</servlet-name>
@@ -62,7 +62,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>ShoppingListServlet</servlet-name>
-        <servlet-class>servlets.ShoppingListServlet</servlet-class>
+        <servlet-class>servlets.user.ShoppingListServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ShoppingListServlet</servlet-name>

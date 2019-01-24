@@ -146,7 +146,7 @@ public class AuthenticationServlet extends HttpServlet {
                     } else if (nv_userDao.getByEmail(email) != null) {
                         status = "needtoverify";
                     } else {
-                        NV_User nv_user = new NV_User(email, password, firstname, lastname, null);
+                        NV_User nv_user = new NV_User(email, password, firstname, lastname);
                         String code = nv_user.getCode();
                         try {
                             nv_userDao.insert(nv_user);

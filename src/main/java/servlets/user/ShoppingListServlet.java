@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package servlets;
+package servlets.user;
 
 import db.daos.List_categoryDAO;
 import db.daos.List_regDAO;
@@ -33,8 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import db.daos.UserDAO;
 import db.entities.List_category;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ShoppingListServlet extends HttpServlet {
 
@@ -216,13 +214,13 @@ public class ShoppingListServlet extends HttpServlet {
         switch (action) {
             case "create": {
                 HttpSession session = request.getSession(false);
-                User user = user = (User) session.getAttribute("user");
+                User user = (User) session.getAttribute("user");
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
                 Integer cat_id = Integer.valueOf(request.getParameter("category"));
                 try {
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
-                    List_reg list = new List_reg(name, user, l_cat, description, null);
+                    List_reg list = new List_reg(name, user, l_cat, description);
                     list_regDao.insert(list);
                 } catch (DAOException ex) {
                     System.err.println("Cannot insert list");
@@ -237,7 +235,7 @@ public class ShoppingListServlet extends HttpServlet {
                 Integer cat_id = Integer.parseInt(request.getParameter("category"));
                 try {
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
-                    List_reg list = new List_reg(name, user, l_cat, description, null);
+                    List_reg list = new List_reg(name, user, l_cat, description);
                     list.setId(Integer.parseInt(request.getParameter("listID")));
                     list_regDao.update(list);
                     System.err.println("Ok, lista modificata:" + list.getId());

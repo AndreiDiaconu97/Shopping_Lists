@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -19,21 +22,17 @@ public class Product implements Serializable {
     private Prod_category category;
     private User creator;
     private String description;
-    private String logo;
-    private String photo;
     private Float rating;
     private Integer num_votes;
 
     public Product() {
     }
 
-    public Product(String name, Prod_category category, User creator, String description, String logo, String photo, Boolean is_public) {
+    public Product(String name, Prod_category category, User creator, String description) {
         this.name = name;
         this.category = category;
         this.creator = creator;
         this.description = description;
-        this.logo = logo;
-        this.photo = photo;
     }
 
     public String getName() {
@@ -57,7 +56,9 @@ public class Product implements Serializable {
     }
 
     public void setCreator(User creator) {
-        this.creator = creator;
+        if (this.creator == null) {
+            this.creator = creator;
+        }
     }
 
     public Integer getId() {
@@ -74,22 +75,6 @@ public class Product implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
     }
 
     public Float getRating() {
@@ -133,4 +118,27 @@ public class Product implements Serializable {
         return true;
     }
 
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("category", Prod_category.toJSON(category));
+        obj.put("description", description);
+        obj.put("creator", User.toJSON(creator));
+        obj.put("rating", rating);
+        obj.put("num_votes", num_votes);
+        return obj;
+    }
+
+    public static JSONObject toJSON(Product product) {
+        return product==null ? null : product.toJSON();
+    }
+    
+    public static JSONArray toJSON(Collection<Product> coll){
+        JSONArray arr = new JSONArray();
+        for(Product p : coll){
+            arr.put(Product.toJSON(p));
+        }
+        return arr;
+    }
 }

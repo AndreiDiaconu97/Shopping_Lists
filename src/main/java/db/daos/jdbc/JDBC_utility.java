@@ -123,7 +123,6 @@ public abstract class JDBC_utility {
         user.setHashed_password(rs.getString("PASSWORD"));
         user.setFirstname(rs.getString(("FIRSTNAME")));
         user.setLastname(rs.getString("LASTNAME"));
-        user.setAvatar(rs.getString("AVATAR"));
         user.setIs_admin(rs.getBoolean("IS_ADMIN"));
         return user;
     }
@@ -146,10 +145,8 @@ public abstract class JDBC_utility {
         product.setCreator(getUser(rs.getInt("CREATOR"), con));
         product.setDescription(rs.getString("DESCRIPTION"));
         product.setId(rs.getInt("ID"));
-        product.setLogo(rs.getString("LOGO"));
         product.setName(rs.getString("NAME"));
         product.setNum_votes(rs.getInt("NUM_VOTES"));
-        product.setPhoto(rs.getString("PHOTO"));
         product.setRating(rs.getFloat("RATING"));
         return product;
     }
@@ -171,7 +168,6 @@ public abstract class JDBC_utility {
         list_reg.setCategory(getList_category(rs.getInt("CATEGORY"), con));
         list_reg.setDescription(rs.getString("DESCRIPTION"));
         list_reg.setId(rs.getInt("ID"));
-        list_reg.setLogo(rs.getString("LOGO"));
         list_reg.setName(rs.getString("NAME"));
         list_reg.setOwner(getUser(rs.getInt("OWNER"), con));
         return list_reg;
@@ -195,7 +191,6 @@ public abstract class JDBC_utility {
         nv_user.setHashed_password(rs.getString("PASSWORD"));
         nv_user.setFirstname(rs.getString(("FIRSTNAME")));
         nv_user.setLastname(rs.getString("LASTNAME"));
-        nv_user.setAvatar(rs.getString("AVATAR"));
         nv_user.setCode(rs.getString("VERIFICATION_CODE"));
         return nv_user;
     }
@@ -217,7 +212,6 @@ public abstract class JDBC_utility {
         list_anonymous.setCategory(getList_category(rs.getInt("CATEGORY"), con));
         list_anonymous.setDescription(rs.getString("DESCRIPTION"));
         list_anonymous.setId(rs.getInt("ID"));
-        list_anonymous.setLogo(rs.getString("LOGO"));
         list_anonymous.setLast_seen(rs.getTimestamp("LAST_SEEN"));
         list_anonymous.setName(rs.getString("NAME"));
         return list_anonymous;
@@ -240,7 +234,6 @@ public abstract class JDBC_utility {
         list_category.setId(rs.getInt("ID"));
         list_category.setName(rs.getString("NAME"));
         list_category.setDescription(rs.getString("DESCRIPTION"));
-        list_category.setLogo(rs.getString("LOGO"));
         return list_category;
     }
     
@@ -261,7 +254,6 @@ public abstract class JDBC_utility {
         prod_category.setId(rs.getInt("ID"));
         prod_category.setName(rs.getString("NAME"));
         prod_category.setDescription(rs.getString("DESCRIPTION"));
-        prod_category.setLogo(rs.getString("LOGO"));
         prod_category.setRenewtime(rs.getInt("RENEW_TIME"));
         return prod_category;
     }

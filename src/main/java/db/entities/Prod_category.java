@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -17,16 +20,15 @@ public class Prod_category implements Serializable {
     private Integer id;
     private String name;
     private String description;
-    private String logo;
     private Integer renewtime;
 
     public Prod_category() {
     }
 
-    public Prod_category(String name, String description, String logo) {
+    public Prod_category(String name, String description, Integer renewtime) {
         this.name = name;
         this.description = description;
-        this.logo = logo;
+        this.renewtime = renewtime;
     }
 
     public Integer getId() {
@@ -53,14 +55,6 @@ public class Prod_category implements Serializable {
         this.description = description;
     }
 
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
     public Integer getRenewtime() {
         return renewtime;
     }
@@ -71,12 +65,8 @@ public class Prod_category implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = 7;
         hash = 83 * hash + Objects.hashCode(this.id);
-        hash = 83 * hash + Objects.hashCode(this.name);
-        hash = 83 * hash + Objects.hashCode(this.description);
-        hash = 83 * hash + Objects.hashCode(this.logo);
-        hash = 83 * hash + Objects.hashCode(this.renewtime);
         return hash;
     }
 
@@ -92,21 +82,30 @@ public class Prod_category implements Serializable {
             return false;
         }
         final Prod_category other = (Prod_category) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        if (!Objects.equals(this.description, other.description)) {
-            return false;
-        }
-        if (!Objects.equals(this.logo, other.logo)) {
-            return false;
-        }
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
-        if (!Objects.equals(this.renewtime, other.renewtime)) {
-            return false;
-        }
         return true;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("description", description);
+        obj.put("renewtime", renewtime);
+        return obj;
+    }
+
+    public static JSONObject toJSON(Prod_category prod_category) {
+        return prod_category == null ? null : prod_category.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<Prod_category> coll) {
+        JSONArray arr = new JSONArray();
+        for (Prod_category p_c : coll) {
+            arr.put(Prod_category.toJSON(p_c));
+        }
+        return arr;
     }
 }

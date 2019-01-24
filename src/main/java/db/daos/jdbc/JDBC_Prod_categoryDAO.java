@@ -48,12 +48,11 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> impl
     public void insert(Prod_category prod_category) throws DAOException {
         checkParam(prod_category, false);
         
-        String query = "INSERT INTO " + P_CAT_TABLE + " (name, description, logo, renew_time) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO " + P_CAT_TABLE + " (name, description, renew_time) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, prod_category.getName());
             stm.setString(2, prod_category.getDescription());
-            stm.setString(3, prod_category.getLogo());
-            stm.setInt(4, prod_category.getRenewtime());
+            stm.setInt(3, prod_category.getRenewtime());
             stm.executeUpdate();
 
             try (ResultSet rs = stm.getGeneratedKeys()) {
@@ -77,13 +76,12 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> impl
     public void update(Prod_category prod_category) throws DAOException {
         checkParam(prod_category, true);
 
-        String query = "UPDATE " + P_CAT_TABLE + " SET NAME = ?, DESCRIPTION = ?, LOGO = ?, RENEW_TIME = ? WHERE ID = ?";
+        String query = "UPDATE " + P_CAT_TABLE + " SET NAME = ?, DESCRIPTION = ?, RENEW_TIME = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, prod_category.getName());
             stm.setString(2, prod_category.getDescription());
-            stm.setString(3, prod_category.getLogo());
-            stm.setInt(4, prod_category.getRenewtime());
-            stm.setInt(5, prod_category.getId());
+            stm.setInt(3, prod_category.getRenewtime());
+            stm.setInt(4, prod_category.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

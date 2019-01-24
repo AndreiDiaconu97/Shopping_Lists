@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -100,6 +103,26 @@ public class Message {
         }
         return true;
     }
-    
-    
+
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("list", List_reg.toJSON(list));
+        obj.put("user", User.toJSON(user));
+        obj.put("text", text);
+        obj.put("time", time);
+        obj.put("isLog", isLog);
+        return obj;
+    }
+
+    public static JSONObject toJSON(Message message) {
+        return message == null ? null : message.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<Message> coll) {
+        JSONArray arr = new JSONArray();
+        for (Message m : coll) {
+            arr.put(Message.toJSON(m));
+        }
+        return arr;
+    }
 }

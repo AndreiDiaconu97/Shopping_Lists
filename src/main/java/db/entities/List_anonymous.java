@@ -7,7 +7,10 @@ package db.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -18,17 +21,15 @@ public class List_anonymous implements Serializable {
     private Integer id;
     private String name;
     private String description;
-    private String logo;
     private List_category category;
     private Timestamp last_seen;
 
     public List_anonymous() {
     }
 
-    public List_anonymous(String name, String description, String logo, List_category category, Timestamp last_seen) {
+    public List_anonymous(String name, String description, List_category category, Timestamp last_seen) {
         this.name = name;
         this.description = description;
-        this.logo = logo;
         this.category = category;
         this.last_seen = last_seen;
     }
@@ -55,14 +56,6 @@ public class List_anonymous implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
     }
 
     public List_category getCategory() {
@@ -104,5 +97,26 @@ public class List_anonymous implements Serializable {
             return false;
         }
         return true;
+    }
+    
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("category", List_category.toJSON(category));
+        obj.put("description", description);
+        return obj;
+    }
+
+    public static JSONObject toJSON(List_anonymous list) {
+        return list == null ? null : list.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<List_anonymous> coll) {
+        JSONArray arr = new JSONArray();
+        for (List_anonymous list : coll) {
+            arr.put(List_anonymous.toJSON(list));
+        }
+        return arr;
     }
 }

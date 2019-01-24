@@ -41,13 +41,12 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public void insert(List_anonymous list_anonymous) throws DAOException {
         checkParam(list_anonymous, false);
 
-        String query = "INSERT INTO " + L_ANONYM_TABLE + " (name, description, category, logo, last_seen) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + L_ANONYM_TABLE + " (name, description, category, last_seen) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
             stm.setInt(3, list_anonymous.getCategory().getId());
-            stm.setString(4, list_anonymous.getLogo());
-            stm.setTimestamp(5, list_anonymous.getLast_seen());
+            stm.setTimestamp(4, list_anonymous.getLast_seen());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -76,14 +75,13 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public void update(List_anonymous list_anonymous) throws DAOException {
         checkParam(list_anonymous, true);
 
-        String query = "UPDATE " + L_ANONYM_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, LOGO = ?, LAST_SEEN = ? WHERE ID = ?";
+        String query = "UPDATE " + L_ANONYM_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, LAST_SEEN = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
             stm.setInt(3, list_anonymous.getCategory().getId());
-            stm.setString(4, list_anonymous.getLogo());
-            stm.setTimestamp(5, list_anonymous.getLast_seen());
-            stm.setInt(6, list_anonymous.getId());
+            stm.setTimestamp(4, list_anonymous.getLast_seen());
+            stm.setInt(5, list_anonymous.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

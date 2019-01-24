@@ -67,12 +67,12 @@
                 </c:when>
                 <c:when test="${param.status=='needtoregister'}">
                     <div class="alert-danger" role="alert">
-                       Email not found, register first.
+                        Email not found, register first.
                     </div>
                 </c:when>
                 <c:when test="${param.status=='notadmin'}">
                     <div class="alert-danger" role="alert">
-                       To access admin pages, please login with an administrator account.
+                        To access admin pages, please login with an administrator account.
                     </div>
                 </c:when>
             </c:choose>

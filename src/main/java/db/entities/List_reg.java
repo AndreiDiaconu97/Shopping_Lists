@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -19,17 +22,15 @@ public class List_reg implements Serializable {
     private User owner;
     private List_category category;
     private String description;
-    private String logo;
 
     public List_reg() {
     }
 
-    public List_reg(String name, User owner, List_category category, String description, String logo) {
+    public List_reg(String name, User owner, List_category category, String description) {
         this.name = name;
         this.owner = owner;
         this.category = category;
         this.description = description;
-        this.logo = logo;
     }
 
     public Integer getId() {
@@ -53,7 +54,9 @@ public class List_reg implements Serializable {
     }
 
     public void setOwner(User owner) {
-        this.owner = owner;
+        if (owner == null) {
+            this.owner = owner;
+        }
     }
 
     public List_category getCategory() {
@@ -70,14 +73,6 @@ public class List_reg implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
     }
 
     @Override
@@ -105,4 +100,25 @@ public class List_reg implements Serializable {
         return true;
     }
 
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("category", List_category.toJSON(category));
+        obj.put("description", description);
+        obj.put("owner", User.toJSON(owner));
+        return obj;
+    }
+
+    public static JSONObject toJSON(List_reg list) {
+        return list == null ? null : list.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<List_reg> coll) {
+        JSONArray arr = new JSONArray();
+        for (List_reg list : coll) {
+            arr.put(List_reg.toJSON(list));
+        }
+        return arr;
+    }
 }

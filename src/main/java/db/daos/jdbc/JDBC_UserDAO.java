@@ -149,14 +149,13 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
     public void insert(User user) throws DAOException {
         checkParam(user, false);
 
-        String query = "INSERT INTO " + U_TABLE + " (email, password, firstname, lastname, is_admin, avatar) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + U_TABLE + " (email, password, firstname, lastname, is_admin) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, user.getEmail());
             stm.setString(2, user.getHashed_password());
             stm.setString(3, user.getFirstname());
             stm.setString(4, user.getLastname());
             stm.setBoolean(5, user.getIs_admin());
-            stm.setString(6, user.getAvatar());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -177,15 +176,14 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
     public void update(User user) throws DAOException {
         checkParam(user, true);
 
-        String query = "UPDATE " + U_TABLE + " SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ?, AVATAR = ? WHERE ID = ?";
+        String query = "UPDATE " + U_TABLE + " SET EMAIL = ?, PASSWORD = ?, FIRSTNAME = ?, LASTNAME = ?, IS_ADMIN = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, user.getEmail());
             stm.setString(2, user.getHashed_password());
             stm.setString(3, user.getFirstname());
             stm.setString(4, user.getLastname());
             stm.setBoolean(5, user.getIs_admin());
-            stm.setString(6, user.getAvatar());
-            stm.setInt(7, user.getId());
+            stm.setInt(6, user.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

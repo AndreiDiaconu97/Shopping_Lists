@@ -53,17 +53,19 @@ public class AuthenticationFilter implements Filter {
         // such as the parameters.
         if (request instanceof HttpServletRequest) {
             ServletContext servletContext = ((HttpServletRequest) request).getServletContext();
+            String contextPath = servletContext.getContextPath();
+            if (!contextPath.endsWith("/")) {
+                contextPath += "/";
+            }
             HttpSession session = ((HttpServletRequest) request).getSession(false);
             User user = null;
             if (session != null) {
                 user = (User) session.getAttribute("user");
             }
             if (user == null) {
-                String contextPath = servletContext.getContextPath();
-                if (!contextPath.endsWith("/")) {
-                    contextPath += "/";
-                }
                 ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(contextPath + "login.html"));
+            } else if (user.getIs_admin()) {
+                ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(contextPath + "admin/admin.html"));
             }
         }
     }

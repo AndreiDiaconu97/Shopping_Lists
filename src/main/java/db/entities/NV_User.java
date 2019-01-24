@@ -20,7 +20,6 @@ public class NV_User implements Serializable {
     private String hashed_password;
     private String firstname;
     private String lastname;
-    private String avatar;
     private String code;
 
     private static final int CODE_SIZE = 50;
@@ -33,11 +32,10 @@ public class NV_User implements Serializable {
         generateCode();
     }
 
-    public NV_User(String email, String normal_password, String firstname, String lastname, String avatar) {
+    public NV_User(String email, String normal_password, String firstname, String lastname) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.avatar = avatar;
         generateCode();
         createHashedPassword(normal_password);
     }
@@ -72,14 +70,6 @@ public class NV_User implements Serializable {
             return;
         }
         this.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
     }
 
     public String getFirstname() {

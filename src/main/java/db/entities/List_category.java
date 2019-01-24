@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -17,15 +20,13 @@ public class List_category implements Serializable {
     private Integer id;
     private String name;
     private String description;
-    private String logo;
 
     public List_category() {
     }
 
-    public List_category(String name, String description, String logo) {
+    public List_category(String name, String description) {
         this.name = name;
         this.description = description;
-        this.logo = logo;
     }
 
     public Integer getId() {
@@ -52,18 +53,10 @@ public class List_category implements Serializable {
         this.description = description;
     }
 
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.name);
+        hash = 53 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -83,5 +76,25 @@ public class List_category implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("name", name);
+        obj.put("description", description);
+        return obj;
+    }
+
+    public static JSONObject toJSON(List_category l_c) {
+        return l_c == null ? null : l_c.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<List_category> coll) {
+        JSONArray arr = new JSONArray();
+        for (List_category l_c : coll) {
+            arr.put(List_category.toJSON(l_c));
+        }
+        return arr;
     }
 }

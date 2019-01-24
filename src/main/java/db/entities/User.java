@@ -6,7 +6,10 @@
 package db.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -19,17 +22,15 @@ public class User implements Serializable {
     private String hashed_password;
     private String firstname;
     private String lastname;
-    private String avatar;
     private Boolean is_admin;
 
     public User() {
     }
 
-    public User(String email, String firstname, String lastname, String avatar) {
+    public User(String email, String firstname, String lastname) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.avatar = avatar;
     }
 
     public Integer getId() {
@@ -54,14 +55,6 @@ public class User implements Serializable {
 
     public void setHashed_password(String hashed_password) {
         this.hashed_password = hashed_password;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
     }
 
     public String getFirstname() {
@@ -113,4 +106,23 @@ public class User implements Serializable {
         return true;
     }
 
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("email", email);
+        obj.put("firstname", firstname);
+        return obj;
+    }
+
+    public static JSONObject toJSON(User user) {
+        return user == null ? null : user.toJSON();
+    }
+
+    public static JSONArray toJSON(Collection<User> coll) {
+        JSONArray arr = new JSONArray();
+        for (User u : coll) {
+            arr.put(User.toJSON(u));
+        }
+        return arr;
+    }
 }

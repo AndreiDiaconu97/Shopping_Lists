@@ -155,13 +155,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void insert(List_reg list_reg) throws DAOException {
         checkParam(list_reg, false);
 
-        String query = "INSERT INTO " + L_TABLE + "(name, description, category, owner, logo) VALUES(?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + L_TABLE + "(name, description, category, owner) VALUES(?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_reg.getName());
             stm.setString(2, list_reg.getDescription());
             stm.setInt(3, list_reg.getCategory().getId());
             stm.setInt(4, list_reg.getOwner().getId());
-            stm.setString(5, list_reg.getLogo());
             stm.executeUpdate();
 
             try (ResultSet rs = stm.getGeneratedKeys()) {
@@ -179,14 +178,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void update(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
 
-        String query = "UPDATE " + L_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ?, OWNER = ?, LOGO = ? WHERE ID = ?";
+        String query = "UPDATE " + L_TABLE + " SET NAME = ?, DESCRIPTION = ?, CATEGORY = ? WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, list_reg.getName());
             stm.setString(2, list_reg.getDescription());
             stm.setInt(3, list_reg.getCategory().getId());
-            stm.setInt(4, list_reg.getOwner().getId());
-            stm.setString(5, list_reg.getLogo());
-            stm.setInt(6, list_reg.getId());
+            stm.setInt(4, list_reg.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

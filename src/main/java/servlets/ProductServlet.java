@@ -5,9 +5,13 @@
  */
 package servlets;
 
+import db.daos.Prod_categoryDAO;
 import db.daos.ProductDAO;
+import db.daos.jdbc.JDBC_utility;
+import db.daos.jdbc.JDBC_utility.SortBy;
+import db.entities.Prod_category;
 import db.entities.Product;
-import db.exceptions.DAOException;
+import db.entities.User;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
@@ -17,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,7 +32,7 @@ import org.json.JSONObject;
 public class ProductServlet extends HttpServlet {
 
     private ProductDAO productDao;
-    private List<Product> allProducts;
+    private Prod_categoryDAO prod_categoryDao;
 
     @Override
     public void init() throws ServletException {
@@ -41,10 +46,10 @@ public class ProductServlet extends HttpServlet {
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for products", ex);
         }
-        try {
-            allProducts = productDao.getAll();
-        } catch (DAOException ex) {
-            throw new ServletException("Impossible to get all products: " + ex.getMessage());
+        try{
+            prod_categoryDao = daoFactory.getDAO(Prod_categoryDAO.class);
+        } catch(DAOFactoryException ex){
+            throw new ServletException("Impossible to get dao for prod_categories", ex);
         }
     }
 
@@ -55,15 +60,19 @@ public class ProductServlet extends HttpServlet {
             contextPath += "/";
         }
 
-        if (request.getParameter("text") != null) {
-            String text = request.getParameter("text");
-            List<Product> searched = new ArrayList<>();
-            for (Product p : allProducts) {
-                if (p.getName().toUpperCase().contains(text.toUpperCase())) {
-                    searched.add(p);
-                }
-            }
-
+        try {
+            HttpSession session = request.getSession(false);
+            User user = (User) session.getAttribute("user");
+            String name = request.getParameter("name");
+            String cat_s = request.getParameter("category");
+            Boolean pubs = "true".equals(request.getParameter("publics"));
+            String sortby_s = request.getParameter("sortby");
+            SortBy sortby = sortby_s=="popularity" ? SortBy.POPULARITY : (sortby_s=="name" ? SortBy.NAME : SortBy.RATING);
+            Integer cat_id = Integer.parseInt(cat_s != null ? cat_s : "-1");
+            Prod_category prod_category = prod_categoryDao.getByPrimaryKey(cat_id);
+            
+            List<Product> searched = productDao.filterProducts(name, prod_category, user, pubs, sortby);
+            
             JSONArray productArray = new JSONArray();
             for (Product p : searched) {
                 JSONObject productJSON = new JSONObject();
@@ -75,8 +84,8 @@ public class ProductServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
             response.getWriter().print(productArray);
 
-        } else {
-            // ERROR
+        } catch (Exception ex) {
+            response.sendRedirect(contextPath + "error.html?prodsearch");
         }
     }
 
