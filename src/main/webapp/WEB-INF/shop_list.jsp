@@ -137,23 +137,22 @@
                 <i class="fa fa-shopping-cart" style="font-size:30px"></i>
                 Shopping lists
             </a>
-            <ul class="nav navbar-nav ml-auto">
-                <li class="nav" style="display: inline-block">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown pull-right">
-                                <a class="nav-link" href="#">Sign in <i class="fa fa-sign-in" style="font-size:20px;"></i></a>
-                            </li>
-                            <li class="dropdown pull-right">
-                                <a class="nav-link" href="#">Log in <i class="fa fa-user" style="font-size:20px;"></i></a>
-                            </li>
-                        </ul>
-                    </div> 
-                </li>
-            </ul>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="dropdown ml-auto my-auto">
+                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
+                    </li>                    
+                    <li class="dropdown ml-auto my-auto">
+                        <form class="form-inline" action="<%=contextPath%>auth" method="POST" method="POST">
+                            <input class="form-control" type="hidden" name="action" value="logout" required>
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
         <!-- name and logo -->
@@ -228,7 +227,7 @@
         </div>
 
         <!-- products -->
-        <div class="card mb-3 shadow border-0">
+        <div class="card mb-2 shadow border-0">
             <div class="card-header">
                 <div class="row my-auto mx-1">
                     <h4 class="my-auto pb-2">Products <small><span class="badge badge-secondary shadow">3/7</span></small></h4>
@@ -236,10 +235,10 @@
                         <div class="input-group">
                             <input class="form-control" type="search" placeholder="Search products in list..." aria-label="Search">
                             <button class="btn btn-outline-success" type="submit">
-                                <i class="fa fa-search mr-auto" style="font-size:20x;"></i>
+                                <i class="fa fa-search mr-auto"></i>
                             </button>   
                             <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
-                                <i class="fa fa-plus mr-auto" style="font-size:20x;"></i>
+                                <i class="fa fa-plus mr-auto"></i>
                             </button>
                         </div>
                     </div>
@@ -247,6 +246,16 @@
             </div>
         </div>
         <div class="container-fluid">
+            <div class="row mx-auto mb-2 justify-content-end">
+                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#">  
+                    Update
+                    <i class="fa fa-check ml-1"></i>
+                </button>
+                <button type="button" class="btn btn-danger my-auto shadow rounded" href="#">  
+                    Cancel
+                    <i class="fa fa-times ml-1"></i>
+                </button>
+            </div>
             <c:forEach var = "i" begin="0" end="20">
                 <div class="card shadow-sm mb-2">
                     <div class="card-body">
@@ -258,18 +267,18 @@
                             <div class="row ml-auto my-auto mr-1 pt-2">
                                 <div class="input-group">
                                     <c:if test="${isListOwner}">
-                                        <button type="button" id="leftBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2">
+                                        <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">
                                             <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
                                         </button>
                                     </c:if>
-                                    <button type="button" id="leftBtn${i}" class="btn btn-secondary btn-sm shadow-sm" onclick="changeValue(this.id, '-')">
+                                    <button type="button" id="leftBtn${i}" class="btn btn-secondary btn-sq-sm shadow-sm"disabled onclick="changeValue(this, '-')">
                                         <i class="fa fa-chevron-left mr-auto"></i>
                                     </button>
-                                    <input type="number" id="buyProd${i}" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="0" max="5" placeholder="0" oninput="handleChange(this)"><br>
+                                    <input type="number" id="prodAmount${i}" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="3" max="10" value="3" placeholder="3" oninput="handleChange(this)"><br>
                                     <div class="input-group-append">
-                                        <span class="input-group-text" id="basic-addon2">5</span>
+                                        <span class="input-group-text" id="basic-addon2">10</span>
                                     </div>
-                                    <button type="button" id="rightBtn${i}" class="btn btn-secondary btn-sm shadow-sm" onclick="changeValue(this.id, '+')">
+                                    <button type="button" id="rightBtn${i}" class="btn btn-secondary btn-sq-sm shadow-sm" onclick="changeValue(this, '+')">
                                         <i class="fa fa-chevron-right mr-auto"></i>
                                     </button>
                                 </div>
@@ -278,6 +287,16 @@
                     </div>
                 </div>
             </c:forEach>
+            <div class="row mx-auto mb-2 justify-content-end">
+                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#">  
+                    Update
+                    <i class="fa fa-check ml-1"></i>
+                </button>
+                <button type="button" class="btn btn-danger my-auto shadow rounded" href="#">  
+                    Cancel
+                    <i class="fa fa-times ml-1"></i>
+                </button>
+            </div>
             <c:forEach var = "i" begin="0" end="20">
                 <div class="card shadow-sm mb-2" style="background-color: whitesmoke">
                     <div class="card-body">
@@ -297,8 +316,8 @@
     </div>
     <!-- MODALS -->
 
+    <!-- list settings -->
     <c:if test="${isListOwner}">
-        <!-- list settings -->
         <div class="modal modal-fluid" id="listSettingsModal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
@@ -341,8 +360,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Confirm changes</button> 
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary">Confirm<i class="fa fa-check ml-1"></i></button> 
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel<i class="fa fa-times ml-1"></i></button>
                     </div>
                 </div>
             </div>
@@ -425,7 +444,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" style="" data-toggle="button" aria-pressed="false">
+                            <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button" aria-pressed="false">
                                 <i class="fa fa-user-times" style="font-size:25px"></i>
                             </button>
                         </div>
@@ -479,10 +498,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" style="" data-toggle="button" aria-pressed="false">
+                            <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button" aria-pressed="false">
                                 <i class="fa fa-user-plus" style="font-size:25px"></i>
                             </button>
-                            <button type="button" class="btn btn-info my-auto mr-2 shadow-sm rounded" style="" data-toggle="button" aria-pressed="false">
+                            <button type="button" class="btn btn-info my-auto mr-2 shadow-sm rounded" data-toggle="button" aria-pressed="false">
                                 <i class="fa fa-clipboard" style="font-size:20px"></i>
                             </button>
                         </div>
@@ -576,6 +595,46 @@
         </div>
     </div>
 
+    <!-- manage product -->
+    <c:if test="${isListOwner}">
+        <div class="modal modal-fluid" id="productManageModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
+                        <h5 class="modal-title" id="prodManageModal">Manage product in list</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                        <div class="input-group">
+                            <div class="text my-auto mr-2">Increase product amount</div>
+                            <button type="button" id="leftBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm" disabled onclick="changeValue(this, '-')">
+                                <i class="fa fa-chevron-left mr-auto"></i>
+                            </button>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">10</span>
+                            </div>
+                            <input type="number" id="prodAmountManage0" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="10" value="10" placeholder="10" oninput="handleChange(this)"><br>
+                            <button type="button" id="rightBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm" onclick="changeValue(this, '+')">
+                                <i class="fa fa-chevron-right mr-auto"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger shadow-sm ml-3">
+                                Remove product
+                                <i class="fa fa-trash mr-auto"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Confirm<i class="fa fa-check ml-1"></i></button> 
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel<i class="fa fa-times ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
     <footer class="page-footer font-small blue pt-3">
         <hr>
         <div class="p-3 mb-2 bg-dark text-white">
@@ -606,30 +665,47 @@
         });
 
         // in/decrement buttons
-        function changeValue(buttonID, operator) {
-            var textID = buttonID.match(/\d+/g);
-            var value = parseInt(document.getElementById('buyProd' + textID).value, 10);
-            value = isNaN(value) ? 0 : value;
+        function changeValue(button, operator) {
+            var btnID = button.id.match(/\d+/g);
+            var btnName = button.id.match(new RegExp("[(left)|(right)]+" + "(.*)" + btnID))[1];
+            var inputName = btnName.match(new RegExp("Btn" + "(.*)"))[1];
+            var prodAmount = document.getElementById('prodAmount' + inputName + btnID);
 
-            var maxVal = parseInt(document.getElementById('buyProd' + textID).max, 10);
-            var minVal = parseInt(document.getElementById('buyProd' + textID).min, 10);
+            var value = parseInt(prodAmount.value);
+            value = isNaN(value) ? prodAmount.min : value;
+
+            var maxVal = parseInt(prodAmount.max);
+            var minVal = parseInt(prodAmount.min);
             switch (operator) {
                 case '+':
-                    if (value < maxVal) {
+                    if (value === minVal) {
+                        document.getElementById('left' + btnName + btnID).disabled = false;
+                    }
+                    if (maxVal) {
+                        if (value < maxVal) {
+                            value++;
+                            if (value === maxVal) {
+                                button.disabled = true;
+                            }
+                        }
+                    }
+                    else {
                         value++;
-                    } else if (value > maxVal) {
-                        value = maxVal;
                     }
                     break;
                 case '-':
+                    if (value === maxVal) {
+                        document.getElementById('right' + btnName + btnID).disabled = false;
+                    }
                     if (value > minVal) {
                         value--;
-                    } else if (value < maxVal) {
-                        value = minVal;
+                        if (value === minVal) {
+                            button.disabled = true;
+                        }
                     }
                     break;
             }
-            document.getElementById('buyProd' + textID).value = value;
+            prodAmount.value = value;
         }
 
         // product input range limiter

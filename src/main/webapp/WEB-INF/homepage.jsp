@@ -109,16 +109,17 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- for NV_user version
-                <button class="btn navbar-button btn-sm mr-2 ml-auto" type="button">Sign in</button>
-                <button class="btn navbar-button btn-sm" type="button">Log in</button>
-                -->
-                <!-- after log-in -->
-                <div class="text-white ml-auto mx-2">logged in as <b>${user.email}</b></div>
-                <form class="form-inline" action="<%=contextPath%>auth" method="POST" method="POST">
-                    <input class="form-control" type="hidden" name="action" value="logout" required>
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
-                </form>
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="dropdown ml-auto">
+                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
+                    </li>                    
+                    <li class="dropdown ml-auto">
+                        <form class="form-inline" action="<%=contextPath%>auth" method="POST" method="POST">
+                            <input class="form-control" type="hidden" name="action" value="logout" required>
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </nav>
         <main role="main">
@@ -171,7 +172,7 @@
                                 <button class="btn btn-outline-success" type="submit">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>   
-                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createListModal" data-toggle="modal">          
                                     <i class="fa fa-plus mr-auto"></i>
                                 </button>
                             </div>
@@ -222,7 +223,7 @@
                                 <button class="btn btn-outline-success" type="submit">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>   
-                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#importListModal" data-toggle="modal">          
                                     <i class="fa fa-plus mr-auto"></i>
                                 </button>
                             </div>
@@ -281,7 +282,7 @@
                                 <button class="btn btn-outline-success" type="submit">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>   
-                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">          
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProductModal" data-toggle="modal">          
                                     <i class="fa fa-plus mr-auto"></i>
                                 </button>
                             </div>
@@ -295,17 +296,85 @@
             </div>
         </div>
     </div>
-</div>
-<footer class="footer font-small blue pt-3">
-    <div class="p-3 mb-2 bg-dark text-white">
-        Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-    </div>
-</footer>
 
-<!-- Bootstrap core JavaScript ================================================== -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <!-- MODALS -->
+    
+    <!-- create list -->
+    <div class="modal modal-fluid" id="createListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow">
+                    <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Create a list</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer form-horizontal">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- import list -->
+    <div class="modal modal-fluid" id="importListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow">
+                    <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Import friend's lists</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer form-horizontal">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- create product -->
+    <div class="modal modal-fluid" id="createProductModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header shadow">
+                    <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                    <h5 class="modal-title">Create a product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+                <div class="modal-footer form-horizontal">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer font-small blue pt-3">
+        <div class="p-3 mb-2 bg-dark text-white">
+            Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 </body>
 </html>
 

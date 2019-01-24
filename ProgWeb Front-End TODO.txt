@@ -1,9 +1,13 @@
 TODOS:
 
+- add cookie agreement window
+- add javascript alert (if disabled)  
+
 - add resources folder and needed icons
+- add folder for Admin, regUser and NVuser and put in related files (images, jsps,...)
 - products in shopping list have clickable icon that shows product info and allows rating
 - list owner has additional button for each product --> modal window for product management (quantity, delete...)
-- add confirm/cancel buttons for products list
 - add create shopping list
 - implement WARNING confirm/delete modal where needed
 - show elements situationally (if owner, ecc..)
+- fix product counters
