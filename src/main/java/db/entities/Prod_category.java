@@ -18,6 +18,7 @@ public class Prod_category implements Serializable {
     private String name;
     private String description;
     private String logo;
+    private Integer renewtime;
 
     public Prod_category() {
     }
@@ -60,10 +61,22 @@ public class Prod_category implements Serializable {
         this.logo = logo;
     }
 
+    public Integer getRenewtime() {
+        return renewtime;
+    }
+
+    public void setRenewtime(Integer renewtime) {
+        this.renewtime = renewtime;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + Objects.hashCode(this.name);
+        hash = 83 * hash + Objects.hashCode(this.id);
+        hash = 83 * hash + Objects.hashCode(this.name);
+        hash = 83 * hash + Objects.hashCode(this.description);
+        hash = 83 * hash + Objects.hashCode(this.logo);
+        hash = 83 * hash + Objects.hashCode(this.renewtime);
         return hash;
     }
 
@@ -79,7 +92,19 @@ public class Prod_category implements Serializable {
             return false;
         }
         final Prod_category other = (Prod_category) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.logo, other.logo)) {
+            return false;
+        }
         if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.renewtime, other.renewtime)) {
             return false;
         }
         return true;

@@ -43,6 +43,9 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (sortby == null) {
             throw new DAOException("Passed sortby is null");
         }
+        if(user==null && includePublics==false){
+            throw new DAOException("No user and no public products");
+        }
         if(user!=null){
             checkParam(user, true);
         }
@@ -72,10 +75,10 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
                 query += "ORDER BY COALESCE(SUM(AMOUNT), 0) DESC";
                 break;
             case NAME:
-                query += "ORDER BY RATING DESC";
+                query += "ORDER BY NAME";
                 break;
             default:
-                query += "ORDER BY NAME";
+                query += "ORDER BY RATING DESC";
                 break;
         }
         try (PreparedStatement stm = CON.prepareStatement(query)) {

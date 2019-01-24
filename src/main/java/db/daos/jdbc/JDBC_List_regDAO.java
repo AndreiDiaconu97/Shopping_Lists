@@ -16,7 +16,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -258,6 +260,28 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to get purchased amount", ex);
         }
     }
+    
+    @Override
+    public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException{
+        checkParam(list_reg, true);
+        checkParam(product, true);
+        
+        String query = "SELECT LAST_PURCHASE FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, product.getId());
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp(1);
+                } else {
+                    throw new DAOException("Last_purchase date not found, list " + list_reg.getId() + ", product " + product.getId());
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get last_purchase date", ex);
+        }
+    }
 
     @Override
     public void updateAmountTotal(List_reg list_reg, Product product, Integer total) throws DAOException {
@@ -283,11 +307,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(list_reg, true);
         checkParam(product, true);
         
-        String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=? WHERE LIST=? AND PRODUCT=?";
+        String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=?, SET LAST_PURCHASE=? WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, purchased);
             stm.setInt(2, list_reg.getId());
-            stm.setInt(3, product.getId());
+            stm.setTimestamp(3, new Timestamp((new Date()).getTime()));
+            stm.setInt(4, product.getId());
             int count = stm.executeUpdate();
             if (count != 1) {
                 throw new DAOException("Purchased amount updated affected an invalid number of records: " + count);

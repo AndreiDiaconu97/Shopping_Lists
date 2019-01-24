@@ -10,6 +10,7 @@ import db.entities.User;
 import db.entities.List_reg;
 import db.entities.Message;
 import db.exceptions.DAOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -33,6 +34,8 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
     public Integer getAmountTotal(List_reg list_reg, Product product) throws DAOException;
 
     public Integer getAmountPurchased(List_reg list_reg, Product product) throws DAOException;
+    
+    public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException;
 
     public void updateAmountTotal(List_reg list_reg, Product product, Integer total) throws DAOException;
 

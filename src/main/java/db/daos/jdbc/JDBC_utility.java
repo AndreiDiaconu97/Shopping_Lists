@@ -262,6 +262,7 @@ public abstract class JDBC_utility {
         prod_category.setName(rs.getString("NAME"));
         prod_category.setDescription(rs.getString("DESCRIPTION"));
         prod_category.setLogo(rs.getString("LOGO"));
+        prod_category.setRenewtime(rs.getInt("RENEW_TIME"));
         return prod_category;
     }
 
