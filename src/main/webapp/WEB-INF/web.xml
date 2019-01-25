@@ -14,7 +14,7 @@
     </filter-mapping>
     <servlet>
         <servlet-name>ProductSearchServlet</servlet-name>
-        <servlet-class>servlets.ProductServlet</servlet-class>
+        <servlet-class>servlets.ProductSearch</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AdminServlet</servlet-name>
@@ -22,7 +22,7 @@
     </servlet>
     <servlet>
         <servlet-name>Admin_jsp</servlet-name>
-        <jsp-file>/WEB-INF/admin.jsp</jsp-file>
+        <jsp-file>/WEB-INF/Admin/admin.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>ProductSearchServlet</servlet-name>
@@ -30,7 +30,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>Homepage_jsp</servlet-name>
-        <jsp-file>/WEB-INF/homepage.jsp</jsp-file>
+        <jsp-file>/WEB-INF/User/homepage.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>Homepage_jsp</servlet-name>
@@ -38,7 +38,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>Shop_list</servlet-name>
-        <jsp-file>/WEB-INF/shop_list.jsp</jsp-file>
+        <jsp-file>/WEB-INF/User/shop_list.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>Shop_list</servlet-name>

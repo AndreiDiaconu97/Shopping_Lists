@@ -7,7 +7,6 @@ package servlets;
 
 import db.daos.Prod_categoryDAO;
 import db.daos.ProductDAO;
-import db.daos.jdbc.JDBC_utility;
 import db.daos.jdbc.JDBC_utility.SortBy;
 import db.entities.Prod_category;
 import db.entities.Product;
@@ -15,21 +14,18 @@ import db.entities.User;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  *
  * @author andrea
  */
-public class ProductServlet extends HttpServlet {
+public class ProductSearch extends HttpServlet {
 
     private ProductDAO productDao;
     private Prod_categoryDAO prod_categoryDao;
@@ -73,16 +69,8 @@ public class ProductServlet extends HttpServlet {
             
             List<Product> searched = productDao.filterProducts(name, prod_category, user, pubs, sortby);
             
-            JSONArray productArray = new JSONArray();
-            for (Product p : searched) {
-                JSONObject productJSON = new JSONObject();
-                productJSON.put("id", p.getId());
-                productJSON.put("name", p.getName());
-                productJSON.put("description", p.getDescription());
-                productArray.put(productJSON);
-            }
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().print(productArray);
+            response.getWriter().print(Product.toJSON(searched));
 
         } catch (Exception ex) {
             response.sendRedirect(contextPath + "error.html?prodsearch");

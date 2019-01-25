@@ -8,6 +8,7 @@ package db.daos;
 import db.entities.Product;
 import db.entities.List_anonymous;
 import db.exceptions.DAOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public interface List_anonymousDAO extends DAO<List_anonymous, Integer> {
     public Integer getAmountTotal(List_anonymous list_anonymous, Product product) throws DAOException;
 
     public Integer getAmountPurchased(List_anonymous list_anonymous, Product product) throws DAOException;
+    
+    public Timestamp getLastPurchase(List_anonymous list_anonymous, Product product) throws DAOException;
 
     public void updateAmountTotal(List_anonymous list_anonymous, Product product, Integer total) throws DAOException;
 

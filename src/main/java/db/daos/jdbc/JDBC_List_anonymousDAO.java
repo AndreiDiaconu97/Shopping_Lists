@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     @Override
     public void delete(List_anonymous list_anonymous) throws DAOException {
         checkParam(list_anonymous, true);
-        
+
         String query = "DELETE FROM " + L_ANONYM_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -94,9 +95,9 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
 
     @Override
     public List_anonymous getByPrimaryKey(Integer id) throws DAOException {
-        try{
+        try {
             return getList_anonymous(id, CON);
-        } catch(SQLException ex){
+        } catch (SQLException ex) {
             throw new DAOException("Cannot get list_anonymous by id " + id, ex);
         }
     }
@@ -105,7 +106,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public void insertProduct(List_anonymous list_anonymous, Product product, Integer amount) throws DAOException {
         checkParam(list_anonymous, true);
         checkParam(product, true);
-        
+
         String query = "INSERT INTO " + L_ANONYM_P_TABLE + " (LIST_ANONYMOUS, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_anonymous.getId());
@@ -120,7 +121,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     @Override
     public List<Product> getProducts(List_anonymous list_anonymous) throws DAOException {
         checkParam(list_anonymous, true);
-        
+
         String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -141,7 +142,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public Integer getAmountTotal(List_anonymous list_anonymous, Product product) throws DAOException {
         checkParam(list_anonymous, true);
         checkParam(product, true);
-        
+
         String query = "SELECT AMOUNT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -163,7 +164,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public Integer getAmountPurchased(List_anonymous list_anonymous, Product product) throws DAOException {
         checkParam(list_anonymous, true);
         checkParam(product, true);
-        
+
         String query = "SELECT PURCHASED FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
@@ -182,10 +183,32 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     }
 
     @Override
+    public Timestamp getLastPurchase(List_anonymous list, Product product) throws DAOException {
+        checkParam(list, true);
+        checkParam(product, true);
+
+        String query = "SELECT LAST_PURCHASE FROM " + L_ANONYM_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list.getId());
+            stm.setInt(2, product.getId());
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp(1);
+                } else {
+                    throw new DAOException("Last_purchase date not found, list_anonym " + list.getId() + ", product " + product.getId());
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get last_purchase date", ex);
+        }
+    }
+
+    @Override
     public void updateAmountTotal(List_anonymous list_anonymous, Product product, Integer total) throws DAOException {
         checkParam(list_anonymous, true);
         checkParam(product, true);
-        
+
         String query = "UPDATE " + L_ANONYM_P_TABLE + " SET TOTAL=? WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, total);
@@ -204,7 +227,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public void updateAmountPurchased(List_anonymous list_anonymous, Product product, Integer purchased) throws DAOException {
         checkParam(list_anonymous, true);
         checkParam(product, true);
-        
+
         String query = "UPDATE " + L_ANONYM_P_TABLE + " SET PURCHASED=? WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, purchased);
