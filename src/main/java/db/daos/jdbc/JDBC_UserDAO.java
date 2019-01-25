@@ -53,7 +53,10 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
         }
 
         User user = getByEmail(email);
-
+        if(user==null){
+            return null;
+        }
+        
         // CHECK IF HASH IS MATCHING
         if (BCrypt.checkpw(password, user.getHashed_password())) {
             return user;
