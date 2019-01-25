@@ -48,7 +48,7 @@ public class JDBC_Prod_categoryDAO extends JDBC_DAO<Prod_category, Integer> impl
     public void insert(Prod_category prod_category) throws DAOException {
         checkParam(prod_category, false);
         
-        String query = "INSERT INTO " + P_CAT_TABLE + " (name, description, renew_time) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + P_CAT_TABLE + " (NAME, DESCRIPTION, RENEW_TIME) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, prod_category.getName());
             stm.setString(2, prod_category.getDescription());

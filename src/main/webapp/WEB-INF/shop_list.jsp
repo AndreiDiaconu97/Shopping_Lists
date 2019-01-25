@@ -267,7 +267,7 @@
                             <div class="row ml-auto my-auto mr-1 pt-2">
                                 <div class="input-group">
                                     <c:if test="${isListOwner}">
-                                        <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">
+                                        <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal" onclick="prodManageModalHandler()">
                                             <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
                                         </button>
                                     </c:if>
@@ -417,39 +417,41 @@
                     </button>
                 </div>
                 <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%" >
-                    <c:forEach var="user" items="${shared_to}">
-                        <div class="row mb-2 px-auto ml-0">
-                            <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                            <p class="mr-2 my-auto">
-                                <c:out value="${user.firstname} ${user.lastname}"/>
-                            </p>
-                            <p class="mr-2 my-auto" style="color: grey">
-                                <c:out value="(${user.email})"/> 
-                            </p>
-                            <div class="row ml-auto mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="inputGroupSelect02">
-                                        <%
-                                            pageContext.setAttribute("access_levels", AccessLevel.values());
-                                            pageContext.setAttribute("user_access_level", userDao.getAccessLevel(user, shopping_list));
-                                        %>
-                                        <c:forEach var="access_level" varStatus="i" items="${access_levels}">
-                                            <option value="${i.index}" <c:if test="${access_level == user_access_level}">selected</c:if>>${access_level}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <div class="input-group-append">
-                                        <label class="input-group-text" for="inputGroupSelect02">
-                                            <i class="fa fa-wrench"></i>
-                                        </label>
-                                    </div>
+                    <%
+                        for (User shared_user : list_regDao.getUsersSharedTo(shopping_list)) {
+                            AccessLevel uAccessLevel = userDao.getAccessLevel(shared_user, shopping_list);
+                            pageContext.setAttribute("access_levels", AccessLevel.values());
+                            pageContext.setAttribute("uAccessLevel", uAccessLevel);
+                    %>
+                    <div class="row mb-2 px-auto ml-0">
+                        <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                        <p class="mr-2 my-auto">
+                            <c:out value="${user.firstname} ${user.lastname}"/>
+                        </p>
+                        <p class="mr-2 my-auto" style="color: grey">
+                            <c:out value="(${user.email})"/> 
+                        </p>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="inputGroupSelect02">
+                                    <c:forEach var="access_level" varStatus="i" items="${access_levels}">
+                                        <option value="${i.index}" <c:if test="${access_level == uAccessLevel}">selected</c:if>>${access_level}</option>
+                                    </c:forEach>
+                                </select>
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="inputGroupSelect02">
+                                        <i class="fa fa-wrench"></i>
+                                    </label>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button" aria-pressed="false">
-                                <i class="fa fa-user-times" style="font-size:25px"></i>
-                            </button>
                         </div>
-                        <hr>
-                    </c:forEach>
+                        <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button" aria-pressed="false">
+                            <i class="fa fa-user-times" style="font-size:25px"></i>
+                        </button>
+                    </div>
+                    <hr>
+                    <%                        }
+                    %>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
@@ -602,7 +604,7 @@
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
-                        <h5 class="modal-title" id="prodManageModal">Manage product in list</h5>
+                        <h5 class="modal-title" >Manage product in list</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -614,7 +616,7 @@
                                 <i class="fa fa-chevron-left mr-auto"></i>
                             </button>
                             <div class="input-group-prepend">
-                                <span class="input-group-text">10</span>
+                                <span class="input-group-text" id='prodMngMinVal-label'>10</span>
                             </div>
                             <input type="number" id="prodAmountManage0" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="10" value="10" placeholder="10" oninput="handleChange(this)"><br>
                             <button type="button" id="rightBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm" onclick="changeValue(this, '+')">
@@ -688,8 +690,7 @@
                                 button.disabled = true;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         value++;
                     }
                     break;
@@ -720,6 +721,12 @@
                 input.value = input.max;
             }
         }
+
+        // product manage modal handler
+        <c:if test="${isListOwner}">
+        function prodManageModalHandler() {
+        }
+        </c:if>
     </script>
 </body>
 </html>

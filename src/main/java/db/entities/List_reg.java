@@ -54,7 +54,7 @@ public class List_reg implements Serializable {
     }
 
     public void setOwner(User owner) {
-        if (owner == null) {
+        if (this.owner == null) {
             this.owner = owner;
         }
     }

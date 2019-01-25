@@ -1,3 +1,4 @@
+<%@page import="db.entities.Prod_category"%>
 <%@page import="db.daos.List_categoryDAO"%>
 <%@page import="db.daos.UserDAO"%>
 <%@page import="db.entities.List_category"%>
@@ -9,11 +10,15 @@
 <%@page import="db.exceptions.DAOFactoryException"%>
 <%@page import="db.exceptions.DAOException"%>
 <%@page import="db.entities.User"%>
+<%@page import="db.entities.Product" %>
 <%@page import="db.daos.List_regDAO"%>
+<%@page import="db.daos.Prod_categoryDAO"%>
+
 
 
 <%!
     private UserDAO userDao;
+    private Prod_categoryDAO prod_categoryDao;
     private List_regDAO list_regDao;
     private List_categoryDAO list_catDao;
 
@@ -26,6 +31,11 @@
             userDao = daoFactory.getDAO(UserDAO.class);
         } catch (DAOFactoryException ex) {
             throw new RuntimeException(new ServletException("Impossible to get dao for user", ex));
+        }
+        try {
+            prod_categoryDao = daoFactory.getDAO(Prod_categoryDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new RuntimeException(new ServletException("Impossible to get dao for product", ex));
         }
         try {
             list_regDao = daoFactory.getDAO(List_regDAO.class);
@@ -42,6 +52,9 @@
     public void jspDestroy() {
         if (userDao != null) {
             userDao = null;
+        }
+        if (prod_categoryDao != null) {
+            prod_categoryDao = null;
         }
         if (list_regDao != null) {
             list_regDao = null;
@@ -74,14 +87,21 @@
 
     List<List_reg> myLists;
     List<List_reg> sharedLists;
-    List<List_category> categories;
+    List<List_category> list_categories;
+    List<Product> userProducts = userDao.getProductsCreated(user);
+    List<Prod_category> prod_categories = prod_categoryDao.getAll();
+
     try {
         myLists = userDao.getOwnedLists(user);
         sharedLists = userDao.getSharedLists(user);
-        categories = list_catDao.getAll();
+        list_categories = list_catDao.getAll();
+        userProducts = userDao.getProductsCreated(user);
+        prod_categories = prod_categoryDao.getAll();
         pageContext.setAttribute("myLists", myLists);
         pageContext.setAttribute("sharedLists", sharedLists);
-        pageContext.setAttribute("categories", categories);
+        pageContext.setAttribute("list_categories", list_categories);
+        pageContext.setAttribute("userProducts", userProducts);
+        pageContext.setAttribute("prod_categories", prod_categories);
         pageContext.setAttribute("list_catDao", list_catDao);
         pageContext.setAttribute("list_regDao", list_regDao);
     } catch (DAOException ex) {
@@ -289,16 +309,33 @@
                         </div>
                     </div>
                 </div>
-                <!-- add products -->
-                <div class="row">
-
+                <div class="container-fluid">
+                    <c:forEach var = "product" items="${userProducts}">
+                        <div class="card shadow-sm mb-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                    <div class="text-left my-auto">
+                                        product ${product.name}
+                                    </div>
+                                    <div class="row ml-auto my-auto mr-1 pt-2">
+                                        <div class="input-group">
+                                            <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal" onclick="prodManageModalHandler()">
+                                                <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODALS -->
-    
+
     <!-- create list -->
     <div class="modal modal-fluid" id="createListModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -310,17 +347,42 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    
-                </div>
-                <div class="modal-footer form-horizontal">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
+                <form action="https://github.com/AndreiDiaconu97/Shopping_Lists" method="GET">
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-3">
+                            <i class="fa fa-bookmark prefix grey-text"></i>
+                            <label data-error="error" data-success="success" for="productForm">List name</label>
+                            <input type="text" class="form-control validate" name="name"/>
+                        </div>
+                        <div class="md-form mb-3">
+                            <i class="fa fa-align-left prefix grey-text"></i>
+                            <label data-error="error" data-success="success" for="productForm">Description</label>
+                            <textarea class="form-control validate" name="description"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-control">
+                                <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
+                                    <option value=${prod_cat.id} <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
+                                </c:forEach>
+                                <option value="volvo" selected>Volvo</option>
+                                <option value="saab">Saab</option>
+                                <option value="mercedes">Mercedes</option>
+                                <option value="audi">Audi</option>
+                            </select>
+                            <div class="input-group-append">
+                                <span class="input-group-text">Category</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer form-horizontal">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" type="submit" name="action" value="Submit"   >Confirm changes</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    
+
     <!-- import list -->
     <div class="modal modal-fluid" id="importListModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -333,7 +395,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    
+
                 </div>
                 <div class="modal-footer form-horizontal">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
@@ -342,7 +404,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- create product -->
     <div class="modal modal-fluid" id="createProductModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -354,8 +416,31 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    
+                <div class="modal-body mx-3">
+                    <div class="md-form mb-3">
+                        <i class="fa fa-bookmark prefix grey-text"></i>
+                        <label data-error="error" data-success="success" for="productForm">Product name</label>
+                        <input type="text" class="form-control validate" name="name"/>
+                    </div>
+                    <div class="md-form mb-3">
+                        <i class="fa fa-align-left prefix grey-text"></i>
+                        <label data-error="error" data-success="success" for="productForm">Description</label>
+                        <textarea class="form-control validate" name="description"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <select class="form-control">
+                            <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
+                                <option value=${prod_cat.id} <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
+                            </c:forEach>
+                            <option value="volvo" selected>Volvo</option>
+                            <option value="saab">Saab</option>
+                            <option value="mercedes">Mercedes</option>
+                            <option value="audi">Audi</option>
+                        </select>
+                        <div class="input-group-append">
+                            <span class="input-group-text">Category</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer form-horizontal">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
@@ -364,7 +449,7 @@
             </div>
         </div>
     </div>
-    
+
     <footer class="footer font-small blue pt-3">
         <div class="p-3 mb-2 bg-dark text-white">
             Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
