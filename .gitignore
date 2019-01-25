@@ -11,3 +11,6 @@ derby.properties
 
 #VScode
 .settings/
+
+#database creator
+src/main/resources/xlsx-db/node_modules/
