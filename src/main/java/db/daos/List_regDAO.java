@@ -35,6 +35,8 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
 
     public Integer getAmountPurchased(List_reg list_reg, Product product) throws DAOException;
     
+    public Integer getFullyPurchasedCount(List_reg list_reg) throws DAOException;
+    
     public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException;
 
     public void updateAmountTotal(List_reg list_reg, Product product, Integer total) throws DAOException;

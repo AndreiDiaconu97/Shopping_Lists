@@ -66,7 +66,7 @@ public class ProductSearch extends HttpServlet {
             SortBy sortby = sortby_s=="popularity" ? SortBy.POPULARITY : (sortby_s=="name" ? SortBy.NAME : SortBy.RATING);
             Integer cat_id = Integer.parseInt(cat_s != null ? cat_s : "-1");
             Prod_category prod_category = prod_categoryDao.getByPrimaryKey(cat_id);
-            
+                
             List<Product> searched = productDao.filterProducts(name, prod_category, user, pubs, sortby);
             
             response.setCharacterEncoding("UTF-8");

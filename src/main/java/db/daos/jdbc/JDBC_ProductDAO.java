@@ -43,10 +43,10 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         if (sortby == null) {
             throw new DAOException("Passed sortby is null");
         }
-        if(user==null && includePublics==false){
+        if (user == null && includePublics == false) {
             throw new DAOException("No user and no public products");
         }
-        if(user!=null){
+        if (user != null) {
             checkParam(user, true);
         }
         if (name == null) {
@@ -63,7 +63,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         query += " WHERE UPPER_NAME LIKE '%' || ? || '%'\n";
         query += "AND (CREATOR = ? ";
         if (includePublics) {
-            query += " OR CREATOR IN (SELECT ID FROM " + U_TABLE + " WHERE IS_ADMIN=TRUE ";
+            query += " OR CREATOR IN (SELECT ID FROM " + U_TABLE + " WHERE IS_ADMIN=TRUE) ";
         }
         query += ")\n";
         if (prod_category != null) {
@@ -84,14 +84,14 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         }
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, name);
-            stm.setInt(2, user==null ? -1 : user.getId());
-            if(prod_category!=null){
+            stm.setInt(2, user == null ? -1 : user.getId());
+            if (prod_category != null) {
                 stm.setInt(3, prod_category.getId());
             }
-            System.err.println("FilterProducts query:\n" + stm + "\n\n");
-            try(ResultSet rs = stm.executeQuery()){
+            System.err.println("FilterProducts query:\n" + query + "\n\n");
+            try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
-                while(rs.next()){
+                while (rs.next()) {
                     products.add(resultSetToProduct(rs, CON));
                 }
                 return products;

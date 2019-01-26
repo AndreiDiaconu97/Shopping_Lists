@@ -257,6 +257,26 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to get purchased amount", ex);
         }
     }
+
+    @Override
+    public Integer getFullyPurchasedCount(List_reg list_reg) throws DAOException {
+        checkParam(list_reg, true);
+        
+        String query = "SELECT COALESCE(COUNT(*),0) FROM " + L_P_TABLE + " WHERE LIST=? AND PURCHASED=AMOUNT GROUP BY LIST";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    return 0;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to get purchased items", ex);
+        }
+    }
     
     @Override
     public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException{

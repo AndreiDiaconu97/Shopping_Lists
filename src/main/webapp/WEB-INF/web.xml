@@ -26,11 +26,15 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ProductSearchServlet</servlet-name>
-        <url-pattern>/searchProduct</url-pattern>
+        <url-pattern>/product.search</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>Homepage_jsp</servlet-name>
         <jsp-file>/WEB-INF/User/homepage.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>ListSearchServlet</servlet-name>
+        <servlet-class>servlets.user.ListSearchServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Homepage_jsp</servlet-name>
@@ -95,6 +99,10 @@
     <servlet-mapping>
         <servlet-name>Admin_jsp</servlet-name>
         <url-pattern>/admin/admin.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ListSearchServlet</servlet-name>
+        <url-pattern>/restricted/list.search</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

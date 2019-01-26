@@ -179,7 +179,7 @@ public class ShoppingListServlet extends HttpServlet {
             } catch (DAOException ex) {
                 System.err.println("Cannot share the list");
             }
-            
+
             response.sendRedirect(contextPath + "restricted/homepage.html");
         }
 
@@ -213,17 +213,17 @@ public class ShoppingListServlet extends HttpServlet {
 
         switch (action) {
             case "create": {
-                HttpSession session = request.getSession(false);
-                User user = (User) session.getAttribute("user");
-                String name = request.getParameter("name");
-                String description = request.getParameter("description");
-                Integer cat_id = Integer.valueOf(request.getParameter("category"));
                 try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    String name = request.getParameter("name");
+                    String description = request.getParameter("description");
+                    Integer cat_id = Integer.valueOf(request.getParameter("category"));
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
                     List_reg list = new List_reg(name, user, l_cat, description);
                     list_regDao.insert(list);
-                } catch (DAOException ex) {
-                    System.err.println("Cannot insert list");
+                } catch (Exception ex) {
+                    System.err.println("Cannot insert list: " + ex.getMessage());
                 }
                 break;
             }
@@ -267,7 +267,7 @@ public class ShoppingListServlet extends HttpServlet {
                     List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
                     Product product = productDao.getByPrimaryKey(prod_id);
                     list_regDao.insertProduct(list_reg, product, amount);
-                } catch (DAOException ex){
+                } catch (DAOException ex) {
                     System.err.println("Cannot add product to list");
                 }
                 break;

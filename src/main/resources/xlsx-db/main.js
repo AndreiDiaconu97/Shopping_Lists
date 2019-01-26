@@ -27,12 +27,16 @@ Array.prototype.randomItem = function () {
 	return this[Math.floor(Math.random() * this.length)];
 };
 
+Date.prototype.toTimestamp = function () {
+	return this.toISOString().replace('T', ' ').replace(/.[0-9]*Z/g, '');
+};
+
 let book = XLSX.readFile('Database ShoppingList.xlsx');
 
 let names = ["michele", "matteo", "giovanni", "anna", "fabrizia", "gianmaria", "mattea", "dora"];
 let lastnames = ["bini", "trump", "amadori", "castellaneta", "chiocco", "toldo"];
 let domains = ["@gmail.com", "@yahoo.it", "@alice.it", "@hotmail.com"];
-const TOT_USERS = 20;
+const TOT_USERS = 50;
 let users = [];
 for (let i = 4; i < TOT_USERS; i++) {
 	let firstname = names.randomItem();
@@ -85,7 +89,7 @@ let prods = sheet_prods.map(function (x) {
 
 // LISTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 let lists = [];
-let TOT_LISTS = 20;
+let TOT_LISTS = TOT_USERS / 2;
 let min_items = 4, max_items = 7;//20;
 for (let i = 1; i <= TOT_LISTS; i++) {
 	let l_cat = 0;//list_cats.indexOf(list_cats.randomItem());
@@ -101,7 +105,7 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 			items = items.unique();
 		}
 	}
-	let owner = Math.floor(Math.random() * (TOT_USERS / 2)) + 4;
+	let owner = Math.random() > 0.7 ? 1 : Math.floor(Math.random() * (TOT_USERS / 2)) + 5;
 	let shared = [];
 	for (let s = 0; s < 5; s++) {
 		let sh = Math.random() > 0.6 ? [4, 5].randomItem() : Math.floor(Math.random() * (TOT_USERS / 2));
@@ -228,8 +232,11 @@ fs.appendFileSync(filename, query);
 query = "";
 for (l of lists) {
 	for (p of l.Products) {
-		query += `INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT) `;
-		query += `VALUES (${l.Id},${p + 1});\n`;
+		let amount = Math.floor(Math.random() * 20) + 1;
+		let purchased = Math.random() > 0.1 ? [0, amount].randomItem() : Math.floor(Math.random() * (amount - 1) + 1);
+		let last_purchase = (new Date(new Date() - Math.floor(Math.random() * 5) * day - Math.floor(Math.random() * 20) * hour - day + 5 * hour)).toTimestamp();
+		query += `INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,AMOUNT,PURCHASED,LAST_PURCHASE) `;
+		query += `VALUES (${l.Id},${p + 1},${amount},${purchased},'${last_purchase}');\n`;
 	}
 }
 query += "\n\n\n\n";
@@ -251,7 +258,7 @@ query = "";
 for (l of lists) {
 	for (m of l.Messages) {
 		query += `INSERT INTO APP.CHATS (LIST,USER_ID,MESSAGE,TIME) `;
-		query += `VALUES (${l.Id},${m.user + 1},'${m.text.replace(/['"]+/g, '')}','${(new Date(m.time)).toISOString().replace('T', ' ').replace(/.[0-9]*Z/g, '')}');\n`;
+		query += `VALUES (${l.Id},${m.user + 1},'${m.text.replace(/['"]+/g, '')}','${(new Date(m.time)).toTimestamp()}');\n`;
 	}
 }
 query += "\n\n\n\n";
