@@ -4,6 +4,11 @@
         <param-name>relative_dburl</param-name>
         <param-value>db.sl</param-value>
     </context-param>
+    <context-param> 
+        <description>Location to store shopping lists images</description> 
+        <param-name>uploadDir</param-name>
+        <param-value>images</param-value>
+    </context-param>
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
         <filter-class>filters.AuthenticationFilter</filter-class>
@@ -11,6 +16,14 @@
     <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/restricted/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>AdminFilter</filter-name>
+        <filter-class>filters.AdminFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AdminFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
     </filter-mapping>
     <servlet>
         <servlet-name>ProductSearchServlet</servlet-name>
@@ -51,6 +64,14 @@
     <servlet-mapping>
         <servlet-name>Shop_list</servlet-name>
         <url-pattern>/restricted/shopping.list.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>List_cat</servlet-name>
+        <jsp-file>/WEB-INF/Admin/list_cat.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>List_cat</servlet-name>
+        <url-pattern>/admin/list.cat.html</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>Registration_jsp</servlet-name>

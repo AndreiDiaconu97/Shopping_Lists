@@ -39,9 +39,9 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
 
     @Override
     public List_category getByPrimaryKey(Integer id) throws DAOException {
-        try{
+        try {
             return getList_category(id, CON);
-        } catch(SQLException ex){
+        } catch (SQLException ex) {
             throw new DAOException("Cannot get list_category by id " + id, ex);
         }
     }
@@ -49,7 +49,7 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     @Override
     public void insert(List_category list_category) throws DAOException {
         checkParam(list_category, false);
-        
+
         String query = "INSERT INTO " + L_CAT_TABLE + " (name, description) VALUES (?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_category.getName());
@@ -93,10 +93,11 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     }
 
     @Override
-    public List<Prod_category> getProd_categories(List_category list_category) throws DAOException {
+    public List<Prod_category> getProd_categories(List_category list_category, boolean own) throws DAOException {
         checkParam(list_category, true);
 
-        String query = "SELECT * FROM " + P_CAT_TABLE + " WHERE ID IN (SELECT ID FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT = ?)";
+        String comparator = own ? "" : "NOT";
+        String query = "SELECT * FROM " + P_CAT_TABLE + " WHERE ID " + comparator + " IN (SELECT PRODUCT_CAT FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_category.getId());
 
@@ -132,7 +133,7 @@ public class JDBC_List_categoryDAO extends JDBC_DAO<List_category, Integer> impl
     public void removeProd_category(List_category list_category, Prod_category prod_category) throws DAOException {
         checkParam(list_category, true);
         checkParam(prod_category, true);
-        
+
         String query = "DELETE FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT = ? AND PRODUCT_CAT = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_category.getId());

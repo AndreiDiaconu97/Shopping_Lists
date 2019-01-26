@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface List_categoryDAO extends DAO<List_category, Integer> {
 
-    public List<Prod_category> getProd_categories(List_category list_category) throws DAOException;
+    public List<Prod_category> getProd_categories(List_category list_category, boolean own) throws DAOException;
 
     public void insertProd_category(List_category list_category, Prod_category prod_category) throws DAOException;
 

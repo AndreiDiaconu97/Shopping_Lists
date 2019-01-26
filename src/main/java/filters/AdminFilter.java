@@ -50,16 +50,18 @@ public class AdminFilter implements Filter {
         // such as the parameters.
         if (request instanceof HttpServletRequest) {
             ServletContext servletContext = ((HttpServletRequest) request).getServletContext();
+            String contextPath = servletContext.getContextPath();
+            if (!contextPath.endsWith("/")) {
+                contextPath += "/";
+            }
             HttpSession session = ((HttpServletRequest) request).getSession(false);
             User user = null;
             if (session != null) {
                 user = (User) session.getAttribute("user");
             }
-            if (user.getIs_admin() == false) {
-                String contextPath = servletContext.getContextPath();
-                if (!contextPath.endsWith("/")) {
-                    contextPath += "/";
-                }
+            if (user == null) {
+                ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(contextPath + "login.html"));
+            } else if (user.getIs_admin() == false) {
                 ((HttpServletResponse) response).sendRedirect(((HttpServletResponse) response).encodeRedirectURL(contextPath + "login.html?status=notadmin"));
             }
         }

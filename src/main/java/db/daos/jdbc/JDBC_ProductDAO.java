@@ -97,7 +97,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
                 return products;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Cannot get fitered products: " + ex);
+            throw new DAOException("Cannot get fitered products" + ex, ex);
         }
     }
 

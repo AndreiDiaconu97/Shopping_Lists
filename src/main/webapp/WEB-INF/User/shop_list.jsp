@@ -64,16 +64,7 @@
         contextPath += "/";
     }
 
-    // check user
-    User user = null;
-    if (session != null) {
-        user = (User) session.getAttribute("user");
-    }
-    if (user == null) {
-        if (!response.isCommitted()) {
-            response.sendRedirect(response.encodeRedirectURL(contextPath + "login.html"));
-        }
-    }
+    User user = (User) session.getAttribute("user");
 
     // check shopping list
     String shop_list_Param = request.getParameter("shop_listID");
