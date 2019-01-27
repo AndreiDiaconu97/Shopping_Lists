@@ -87,7 +87,7 @@ public class ProductServlet extends HttpServlet {
                     Integer cat_id = Integer.parseInt(request.getParameter("category"));
                     Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
                     Product product = new Product(name, p_cat, user, description);
-                    product.setId(Integer.parseInt(request.getParameter("id")));
+                    product.setId(Integer.parseInt(request.getParameter("productID")));
                     productDao.update(product);
                     System.err.println("Ok, product modified: " + product.getId());
                 } catch (DAOException ex) {

@@ -332,10 +332,10 @@
                                     </div>
                                     <div class="row ml-auto my-auto mr-1 pt-2">
                                         <div class="input-group">
-                                            <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">
+                                            <button type="button" id="modifyProdBtn${product.id}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#editProductModal" onclick="fillEditProductForm(${product.id})">
                                                 <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
                                             </button>
-                                            <button type="button" id="deleteProdBtn${i}" style="background-color: crimson" class="btn btn-info btn-sm shadow-sm mr-2">
+                                            <button type="button" id="deleteProdBtn${product.id}" class="btn btn-info btn-sm shadow-sm mr-2" style="background-color: crimson">
                                                 <i class="fa fa-trash mr-auto" style="font-size: 28px"></i>
                                             </button>
                                         </div>
@@ -460,32 +460,33 @@
             </div>
         </div>
 
-                        <!--Edit product modal-->
+        <!--Edit product modal-->
         <div class="modal modal-fluid" id="editProductModal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
-                        <h5 class="modal-title">Create a product</h5>
+                        <h5 class="modal-title">Edit product</h5>
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST">
-                        <input type="hidden" name="action" value="create"/>
+                    <form id="editProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="action" value="edit"/>
+                        <input type="hidden" name="productID" value="" id="editProductForm-prodID"/>
                         <div class="modal-body mx-3">
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="productForm">Product name</label>
-                                <input type="text" class="form-control validate" name="name"/>
+                                <input type="text" class="form-control validate" name="name" id="editProductForm-name"/>
                             </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-align-left prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="productForm">Description</label>
-                                <textarea class="form-control validate" name="description"></textarea>
+                                <textarea class="form-control validate" name="description" id="editProductForm-description"></textarea>
                             </div>
                             <div class="input-group">
-                                <select class="form-control" name="category">
+                                <select class="form-control" name="category" id="editProductForm-category">
                                     <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
                                         <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
                                     </c:forEach>
@@ -497,7 +498,7 @@
                         </div>
                     </form>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#createProductForm')[0].submit()">Create</button> 
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#editProductForm')[0].submit()">Create</button> 
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -512,6 +513,9 @@
 
 
         <script>
+            var currentProducts = ${Product.toJSON(userProducts)};
+            var prod_categories = ${Prod_category.toJSON(prod_categories)};
+
             function searchLists(shared) {
                 let id = shared === true ? 'sl' : 'ml';
                 let sortby = $('#' + id + '-search-sort')[0].value;
@@ -559,6 +563,7 @@
             }
 
             function searchProducts() {
+                console.log('SEARCHING PRODUCTS');
                 let sortby = $('#p-search-sort')[0].value;
                 let pcatID = $('#p-search-cat')[0].value;
                 let name = $('#p-search-name')[0].value;
@@ -566,6 +571,7 @@
                 xmlHttp.onreadystatechange = function () {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         let products = JSON.parse(xmlHttp.responseText);
+                        currentProducts = products;
                         let innerhtml = "";
                         for (p of products) {
                             innerhtml = innerhtml
@@ -578,8 +584,11 @@
                                     + '</div>'
                                     + '<div class="row ml-auto my-auto mr-1 pt-2">'
                                     + '<div class="input-group">'
-                                    + '<button type="button" id="modifyProdBtn' + products.indexOf(p) + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">'
-                                    + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                                    + '<button type="button" id="modifyProdBtn'+p.id+'" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#editProductModal" onclick="fillEditProductForm(' +p.id + ')">'
+                                    + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'            
+                                    + '</button>'
+                                    + '<button type="button" id="deleteProdBtn'+p.id+'" style="background-color: crimson" class="btn btn-info btn-sm shadow-sm mr-2">'
+                                    + '<i class="fa fa-trash mr-auto" style="font-size: 28px"></i>'            
                                     + '</button>'
                                     + '</div>'
                                     + '</div>'
@@ -597,6 +606,15 @@
                 }
                 xmlHttp.open("GET", url, true); // true for asynchronous 
                 xmlHttp.send(null);
+            }
+
+            function fillEditProductForm(id) {
+                let prod = currentProducts.filter(p => p.id === id)[0];
+                console.log('Editing prod id: ' + id + '\nProd:\n' + prod);
+                $('#editProductForm-prodID')[0].value = prod.id;
+                $('#editProductForm-name')[0].value = prod.name;
+                $('#editProductForm-description')[0].innerHTML = prod.description;
+                $('#editProductForm-category')[0].selectedIndex = prod_categories.findIndex(c => c.id===prod.category.id);
             }
 
             function getRGB(purchased, total) {
