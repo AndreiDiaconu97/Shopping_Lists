@@ -218,12 +218,14 @@ public class ShoppingListServlet extends HttpServlet {
                     User user = (User) session.getAttribute("user");
                     String name = request.getParameter("name");
                     String description = request.getParameter("description");
-                    Integer cat_id = Integer.valueOf(request.getParameter("category"));
+                    Integer cat_id = Integer.parseInt(request.getParameter("category"));
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
                     List_reg list = new List_reg(name, user, l_cat, description);
                     list_regDao.insert(list);
+                    System.err.println("Ok, list created: " + list.getId());
                 } catch (Exception ex) {
                     System.err.println("Cannot insert list: " + ex.getMessage());
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
@@ -238,9 +240,10 @@ public class ShoppingListServlet extends HttpServlet {
                     List_reg list = new List_reg(name, user, l_cat, description);
                     list.setId(Integer.parseInt(request.getParameter("listID")));
                     list_regDao.update(list);
-                    System.err.println("Ok, lista modificata:" + list.getId());
+                    System.err.println("Ok, list modified: " + list.getId());
                 } catch (DAOException ex) {
-                    System.err.println("Errore in modifica lista");
+                    System.err.println("Cannot edit list");
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
@@ -248,14 +251,11 @@ public class ShoppingListServlet extends HttpServlet {
                 Integer id = Integer.parseInt(request.getParameter("list_id"));
                 try {
                     List_reg list = list_regDao.getByPrimaryKey(id);
-                    try {
-                        list_regDao.delete(list);
-                        System.err.println("List deleted");
-                    } catch (DAOException ex) {
-                        System.err.println("Impossible to delete selected list");
-                    }
+                    list_regDao.delete(list);
+                    System.err.println("Ok, list deleted");
                 } catch (DAOException ex) {
-                    System.err.println("Impossible to retrieve list by given ID");
+                    System.err.println("Impossible to delete list by given ID");
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
@@ -269,14 +269,18 @@ public class ShoppingListServlet extends HttpServlet {
                     list_regDao.insertProduct(list_reg, product, amount);
                 } catch (DAOException ex) {
                     System.err.println("Cannot add product to list");
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
             default:
                 System.err.println("ShoppingListServlet: unsupported parameter");
+                response.sendRedirect(contextPath + "error.html");
                 break;
         }
-        response.sendRedirect(contextPath + "restricted/homepage.html");
+        if (!response.isCommitted()) {
+            response.sendRedirect(contextPath + "restricted/homepage.html");
+        }
     }
 
     @Override

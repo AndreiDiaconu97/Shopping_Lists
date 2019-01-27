@@ -36,6 +36,10 @@
         <servlet-name>ListSearchServlet</servlet-name>
         <servlet-class>servlets.user.ListSearchServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProductServlet</servlet-name>
+        <servlet-class>servlets.user.ProductServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Homepage_jsp</servlet-name>
         <url-pattern>/restricted/homepage.html</url-pattern>
@@ -103,6 +107,10 @@
     <servlet-mapping>
         <servlet-name>ListSearchServlet</servlet-name>
         <url-pattern>/restricted/list.search</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductServlet</servlet-name>
+        <url-pattern>/restricted/product.handler</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

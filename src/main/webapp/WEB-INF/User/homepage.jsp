@@ -128,7 +128,7 @@
                 <i class="fa fa-shopping-cart" style="font-size:30px"></i>
                 Shopping lists
             </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -156,33 +156,33 @@
         </main>
         <nav>
             <div class="nav nav-tabs nav-justified shadow-sm" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link my-auto active" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab" aria-controls="nav-myLists" aria-selected="true">
+                <a class="nav-item nav-link my-auto active" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab">
                     <h5>my lists</h5>
                 </a>
-                <a class="nav-item nav-link my-auto mx-1" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab" aria-controls="nav-sharedLists" aria-selected="false">
+                <a class="nav-item nav-link my-auto mx-1" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab">
                     <h5>shared with me</h5>
                 </a>
-                <a class="nav-item nav-link my-auto" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab" aria-controls="nav-myProducts" aria-selected="false">
+                <a class="nav-item nav-link my-auto" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab">
                     <h5>my products</h5>
                 </a>
             </div>
         </nav>
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-myLists" role="tabpanel" aria-labelledby="nav-myLists">
+            <div class="tab-pane fade show active" id="nav-myLists" role="tabpanel">
                 <div class="row  mx-1">
                     <div class="row ml-auto mr-1 mt-2">
                         <div class="row ml-2 mr-0 my-2">
                             <div class="input-group my-auto">
-                                <select class="custom-select" id="ml-search-sort">
+                                <select class="custom-select" id="ml-search-sort" onchange="searchLists()">
                                     <option value="Name" selected>Name</option>
-                                    <option value="Completion">Completion</option>
-                                    <option value="Completion desc">Completion desc</option>
+                                    <option value="Completion >">Completion ></option>
+                                    <option value="Completion <">Completion <</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row mx-2 my-2">
                             <div class="input-group my-auto">
-                                <select class="custom-select" id="ml-search-cat">
+                                <select class="custom-select" id="ml-search-cat" onchange="searchLists()">
                                     <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
@@ -196,7 +196,7 @@
                                 <button class="btn btn-outline-success" onclick="searchLists()">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>
-                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#importListModal" data-toggle="modal">          
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createListModal" data-toggle="modal">          
                                     <i class="fa fa-plus mr-auto"></i>
                                 </button>
                             </div>
@@ -224,21 +224,21 @@
                     </c:forEach>
                 </div>
             </div>
-            <div class="tab-pane fade" id="nav-sharedLists" role="tabpanel" aria-labelledby="nav-sharedLists">
+            <div class="tab-pane fade" id="nav-sharedLists" role="tabpanel">
                 <div class="row  mx-1">
                     <div class="row ml-auto mr-1 mt-2">
                         <div class="row ml-2 mr-0 my-2">
                             <div class="input-group my-auto">
-                                <select class="custom-select" id="sl-search-sort">
+                                <select class="custom-select" id="sl-search-sort" onchange="searchLists(true)">
                                     <option value="Name" selected>Name</option>
-                                    <option value="Completion">Completion</option>
-                                    <option value="Completion desc">Completion desc</option>
+                                    <option value="Completion >">Completion ></option>
+                                    <option value="Completion <">Completion <</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row mx-2 my-2">
                             <div class="input-group my-auto">
-                                <select class="custom-select" id="sl-search-cat">
+                                <select class="custom-select" id="sl-search-cat" onchange="searchLists(true)">
                                     <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
@@ -284,33 +284,32 @@
                     </c:forEach>
                 </div>
             </div>
-            <div class="tab-pane fade" id="nav-myProducts" role="tabpanel" aria-labelledby="nav-myProducts">
+            <div class="tab-pane fade" id="nav-myProducts" role="tabpanel">
                 <div class="row  mx-1">
                     <div class="row ml-auto mr-1 mt-2">
                         <div class="row ml-2 mr-0 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select">
-                                    <option value="-1" selected>sort by</option>
-                                    <option value="0">name [a-Z]</option>
-                                    <option value="1">name [Z-a]</option>
-                                    <option value="2">rating</option>
-                                    <option value="3">popularity</option>
+                            <div class="input-group my-auto" id="p-search-sort">
+                                <select class="custom-select" onchange="searchProducts()">
+                                    <option value="name">Name</option>
+                                    <option value="rating">Rating</option>
+                                    <option value="popularity">Popularity</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row mx-2 my-2">
                             <div class="input-group my-auto">
-                                <select class="custom-select">
-                                    <option value="-1" selected>all categories</option>
-                                    <option value="0">category 1</option>
-                                    <option value="1">category 2</option>
+                                <select class="custom-select" id="p-search-cat" onchange="searchProducts()">
+                                    <option value="-1" selected>All categories</option>
+                                    <c:forEach var="cat" items="${prod_categories}">
+                                        <option value="${cat.id}">${cat.name}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                         </div>
                         <div class="row ml-auto mx-2 my-2">
                             <div class="input-group">                            
-                                <input class="form-control" type="search" placeholder="your products..." aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">
+                                <input class="form-control" type="search" placeholder="your products..." id="p-search-name">
+                                <button class="btn btn-outline-success" onclick="searchProducts()">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>   
                                 <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProductModal" data-toggle="modal">          
@@ -320,7 +319,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="container-fluid">
+
+                <!--Loading products-->
+                <div class="container-fluid" id="p-div">
                     <c:forEach var = "product" items="${userProducts}">
                         <div class="card shadow-sm mb-2">
                             <div class="card-body">
@@ -331,8 +332,11 @@
                                     </div>
                                     <div class="row ml-auto my-auto mr-1 pt-2">
                                         <div class="input-group">
-                                            <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal" onclick="prodManageModalHandler()">
+                                            <button type="button" id="modifyProdBtn${i}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">
                                                 <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
+                                            </button>
+                                            <button type="button" id="deleteProdBtn${i}" style="background-color: crimson" class="btn btn-info btn-sm shadow-sm mr-2">
+                                                <i class="fa fa-trash mr-auto" style="font-size: 28px"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -353,8 +357,8 @@
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Create a list</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
                     <form id="createListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST">
@@ -372,8 +376,8 @@
                             </div>
                             <div class="input-group">
                                 <select name="category" class="form-control">
-                                    <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
-                                        <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
+                                    <c:forEach var="list_cat" items="${list_categories}" varStatus="i">
+                                        <option value="${list_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${list_cat.name}</option>
                                     </c:forEach>
                                 </select>
                                 <div class="input-group-append">
@@ -382,7 +386,7 @@
                             </div>
                         </div>
                         <div class="modal-footer form-horizontal">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$(createListForm).submit()">Confirm changes</button> 
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$(createListForm)[0].submit()">Confirm changes</button> 
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>
@@ -397,8 +401,8 @@
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Import friend's lists</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -419,38 +423,81 @@
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Create a product</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body mx-3">
-                        <div class="md-form mb-3">
-                            <i class="fa fa-bookmark prefix grey-text"></i>
-                            <label data-error="error" data-success="success" for="productForm">Product name</label>
-                            <input type="text" class="form-control validate" name="name"/>
-                        </div>
-                        <div class="md-form mb-3">
-                            <i class="fa fa-align-left prefix grey-text"></i>
-                            <label data-error="error" data-success="success" for="productForm">Description</label>
-                            <textarea class="form-control validate" name="description"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <select class="form-control">
-                                <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
-                                    <option value=${prod_cat.id} <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
-                                </c:forEach>
-                                <option value="volvo" selected>Volvo</option>
-                                <option value="saab">Saab</option>
-                                <option value="mercedes">Mercedes</option>
-                                <option value="audi">Audi</option>
-                            </select>
-                            <div class="input-group-append">
-                                <span class="input-group-text">Category</span>
+                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="action" value="create"/>
+                        <div class="modal-body mx-3">
+                            <div class="md-form mb-3">
+                                <i class="fa fa-bookmark prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="productForm">Product name</label>
+                                <input type="text" class="form-control validate" name="name"/>
+                            </div>
+                            <div class="md-form mb-3">
+                                <i class="fa fa-align-left prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="productForm">Description</label>
+                                <textarea class="form-control validate" name="description"></textarea>
+                            </div>
+                            <div class="input-group">
+                                <select class="form-control" name="category">
+                                    <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
+                                        <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
+                                    </c:forEach>
+                                </select>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Category</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#createProductForm')[0].submit()">Create</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                        <!--Edit product modal-->
+        <div class="modal modal-fluid" id="editProductModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                        <h5 class="modal-title">Create a product</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="action" value="create"/>
+                        <div class="modal-body mx-3">
+                            <div class="md-form mb-3">
+                                <i class="fa fa-bookmark prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="productForm">Product name</label>
+                                <input type="text" class="form-control validate" name="name"/>
+                            </div>
+                            <div class="md-form mb-3">
+                                <i class="fa fa-align-left prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="productForm">Description</label>
+                                <textarea class="form-control validate" name="description"></textarea>
+                            </div>
+                            <div class="input-group">
+                                <select class="form-control" name="category">
+                                    <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
+                                        <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
+                                    </c:forEach>
+                                </select>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Category</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-footer form-horizontal">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#createProductForm')[0].submit()">Create</button> 
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -466,10 +513,10 @@
 
         <script>
             function searchLists(shared) {
-                let ids = shared === true ? 'sl' : 'ml';
-                let sortby = $('#' + ids + '-search-sort')[0].value;
-                let lcatID = $('#' + ids + '-search-cat')[0].value;
-                let name = $('#' + ids + '-search-name')[0].value;
+                let id = shared === true ? 'sl' : 'ml';
+                let sortby = $('#' + id + '-search-sort')[0].value;
+                let lcatID = $('#' + id + '-search-cat')[0].value;
+                let name = $('#' + id + '-search-name')[0].value;
                 let xmlHttp = new XMLHttpRequest();
                 xmlHttp.onreadystatechange = function () {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
@@ -496,7 +543,7 @@
                                     + '</a>';
                             innerhtml += lhtml;
                         }
-                        $('#' + ids + '-div')[0].innerHTML = innerhtml;
+                        $('#' + id + '-div')[0].innerHTML = innerhtml;
                     }
                 };
 
@@ -510,6 +557,48 @@
                 xmlHttp.open("GET", url, true); // true for asynchronous 
                 xmlHttp.send(null);
             }
+
+            function searchProducts() {
+                let sortby = $('#p-search-sort')[0].value;
+                let pcatID = $('#p-search-cat')[0].value;
+                let name = $('#p-search-name')[0].value;
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                        let products = JSON.parse(xmlHttp.responseText);
+                        let innerhtml = "";
+                        for (p of products) {
+                            innerhtml = innerhtml
+                                    + '<div class="card shadow-sm mb-2">'
+                                    + '<div class="card-body">'
+                                    + '<div class="row">'
+                                    + '<img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                                    + '<div class="text-left my-auto">'
+                                    + p.name
+                                    + '</div>'
+                                    + '<div class="row ml-auto my-auto mr-1 pt-2">'
+                                    + '<div class="input-group">'
+                                    + '<button type="button" id="modifyProdBtn' + products.indexOf(p) + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">'
+                                    + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                                    + '</button>'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '</div>';
+                        }
+                        $('#p-div')[0].innerHTML = innerhtml;
+                    }
+                };
+
+                let url = "${contextPath}product.search?sortby=" + sortby + "&name=" + name + "&publics=false";
+                if (pcatID !== "-1") {
+                    url += "&category=" + pcatID;
+                }
+                xmlHttp.open("GET", url, true); // true for asynchronous 
+                xmlHttp.send(null);
+            }
+
             function getRGB(purchased, total) {
                 purchased++;
                 total++;

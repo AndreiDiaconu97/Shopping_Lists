@@ -88,7 +88,6 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
             if (prod_category != null) {
                 stm.setInt(3, prod_category.getId());
             }
-            System.err.println("FilterProducts query:\n" + query + "\n\n");
             try (ResultSet rs = stm.executeQuery()) {
                 List<Product> products = new ArrayList<>();
                 while (rs.next()) {
@@ -105,14 +104,12 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
     public void insert(Product product) throws DAOException {
         checkParam(product, false);
 
-        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator, num_votes, rating) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + P_TABLE + " (name, description, category, creator) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, product.getName());
             stm.setString(2, product.getDescription());
             stm.setInt(3, product.getCategory().getId());
             stm.setInt(4, product.getCreator().getId());
-            stm.setInt(5, product.getNum_votes());
-            stm.setFloat(6, product.getRating());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();

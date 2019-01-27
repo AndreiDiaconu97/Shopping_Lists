@@ -105,7 +105,7 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 			items = items.unique();
 		}
 	}
-	let owner = Math.random() > 0.7 ? 1 : Math.floor(Math.random() * (TOT_USERS / 2)) + 5;
+	let owner = Math.random() > 0.8 ? 4 : Math.floor(Math.random() * (TOT_USERS / 2)) + 5;
 	let shared = [];
 	for (let s = 0; s < 5; s++) {
 		let sh = Math.random() > 0.6 ? [4, 5].randomItem() : Math.floor(Math.random() * (TOT_USERS / 2));
@@ -213,8 +213,10 @@ fs.appendFileSync(filename, query);
 
 query = "";
 for (p of prods) {
-	query += `INSERT INTO APP.PRODUCTS ("NAME", DESCRIPTION, CATEGORY, CREATOR) `;
-	query += `VALUES ('${p.Name.replace(/['"]+/g, '')}','${p.Description.replace(/['"]+/g, '')}',${p.Category + 1},${p.Creator + 1});\n`;
+	let num_votes = Math.random() > 0.2 ? Math.floor(Math.random() * 100) + 10 : 0;
+	let rating = num_votes === 0 ? 0 : Math.random() * 5;
+	query += `INSERT INTO APP.PRODUCTS ("NAME", DESCRIPTION, CATEGORY, CREATOR, RATING, NUM_VOTES) `;
+	query += `VALUES ('${p.Name.replace(/['"]+/g, '')}','${p.Description.replace(/['"]+/g, '')}',${p.Category + 1},${p.Creator + 1},${rating},${num_votes});\n`;
 }
 query += "\n\n\n\n";
 fs.appendFileSync(filename, query);
