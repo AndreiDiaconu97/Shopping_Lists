@@ -25,8 +25,6 @@ public interface List_anonymousDAO extends DAO<List_anonymous, Integer> {
 
     public Integer getAmountPurchased(List_anonymous list_anonymous, Product product) throws DAOException;
     
-    public Integer getFullyPurchasedCount(List_anonymous list_anonymous) throws DAOException;
-    
     public Timestamp getLastPurchase(List_anonymous list_anonymous, Product product) throws DAOException;
 
     public void updateAmountTotal(List_anonymous list_anonymous, Product product, Integer total) throws DAOException;

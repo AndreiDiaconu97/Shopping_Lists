@@ -238,7 +238,7 @@ public class ShoppingListServlet extends HttpServlet {
                 try {
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
                     List_reg list = new List_reg(name, user, l_cat, description);
-                    list.setId(Integer.parseInt(request.getParameter("listID")));
+                    list.setId(Integer.parseInt(request.getParameter("list_id")));
                     list_regDao.update(list);
                     System.err.println("Ok, list modified: " + list.getId());
                 } catch (DAOException ex) {
@@ -279,7 +279,7 @@ public class ShoppingListServlet extends HttpServlet {
                 break;
         }
         if (!response.isCommitted()) {
-            response.sendRedirect(contextPath + "restricted/homepage.html");
+            response.sendRedirect(contextPath + "restricted/homepage.html?tab="+request.getParameter("tab"));
         }
     }
 

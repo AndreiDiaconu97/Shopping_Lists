@@ -87,7 +87,7 @@ public class ProductServlet extends HttpServlet {
                     Integer cat_id = Integer.parseInt(request.getParameter("category"));
                     Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
                     Product product = new Product(name, p_cat, user, description);
-                    product.setId(Integer.parseInt(request.getParameter("productID")));
+                    product.setId(Integer.parseInt(request.getParameter("prodID")));
                     productDao.update(product);
                     System.err.println("Ok, product modified: " + product.getId());
                 } catch (DAOException ex) {
@@ -98,7 +98,7 @@ public class ProductServlet extends HttpServlet {
             }
             case "delete": {
                 try {
-                    Integer id = Integer.parseInt(request.getParameter("list_id"));
+                    Integer id = Integer.parseInt(request.getParameter("prodID"));
                     Product product = productDao.getByPrimaryKey(id);
                     productDao.delete(product);
                     System.err.println("Ok, product deleted");
@@ -109,12 +109,12 @@ public class ProductServlet extends HttpServlet {
                 break;
             }
             default:
-                System.err.println("ShoppingListServlet: unsupported parameter");
+                System.err.println("ProductServlet: unsupported parameter");
                 response.sendRedirect(contextPath + "error.html");
                 break;
         }
         if (!response.isCommitted()) {
-            response.sendRedirect(contextPath + "restricted/homepage.html#nav-myProducts");
+            response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
         }
     }
 

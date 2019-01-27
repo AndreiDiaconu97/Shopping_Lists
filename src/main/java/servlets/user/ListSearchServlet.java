@@ -11,7 +11,6 @@ import db.daos.UserDAO;
 import db.entities.List_category;
 import db.entities.List_reg;
 import db.entities.User;
-import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  *
@@ -30,7 +28,6 @@ import org.json.JSONObject;
  */
 public class ListSearchServlet extends HttpServlet {
 
-    private List_regDAO list_regDao;
     private List_categoryDAO list_categoryDao;
     private UserDAO userDao;
 
@@ -40,11 +37,6 @@ public class ListSearchServlet extends HttpServlet {
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
         if (daoFactory == null) {
             throw new ServletException("Impossible to get dao factory");
-        }
-        try {
-            list_regDao = daoFactory.getDAO(List_regDAO.class);
-        } catch (DAOFactoryException ex) {
-            throw new ServletException("Impossible to get dao for lists", ex);
         }
         try {
             list_categoryDao = daoFactory.getDAO(List_categoryDAO.class);
@@ -85,28 +77,20 @@ public class ListSearchServlet extends HttpServlet {
             switch (sortby_s) {
                 case "Completion >":
                     searched.sort((l, r) -> {
-                        try {
-                            int p_l = list_regDao.getFullyPurchasedCount(l);
-                            int t_l = list_regDao.getProducts(l).size();
-                            int p_r = list_regDao.getFullyPurchasedCount(r);
-                            int t_r = list_regDao.getProducts(r).size();
-                            return (100 * ++p_r / ++t_r) - (100 * ++p_l / ++t_l);
-                        } catch (DAOException ex) {
-                            return 0;
-                        }
+                        int p_l = l.getPurchased();
+                        int t_l = l.getTotal();
+                        int p_r = r.getPurchased();
+                        int t_r = r.getTotal();
+                        return (100 * ++p_r / ++t_r) - (100 * ++p_l / ++t_l);
                     });
                     break;
                 case "Completion <":
                     searched.sort((l, r) -> {
-                        try {
-                            int p_l = list_regDao.getFullyPurchasedCount(l);
-                            int t_l = list_regDao.getProducts(l).size();
-                            int p_r = list_regDao.getFullyPurchasedCount(r);
-                            int t_r = list_regDao.getProducts(r).size();
-                            return (100 * ++p_l / ++t_l) - (100 * ++p_r / ++t_r);
-                        } catch (DAOException e) {
-                            return 0;
-                        }
+                        int p_l = l.getPurchased();
+                        int t_l = l.getTotal();
+                        int p_r = r.getPurchased();
+                        int t_r = r.getTotal();
+                        return (100 * ++p_l / ++t_l) - (100 * ++p_r / ++t_r);
                     });
                     break;
                 default:// name or nothing
@@ -115,12 +99,6 @@ public class ListSearchServlet extends HttpServlet {
             }
 
             JSONArray searchedJSON = List_reg.toJSON(searched);
-
-            for (int i = 0; i < searchedJSON.length(); i++) {
-                JSONObject list = searchedJSON.getJSONObject(i);
-                list.put("purchased", list_regDao.getFullyPurchasedCount(list_regDao.getByPrimaryKey(list.getInt("id"))));
-                list.put("total", list_regDao.getProducts(list_regDao.getByPrimaryKey(list.getInt("id"))).size());
-            }
 
             response.setCharacterEncoding("UTF-8");
             response.getWriter().print(searchedJSON);

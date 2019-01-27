@@ -111,6 +111,7 @@ public class User implements Serializable {
         obj.put("id", id);
         obj.put("email", email);
         obj.put("firstname", firstname);
+        obj.put("lastname", lastname);
         return obj;
     }
 

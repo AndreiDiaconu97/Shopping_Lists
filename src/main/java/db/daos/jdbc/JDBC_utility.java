@@ -112,7 +112,7 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToUser(rs, con) : null;
     }
 
@@ -135,10 +135,10 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToProduct(rs, con) : null;
     }
-    
+
     public static Product resultSetToProduct(ResultSet rs, Connection con) throws SQLException {
         Product product = new Product();
         product.setCategory(getProd_category(rs.getInt("CATEGORY"), con));
@@ -150,7 +150,7 @@ public abstract class JDBC_utility {
         product.setRating(rs.getFloat("RATING"));
         return product;
     }
-    
+
     public static List_reg getList_reg(Integer id, Connection con) throws SQLException {
         if (id == null) {
             throw new SQLException("Given id is empty");
@@ -159,19 +159,34 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToList_reg(rs, con) : null;
     }
 
     public static List_reg resultSetToList_reg(ResultSet rs, Connection con) throws SQLException {
         List_reg list_reg = new List_reg();
-        list_reg.setCategory(getList_category(rs.getInt("CATEGORY"), con));
-        list_reg.setDescription(rs.getString("DESCRIPTION"));
         list_reg.setId(rs.getInt("ID"));
         list_reg.setName(rs.getString("NAME"));
+        list_reg.setDescription(rs.getString("DESCRIPTION"));
+        list_reg.setCategory(getList_category(rs.getInt("CATEGORY"), con));
         list_reg.setOwner(getUser(rs.getInt("OWNER"), con));
+        
+        String query = "SELECT COUNT(*) FROM " + L_P_TABLE + " WHERE LIST=? AND PURCHASED=AMOUNT";
+        PreparedStatement stm = con.prepareStatement(query);
+        stm.setInt(1, list_reg.getId());
+        ResultSet rs_p = stm.executeQuery();
+        list_reg.setPurchased(rs_p.next() ? rs_p.getInt(1) : 0);
+        
+        query = "SELECT COUNT(*) FROM " + L_P_TABLE + " WHERE LIST=?";
+        stm = con.prepareStatement(query);
+        stm.setInt(1, list_reg.getId());
+        ResultSet rs_t = stm.executeQuery();
+        list_reg.setTotal(rs_t.next() ? rs_t.getInt(1) : 0);
+        
         return list_reg;
     }
+
+    
 
     public static NV_User getNV_User(String email, Connection con) throws SQLException {
         if (email == null) {
@@ -181,10 +196,10 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setString(1, email);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToNV_User(rs, con) : null;
     }
-    
+
     public static NV_User resultSetToNV_User(ResultSet rs, Connection con) throws SQLException {
         NV_User nv_user = new NV_User();
         nv_user.setEmail(rs.getString("EMAIL"));
@@ -194,7 +209,7 @@ public abstract class JDBC_utility {
         nv_user.setCode(rs.getString("VERIFICATION_CODE"));
         return nv_user;
     }
-    
+
     public static List_anonymous getList_anonymous(Integer id, Connection con) throws SQLException {
         if (id == null) {
             throw new SQLException("Given id is empty");
@@ -203,7 +218,7 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToList_anonymous(rs, con) : null;
     }
 
@@ -214,9 +229,22 @@ public abstract class JDBC_utility {
         list_anonymous.setId(rs.getInt("ID"));
         list_anonymous.setLast_seen(rs.getTimestamp("LAST_SEEN"));
         list_anonymous.setName(rs.getString("NAME"));
+        
+        String query = "SELECT COUNT(*) FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PURCHASED=AMOUNT";
+        PreparedStatement stm = con.prepareStatement(query);
+        stm.setInt(1, list_anonymous.getId());
+        ResultSet rs_p = stm.executeQuery();
+        list_anonymous.setPurchased(rs_p.next() ? rs_p.getInt(1) : 0);
+        
+        query = "SELECT COUNT(*) FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=?";
+        stm = con.prepareStatement(query);
+        stm.setInt(1, list_anonymous.getId());
+        ResultSet rs_t = stm.executeQuery();
+        list_anonymous.setTotal(rs_t.next() ? rs_t.getInt(1) : 0);
+        
         return list_anonymous;
     }
-    
+
     public static List_category getList_category(Integer id, Connection con) throws SQLException {
         if (id == null) {
             throw new SQLException("Given id is empty");
@@ -225,7 +253,7 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToList_category(rs, con) : null;
     }
 
@@ -236,7 +264,7 @@ public abstract class JDBC_utility {
         list_category.setDescription(rs.getString("DESCRIPTION"));
         return list_category;
     }
-    
+
     public static Prod_category getProd_category(Integer id, Connection con) throws SQLException {
         if (id == null) {
             throw new SQLException("Given id is empty");
@@ -245,7 +273,7 @@ public abstract class JDBC_utility {
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, id);
         ResultSet rs = stm.executeQuery();
-        
+
         return rs.next() ? resultSetToProd_category(rs, con) : null;
     }
 
@@ -263,8 +291,8 @@ public abstract class JDBC_utility {
         PRODUCTS,
         FULL
     }
-    
-    public enum SortBy{
+
+    public enum SortBy {
         NAME,
         RATING,
         POPULARITY

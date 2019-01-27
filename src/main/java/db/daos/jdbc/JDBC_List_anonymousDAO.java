@@ -181,26 +181,6 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("Impossible to get purchased amount", ex);
         }
     }
-
-    @Override
-    public Integer getFullyPurchasedCount(List_anonymous list) throws DAOException {
-        checkParam(list, true);
-        
-        String query = "SELECT COUNT(*) FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PURCHASED=AMOUNT GROUP BY LIST_ANONYMOUS";
-        try (PreparedStatement stm = CON.prepareStatement(query)) {
-            stm.setInt(1, list.getId());
-
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                } else {
-                    return 0;
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DAOException("Impossible to get purchased items", ex);
-        }
-    }
     
     @Override
     public Timestamp getLastPurchase(List_anonymous list, Product product) throws DAOException {

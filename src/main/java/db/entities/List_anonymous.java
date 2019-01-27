@@ -23,6 +23,8 @@ public class List_anonymous implements Serializable {
     private String description;
     private List_category category;
     private Timestamp last_seen;
+    private Integer purchased;
+    private Integer total;
 
     public List_anonymous() {
     }
@@ -32,6 +34,8 @@ public class List_anonymous implements Serializable {
         this.description = description;
         this.category = category;
         this.last_seen = last_seen;
+        this.purchased = 0;
+        this.total = 0;
     }
 
     public Integer getId() {
@@ -74,6 +78,22 @@ public class List_anonymous implements Serializable {
         this.last_seen = last_seen;
     }
 
+    public Integer getPurchased() {
+        return purchased;
+    }
+
+    public void setPurchased(Integer purchased) {
+        this.purchased = purchased;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -105,6 +125,8 @@ public class List_anonymous implements Serializable {
         obj.put("name", name);
         obj.put("category", List_category.toJSON(category));
         obj.put("description", description);
+        obj.put("purchased", purchased);
+        obj.put("total", total);
         return obj;
     }
 

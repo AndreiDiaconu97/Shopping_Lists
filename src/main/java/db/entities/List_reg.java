@@ -22,6 +22,8 @@ public class List_reg implements Serializable {
     private User owner;
     private List_category category;
     private String description;
+    private Integer purchased;
+    private Integer total;
 
     public List_reg() {
     }
@@ -31,6 +33,8 @@ public class List_reg implements Serializable {
         this.owner = owner;
         this.category = category;
         this.description = description;
+        this.purchased = 0;
+        this.total = 0;
     }
 
     public Integer getId() {
@@ -75,6 +79,22 @@ public class List_reg implements Serializable {
         this.description = description;
     }
 
+    public Integer getPurchased() {
+        return purchased;
+    }
+
+    public void setPurchased(Integer purchased) {
+        this.purchased = purchased;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -107,6 +127,8 @@ public class List_reg implements Serializable {
         obj.put("category", List_category.toJSON(category));
         obj.put("description", description);
         obj.put("owner", User.toJSON(owner));
+        obj.put("purchased", purchased);
+        obj.put("total", total);
         return obj;
     }
 

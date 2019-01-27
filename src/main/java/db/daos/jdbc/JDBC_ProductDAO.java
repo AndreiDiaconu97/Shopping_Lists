@@ -55,12 +55,12 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         name = name.toUpperCase();
         String query = "";
         if (sortby == SortBy.POPULARITY) {
-            query = "SELECT ID, NAME, DESCRIPTION, CATEGORY, CREATOR, NUM_VOTES, RATING, FROM " + P_TABLE;
-            query += " LEFT OUTER JOIN " + L_P_TABLE + "\n";
+            query = "SELECT ID, NAME, DESCRIPTION, CATEGORY, CREATOR, NUM_VOTES, RATING FROM " + P_TABLE;
+            query += " LEFT OUTER JOIN " + L_P_TABLE + " ON " + P_TABLE + ".ID=" + L_P_TABLE + ".PRODUCT\n";
         } else {
             query = "SELECT * FROM " + P_TABLE + "\n";
         }
-        query += " WHERE UPPER_NAME LIKE '%' || ? || '%'\n";
+        query += "WHERE UPPER_NAME LIKE '%' || ? || '%'\n";
         query += "AND (CREATOR = ? ";
         if (includePublics) {
             query += " OR CREATOR IN (SELECT ID FROM " + U_TABLE + " WHERE IS_ADMIN=TRUE) ";
@@ -82,6 +82,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
                 query += "ORDER BY RATING DESC";
                 break;
         }
+        //System.err.println("Filter products query: " + query);
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setString(1, name);
             stm.setInt(2, user == null ? -1 : user.getId());
@@ -96,7 +97,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
                 return products;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Cannot get fitered products", ex);
+            throw new DAOException("Cannot get fitered products: " + ex);
         }
     }
 

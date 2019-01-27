@@ -78,17 +78,23 @@
 
     User user = (User) session.getAttribute("user");
 
+    String currentTab = "mylists";
+    if ("sharedlists".equals(request.getParameter("tab")) || "myproducts".equals(request.getParameter("tab"))) {
+        currentTab = request.getParameter("tab");
+    }
+    pageContext.setAttribute("currentTab", currentTab);
+
     List<List_reg> myLists;
     List<List_reg> sharedLists;
     List<List_category> list_categories;
-    List<Product> userProducts = productDao.filterProducts(null, null, user, false, SortBy.NAME);
-    List<Prod_category> prod_categories = prod_categoryDao.getAll();
+    List<Product> userProducts;
+    List<Prod_category> prod_categories;
 
     try {
         myLists = userDao.getOwnedLists(user);
         sharedLists = userDao.getSharedLists(user);
         list_categories = list_catDao.getAll();
-        userProducts = userDao.getProductsCreated(user);
+        userProducts = productDao.filterProducts(null, null, user, false, SortBy.POPULARITY);
         prod_categories = prod_categoryDao.getAll();
         pageContext.setAttribute("myLists", myLists);
         pageContext.setAttribute("sharedLists", sharedLists);
@@ -117,10 +123,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-        <script>
-            var myLists = ${List_reg.toJSON(myLists)};
-            var sharedLists = ${List_reg.toJSON(sharedLists)};
-        </script>
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
@@ -138,7 +140,7 @@
                     </li>                    
                     <li class="dropdown ml-auto">
                         <form class="form-inline" action="${contextPath}auth" method="POST" method="POST">
-                            <input class="form-control" type="hidden" name="action" value="logout" required>
+                            <input class="form-control" type="hidden" name="action" value="logout" required/>
                             <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
                         </form>
                     </li>
@@ -156,34 +158,34 @@
         </main>
         <nav>
             <div class="nav nav-tabs nav-justified shadow-sm" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link my-auto active" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab">
-                    <h5>my lists</h5>
-                </a>
-                <a class="nav-item nav-link my-auto mx-1" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab">
-                    <h5>shared with me</h5>
-                </a>
-                <a class="nav-item nav-link my-auto" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab">
-                    <h5>my products</h5>
-                </a>
-            </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-myLists" role="tabpanel">
-                <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
-                        <div class="row ml-2 mr-0 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="ml-search-sort" onchange="searchLists()">
-                                    <option value="Name" selected>Name</option>
-                                    <option value="Completion >">Completion ></option>
-                                    <option value="Completion <">Completion <</option>
-                                </select>
+                <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('mylists')}">active</c:if>" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab" onclick="changeTab('mylists')">
+                        <h5>My lists</h5>
+                    </a>
+                    <a class="nav-item nav-link my-auto mx-1 <c:if test="${currentTab.equals('sharedlists')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab" onclick="changeTab('sharedlists')">
+                        <h5>Shared with me</h5>
+                    </a>
+                    <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('myproducts')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab" onclick="changeTab('myproducts')">
+                        <h5>My products</h5>
+                    </a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade <c:if test="${currentTab.equals('mylists')}">show active</c:if>" id="nav-myLists" role="tabpanel">
+                    <div class="row  mx-1">
+                        <div class="row ml-auto mr-1 mt-2">
+                            <div class="row ml-2 mr-0 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="ml-search-sort" onchange="searchLists()">
+                                        <option value="Name" selected>Name</option>
+                                        <option value="Completion >">Completion ></option>
+                                        <option value="Completion <">Completion <</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mx-2 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="ml-search-cat" onchange="searchLists()">
-                                    <option value="-1" selected>All categories</option>
+                            <div class="row mx-2 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="ml-search-cat" onchange="searchLists()">
+                                        <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -203,43 +205,29 @@
                         </div>
                     </div>
                 </div>
+
                 <!--Loading my lists-->
                 <div class="row justify-content-center mx-auto" id="ml-div">
-                    <c:forEach var="list" items="${myLists}" varStatus="i">
-                        <c:set var="purchased" value="${list_regDao.getFullyPurchasedCount(list)+1}"/>
-                        <c:set var="total" value="${list_regDao.getProducts(list).size()+1}"/>
-                        <c:set var="bgcolor" value="rgb(${500*(total-purchased)/total},${500*purchased/total},0)"/>
-                        <a href="shopping.list.html?shop_listID=${list.id}" class="my-3 mx-4">
-                            <div class="card text-dark" style="width: 16rem; display: inline-block">
-                                <div class="card-header" style="font-weight: bold; background-color: ${bgcolor}">
-                                    <c:out value="${list.name}"/>
-                                </div>
-                                <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">
-                                <div class="card-footer text-muted" style="background-color: ${bgcolor}">
-                                    <c:out value="${list.category.name}"/>
-                                    <span class="badge badge-pill badge-secondary float-right">${purchased}/${total}</span>
-                                </div>
-                            </div>
-                        </a>
-                    </c:forEach>
                 </div>
             </div>
-            <div class="tab-pane fade" id="nav-sharedLists" role="tabpanel">
-                <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
-                        <div class="row ml-2 mr-0 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="sl-search-sort" onchange="searchLists(true)">
-                                    <option value="Name" selected>Name</option>
-                                    <option value="Completion >">Completion ></option>
-                                    <option value="Completion <">Completion <</option>
-                                </select>
+
+
+            <div class="tab-pane fade <c:if test="${currentTab.equals('sharedlists')}">show active</c:if>" id="nav-sharedLists" role="tabpanel">
+                    <div class="row  mx-1">
+                        <div class="row ml-auto mr-1 mt-2">
+                            <div class="row ml-2 mr-0 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="sl-search-sort" onchange="searchLists(true)">
+                                        <option value="Name" selected>Name</option>
+                                        <option value="Completion >">Completion ></option>
+                                        <option value="Completion <">Completion <</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mx-2 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="sl-search-cat" onchange="searchLists(true)">
-                                    <option value="-1" selected>All categories</option>
+                            <div class="row mx-2 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="sl-search-cat" onchange="searchLists(true)">
+                                        <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -259,47 +247,29 @@
                         </div>
                     </div>
                 </div>
+
                 <!--Loading shared lists-->
                 <div class="row justify-content-center mx-auto" id="sl-div">
-                    <c:forEach var="list" items="${sharedLists}" varStatus="i">
-                        <c:set var="purchased" value="${list_regDao.getFullyPurchasedCount(list)+1}"/>
-                        <c:set var="total" value="${list_regDao.getProducts(list).size()+1}"/>
-                        <c:set var="bgcolor" value="rgb(${500*(total-purchased)/total},${500*purchased/total},0)"/>
-                        <a href="shopping.list.html?shop_listID=${list.id}" class="my-3 mx-4">
-                            <div class="card text-dark" style="width: 16rem; display: inline-block">
-                                <div class="card-header" style="font-weight: bold; background-color: ${bgcolor}">
-                                    <c:out value="${list.name}"/>
-                                </div>
-                                <img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">
-                                <div class="card-body" style="font-size: 15px; text-align: right">
-                                    <c:out value="${list.owner.firstname} ${list.owner.lastname}"/>
-                                    <i class="fa fa-user" style="font-size:20px;"></i>
-                                </div>
-                                <div class="card-footer text-muted" style="background-color: ${bgcolor}">
-                                    <c:out value="${list.category.name}"/>
-                                    <span class="badge badge-pill badge-secondary float-right">${purchased}/${total}</span>
-                                </div>
-                            </div>
-                        </a>
-                    </c:forEach>
                 </div>
             </div>
-            <div class="tab-pane fade" id="nav-myProducts" role="tabpanel">
-                <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
-                        <div class="row ml-2 mr-0 my-2">
-                            <div class="input-group my-auto" id="p-search-sort">
-                                <select class="custom-select" onchange="searchProducts()">
-                                    <option value="name">Name</option>
-                                    <option value="rating">Rating</option>
-                                    <option value="popularity">Popularity</option>
-                                </select>
+
+
+            <div class="tab-pane fade <c:if test="${currentTab.equals('myproducts')}">show active</c:if>" id="nav-myProducts" role="tabpanel">
+                    <div class="row  mx-1">
+                        <div class="row ml-auto mr-1 mt-2">
+                            <div class="row ml-2 mr-0 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="p-search-sort" onchange="searchProducts()">
+                                        <option value="Name">Name</option>
+                                        <option value="Rating">Rating</option>
+                                        <option value="Popularity">Popularity</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mx-2 my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="p-search-cat" onchange="searchProducts()">
-                                    <option value="-1" selected>All categories</option>
+                            <div class="row mx-2 my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="p-search-cat" onchange="searchProducts()">
+                                        <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${prod_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -322,28 +292,6 @@
 
                 <!--Loading products-->
                 <div class="container-fluid" id="p-div">
-                    <c:forEach var = "product" items="${userProducts}">
-                        <div class="card shadow-sm mb-2">
-                            <div class="card-body">
-                                <div class="row">
-                                    <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                    <div class="text-left my-auto">
-                                        ${product.name}
-                                    </div>
-                                    <div class="row ml-auto my-auto mr-1 pt-2">
-                                        <div class="input-group">
-                                            <button type="button" id="modifyProdBtn${product.id}" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#editProductModal" onclick="fillEditProductForm(${product.id})">
-                                                <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
-                                            </button>
-                                            <button type="button" id="deleteProdBtn${product.id}" class="btn btn-info btn-sm shadow-sm mr-2" style="background-color: crimson">
-                                                <i class="fa fa-trash mr-auto" style="font-size: 28px"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
                 </div>
             </div>
         </div>
@@ -362,6 +310,7 @@
                         </button>
                     </div>
                     <form id="createListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                        <input type="hidden" name="tab" value="mylists" id="tab-input-0"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
                             <div class="md-form mb-3">
@@ -428,6 +377,7 @@
                         </button>
                     </div>
                     <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="tab" value="myproducts" id="tab-input-1"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
                             <div class="md-form mb-3">
@@ -472,8 +422,9 @@
                         </button>
                     </div>
                     <form id="editProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
                         <input type="hidden" name="action" value="edit"/>
-                        <input type="hidden" name="productID" value="" id="editProductForm-prodID"/>
+                        <input type="hidden" name="prodID" value="" id="editProductForm-prodID"/>
                         <div class="modal-body mx-3">
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
@@ -504,6 +455,29 @@
                 </div>
             </div>
         </div>
+                        
+        <!--Delete product modal-->
+        <div class="modal modal-centered" id="deleteProductModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <h5 class="modal-title">Delete product ?</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <form id="deleteProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                        <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
+                        <input type="hidden" name="action" value="delete"/>
+                        <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
+                    </form>
+                    <div class="modal-footer form-horizontal">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#deleteProductForm')[0].submit()">Delete</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <footer class="footer font-small blue pt-3">
             <div class="p-3 mb-2 bg-dark text-white">
@@ -513,108 +487,130 @@
 
 
         <script>
-            var currentProducts = ${Product.toJSON(userProducts)};
+            var user_products = ${Product.toJSON(userProducts)};
             var prod_categories = ${Prod_category.toJSON(prod_categories)};
+            var user_lists = ${List_reg.toJSON(myLists)};
+            var shared_lists = ${List_reg.toJSON(sharedLists)};
 
             function searchLists(shared) {
                 let id = shared === true ? 'sl' : 'ml';
                 let sortby = $('#' + id + '-search-sort')[0].value;
                 let lcatID = $('#' + id + '-search-cat')[0].value;
                 let name = $('#' + id + '-search-name')[0].value;
-                let xmlHttp = new XMLHttpRequest();
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                        let lists = JSON.parse(xmlHttp.responseText);
-                        let innerhtml = "";
-                        for (l of lists) {
-                            let lhtml = '<a href="shopping.list.html?shop_listID="' + l.id + ' class="my-3 mx-4">'
-                                    + '<div class="card text-dark" style="width: 16rem; display: inline-block">'
-                                    + '<div class="card-header" style="font-weight: bold; background-color: ' + getRGB(l.purchased, l.total) + '">'
-                                    + l.name
-                                    + '</div>'
-                                    + '<img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">';
-                            if (shared) {
-                                lhtml += '<div class="card-body" style="font-size: 15px; text-align: right">'
-                                        + l.owner.firstname + ' ' + l.owner.lastname
-                                        + '<i class="fa fa-user" style="font-size:20px;"></i>'
-                                        + '</div>';
-                            }
-                            lhtml += '<div class="card-footer text-muted" style="background-color: ' + getRGB(l.purchased, l.total) + '">'
-                                    + l.category.name
-                                    + '<span class="badge badge-pill badge-secondary float-right">' + l.purchased + '/' + l.total + '</span>'
-                                    + '</div>'
-                                    + '</div>'
-                                    + '</a>';
-                            innerhtml += lhtml;
-                        }
-                        $('#' + id + '-div')[0].innerHTML = innerhtml;
-                    }
-                };
-
-                let url = "${contextPath}restricted/list.search?sortby=" + sortby + "&name=" + name;
+                let lists = shared === true ? shared_lists : user_lists;
                 if (lcatID !== "-1") {
-                    url += "&category=" + lcatID;
+                    lists = lists.filter(l => l.category.id.toString() === lcatID);
                 }
-                if (shared) {
-                    url += "&shared=true";
+                lists = lists.filter(l => l.name.includes(name));
+                switch (sortby) {
+                    case "Completion >":
+                        lists.sort((l, r) => {
+                            let p_l = l.purchased;
+                            let t_l = l.total;
+                            let p_r = r.purchased;
+                            let t_r = r.total;
+                            return (100 * ++p_r / ++t_r) - (100 * ++p_l / ++t_l);
+                        });
+                        break;
+                    case "Completion <":
+                        lists.sort((l, r) => {
+                            let p_l = l.purchased;
+                            let t_l = l.total;
+                            let p_r = r.purchased;
+                            let t_r = r.total;
+                            return (100 * ++p_l / ++t_l) - (100 * ++p_r / ++t_r);
+                        });
+                        break;
+                    default:// name or nothing
+                        lists.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
                 }
-                xmlHttp.open("GET", url, true); // true for asynchronous 
-                xmlHttp.send(null);
+
+                let innerhtml = "";
+                for (l of lists) {
+                    let lhtml = '<a href="shopping.list.html?shop_listID="' + l.id + ' class="my-3 mx-4">'
+                            + '<div class="card text-dark" style="width: 16rem; display: inline-block">'
+                            + '<div class="card-header" style="font-weight: bold; background-color: ' + getRGB(l.purchased, l.total) + '">'
+                            + l.name
+                            + '</div>'
+                            + '<img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">';
+                    if (shared) {
+                        lhtml += '<div class="card-body" style="font-size: 15px; text-align: right">'
+                                + l.owner.firstname + ' ' + l.owner.lastname
+                                + '<i class="fa fa-user" style="font-size:20px;"></i>'
+                                + '</div>';
+                    }
+                    lhtml += '<div class="card-footer text-muted" style="background-color: ' + getRGB(l.purchased, l.total) + '">'
+                            + l.category.name
+                            + '<span class="badge badge-pill badge-secondary float-right">' + l.purchased + '/' + l.total + '</span>'
+                            + '</div>'
+                            + '</div>'
+                            + '</a>';
+                    innerhtml += lhtml;
+                }
+                $('#' + id + '-div')[0].innerHTML = innerhtml;
             }
 
             function searchProducts() {
-                console.log('SEARCHING PRODUCTS');
                 let sortby = $('#p-search-sort')[0].value;
                 let pcatID = $('#p-search-cat')[0].value;
                 let name = $('#p-search-name')[0].value;
-                let xmlHttp = new XMLHttpRequest();
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                        let products = JSON.parse(xmlHttp.responseText);
-                        currentProducts = products;
-                        let innerhtml = "";
-                        for (p of products) {
-                            innerhtml = innerhtml
-                                    + '<div class="card shadow-sm mb-2">'
-                                    + '<div class="card-body">'
-                                    + '<div class="row">'
-                                    + '<img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
-                                    + '<div class="text-left my-auto">'
-                                    + p.name
-                                    + '</div>'
-                                    + '<div class="row ml-auto my-auto mr-1 pt-2">'
-                                    + '<div class="input-group">'
-                                    + '<button type="button" id="modifyProdBtn'+p.id+'" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#editProductModal" onclick="fillEditProductForm(' +p.id + ')">'
-                                    + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'            
-                                    + '</button>'
-                                    + '<button type="button" id="deleteProdBtn'+p.id+'" style="background-color: crimson" class="btn btn-info btn-sm shadow-sm mr-2">'
-                                    + '<i class="fa fa-trash mr-auto" style="font-size: 28px"></i>'            
-                                    + '</button>'
-                                    + '</div>'
-                                    + '</div>'
-                                    + '</div>'
-                                    + '</div>'
-                                    + '</div>';
-                        }
-                        $('#p-div')[0].innerHTML = innerhtml;
-                    }
-                };
-
-                let url = "${contextPath}product.search?sortby=" + sortby + "&name=" + name + "&publics=false";
+                let innerhtml = "";
+                let products = user_products.slice();
                 if (pcatID !== "-1") {
-                    url += "&category=" + pcatID;
+                    products = products.filter(p => p.category.id.toString() === pcatID);
                 }
-                xmlHttp.open("GET", url, true); // true for asynchronous 
-                xmlHttp.send(null);
+                products = products.filter(p => p.name.includes(name));
+                switch (sortby) {
+                    case "Rating":
+                        products.sort((l, r) => l.rating > r.rating ? 1 : -1);
+                        break;
+
+                    case "Popularity":
+                        // already ordered
+                        break;
+
+                    default:
+                        // Name
+                        products.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
+                }
+                for (p of products) {
+                    innerhtml = innerhtml
+                            + '<div class="card shadow-sm mb-2">'
+                            + '<div class="card-body">'
+                            + '<div class="row">'
+                            + '<img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '<div class="text-left my-auto">'
+                            + p.name
+                            + '</div>'
+                            + '<div class="row ml-auto my-auto mr-1 pt-2">'
+                            + '<div class="input-group">'
+                            + '<button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#editProductModal" onclick="fillEditProductForm(' + p.id + ')">'
+                            + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                            + '</button>'
+                            + '<button type="button" id="deleteProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" style="background-color: crimson" data-toggle="modal" data-target="#deleteProductModal" onclick="fillDeleteProductForm(' + p.id + ')">'
+                            + '<i class="fa fa-trash mr-auto" style="font-size: 28px"></i>'
+                            + '</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>';
+                }
+                $('#p-div')[0].innerHTML = innerhtml;
             }
 
             function fillEditProductForm(id) {
-                let prod = currentProducts.filter(p => p.id === id)[0];
-                console.log('Editing prod id: ' + id + '\nProd:\n' + prod);
+                let prod = user_products.filter(p => p.id === id)[0];
                 $('#editProductForm-prodID')[0].value = prod.id;
                 $('#editProductForm-name')[0].value = prod.name;
                 $('#editProductForm-description')[0].innerHTML = prod.description;
-                $('#editProductForm-category')[0].selectedIndex = prod_categories.findIndex(c => c.id===prod.category.id);
+                $('#editProductForm-category')[0].selectedIndex = prod_categories.findIndex(c => c.id === prod.category.id);
+            }
+            
+            function fillDeleteProductForm(id) {
+                $('#deleteProductForm-prodID')[0].value = id;
             }
 
             function getRGB(purchased, total) {
@@ -622,6 +618,15 @@
                 total++;
                 return "rgb(" + 500 * (total - purchased) / total + "," + 500 * purchased / total + ",0)";
             }
+
+            function changeTab(tab) {
+                window.history.pushState(null,null,'${contextPath}restricted/homepage.html?tab=' + tab);
+            }
+
+            searchLists();
+            searchLists(true);
+            searchProducts();
+            changeTab('${currentTab}');
         </script>
     </body>
 </html>
