@@ -6,7 +6,7 @@
 <%@page import="db.entities.List_category"%>
 <%@page import="db.entities.List_reg"%>
 <%@page import="java.util.List"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="db.factories.DAOFactory"%>
 <%@page import="db.exceptions.DAOFactoryException"%>
@@ -175,7 +175,7 @@
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="ml-search-sort" onchange="searchLists()">
+                                    <select class="custom-select" id="ml-search-sort" onchange="showLists()">
                                         <option value="Name" selected>Name</option>
                                         <option value="Completion >">Completion ></option>
                                         <option value="Completion <">Completion <</option>
@@ -184,7 +184,7 @@
                             </div>
                             <div class="row mx-2 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="ml-search-cat" onchange="searchLists()">
+                                    <select class="custom-select" id="ml-search-cat" onchange="showLists()">
                                         <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
@@ -194,8 +194,8 @@
                         </div>
                         <div class="row ml-auto mx-2 my-2">
                             <div class="input-group">                            
-                                <input class="form-control" type="search" id="ml-search-name" placeholder="List name">
-                                <button class="btn btn-outline-success" onclick="searchLists()">
+                                <input class="form-control" type="search" id="ml-search-name" placeholder="List name" onkeyup="showLists()">
+                                <button class="btn btn-outline-success" onclick="showLists()">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createListModal" data-toggle="modal">          
@@ -217,7 +217,7 @@
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="sl-search-sort" onchange="searchLists(true)">
+                                    <select class="custom-select" id="sl-search-sort" onchange="showLists(true)">
                                         <option value="Name" selected>Name</option>
                                         <option value="Completion >">Completion ></option>
                                         <option value="Completion <">Completion <</option>
@@ -226,7 +226,7 @@
                             </div>
                             <div class="row mx-2 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="sl-search-cat" onchange="searchLists(true)">
+                                    <select class="custom-select" id="sl-search-cat" onchange="showLists(true)">
                                         <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
@@ -236,8 +236,8 @@
                         </div>
                         <div class="row ml-auto mx-2 my-2">
                             <div class="input-group">                            
-                                <input class="form-control" type="search" id="sl-search-name" placeholder="List name">
-                                <button class="btn btn-outline-success" onclick="searchLists(true)">
+                                <input class="form-control" type="search" id="sl-search-name" placeholder="List name" onkeyup="showLists(true)">
+                                <button class="btn btn-outline-success" onclick="showLists(true)">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#importListModal" data-toggle="modal">          
@@ -259,7 +259,7 @@
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="p-search-sort" onchange="searchProducts()">
+                                    <select class="custom-select" id="p-search-sort" onchange="showProducts()">
                                         <option value="Name">Name</option>
                                         <option value="Rating">Rating</option>
                                         <option value="Popularity">Popularity</option>
@@ -268,7 +268,7 @@
                             </div>
                             <div class="row mx-2 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select" id="p-search-cat" onchange="searchProducts()">
+                                    <select class="custom-select" id="p-search-cat" onchange="showProducts()">
                                         <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${prod_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
@@ -278,8 +278,8 @@
                         </div>
                         <div class="row ml-auto mx-2 my-2">
                             <div class="input-group">                            
-                                <input class="form-control" type="search" placeholder="your products..." id="p-search-name">
-                                <button class="btn btn-outline-success" onclick="searchProducts()">
+                                <input class="form-control" type="search" placeholder="your products..." id="p-search-name" onkeyup="showProducts()">
+                                <button class="btn btn-outline-success" onclick="showProducts()">
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>   
                                 <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProductModal" data-toggle="modal">          
@@ -455,7 +455,7 @@
                 </div>
             </div>
         </div>
-                        
+
         <!--Delete product modal-->
         <div class="modal modal-centered" id="deleteProductModal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
@@ -492,7 +492,7 @@
             var user_lists = ${List_reg.toJSON(myLists)};
             var shared_lists = ${List_reg.toJSON(sharedLists)};
 
-            function searchLists(shared) {
+            function showLists(shared) {
                 let id = shared === true ? 'sl' : 'ml';
                 let sortby = $('#' + id + '-search-sort')[0].value;
                 let lcatID = $('#' + id + '-search-cat')[0].value;
@@ -501,7 +501,7 @@
                 if (lcatID !== "-1") {
                     lists = lists.filter(l => l.category.id.toString() === lcatID);
                 }
-                lists = lists.filter(l => l.name.includes(name));
+                lists = lists.filter(l => l.name.toUpperCase().includes(name.toUpperCase()));
                 switch (sortby) {
                     case "Completion >":
                         lists.sort((l, r) => {
@@ -528,7 +528,7 @@
 
                 let innerhtml = "";
                 for (l of lists) {
-                    let lhtml = '<a href="shopping.list.html?shop_listID="' + l.id + ' class="my-3 mx-4">'
+                    let lhtml = '<a href="shopping.list.html?listID=' + l.id + '" class="my-3 mx-4">'
                             + '<div class="card text-dark" style="width: 16rem; display: inline-block">'
                             + '<div class="card-header" style="font-weight: bold; background-color: ' + getRGB(l.purchased, l.total) + '">'
                             + l.name
@@ -551,16 +551,15 @@
                 $('#' + id + '-div')[0].innerHTML = innerhtml;
             }
 
-            function searchProducts() {
+            function showProducts() {
                 let sortby = $('#p-search-sort')[0].value;
                 let pcatID = $('#p-search-cat')[0].value;
                 let name = $('#p-search-name')[0].value;
-                let innerhtml = "";
                 let products = user_products.slice();
                 if (pcatID !== "-1") {
                     products = products.filter(p => p.category.id.toString() === pcatID);
                 }
-                products = products.filter(p => p.name.includes(name));
+                products = products.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
                 switch (sortby) {
                     case "Rating":
                         products.sort((l, r) => l.rating > r.rating ? 1 : -1);
@@ -575,6 +574,7 @@
                         products.sort((l, r) => l.name > r.name ? 1 : -1);
                         break;
                 }
+                let innerhtml = "";
                 for (p of products) {
                     innerhtml = innerhtml
                             + '<div class="card shadow-sm mb-2">'
@@ -608,7 +608,7 @@
                 $('#editProductForm-description')[0].innerHTML = prod.description;
                 $('#editProductForm-category')[0].selectedIndex = prod_categories.findIndex(c => c.id === prod.category.id);
             }
-            
+
             function fillDeleteProductForm(id) {
                 $('#deleteProductForm-prodID')[0].value = id;
             }
@@ -620,12 +620,12 @@
             }
 
             function changeTab(tab) {
-                window.history.pushState(null,null,'${contextPath}restricted/homepage.html?tab=' + tab);
+                window.history.pushState(null, null, '${contextPath}restricted/homepage.html?tab=' + tab);
             }
 
-            searchLists();
-            searchLists(true);
-            searchProducts();
+            showLists();
+            showLists(true);
+            showProducts();
             changeTab('${currentTab}');
         </script>
     </body>
