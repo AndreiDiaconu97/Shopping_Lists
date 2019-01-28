@@ -258,7 +258,6 @@
                 </div>
             </div>
 
-
             <my:n><div class="tab-pane fade <c:if test="${currentTab.equals('myproducts')}">show active</c:if>" id="nav-myProducts" role="tabpanel">
                 </my:n>
                 <div class="row  mx-1">
@@ -315,10 +314,18 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="createListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                    <form id="createListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="mylists" id="tab-input-0"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
+                            <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                            </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="productForm">List name</label>
@@ -427,11 +434,19 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="editProductForm" action="${contextPath}restricted/product.handler" method="POST">
-                        <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
-                        <input type="hidden" name="action" value="edit"/>
-                        <input type="hidden" name="prodID" value="" id="editProductForm-prodID"/>
-                        <div class="modal-body mx-3">
+                    <div class="modal-body mx-3">
+                        <form id="editProductForm" action="${contextPath}restricted/product.handler" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
+                            <input type="hidden" name="action" value="edit"/>
+                            <input type="hidden" name="prodID" value="" id="editProductForm-prodID"/>
+                            <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                            </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="productForm">Product name</label>
@@ -452,10 +467,10 @@
                                     <span class="input-group-text">Category</span>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#editProductForm')[0].submit()">Create</button> 
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#editProductForm')[0].submit()">Confirm</button> 
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -539,7 +554,7 @@
                             + '<div class="card-header" style="font-weight: bold; background-color: ' + getRGB(l.purchased, l.total) + '">'
                             + l.name
                             + '</div>'
-                            + '<img class="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg" alt="Card image cap">';
+                            + '<img class="card-img-top" src="../images/shopping_lists/' + l.id + '" alt="Card image cap">';
                     if (shared) {
                         lhtml += '<div class="card-body" style="font-size: 15px; text-align: right">'
                                 + l.owner.firstname + ' ' + l.owner.lastname
@@ -586,7 +601,7 @@
                             + '<div class="card shadow-sm mb-2">'
                             + '<div class="card-body">'
                             + '<div class="row">'
-                            + '<img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '<img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/products/' + p.id + '">'
                             + '<div class="text-left my-auto">'
                             + p.name
                             + '</div>'

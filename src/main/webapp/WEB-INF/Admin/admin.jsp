@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@page import="db.daos.jdbc.JDBC_utility.SortBy"%>
 <%@page import="db.entities.Product"%>
 <%@page import="java.util.List"%>
@@ -89,13 +90,22 @@
     List<List_category> list_categories;
     List<Prod_category> prod_categories;
     List<Product> publicProducts;
+    List<List<Prod_category>> own_prod_categoriesOflist_cat = new ArrayList<>();
     try {
         list_categories = list_catDao.getAll();
         prod_categories = prod_catDao.getAll();
-        publicProducts = productDao.filterProducts(null, null, null, true, SortBy.NAME);
+        publicProducts = productDao.filterProducts(null, null, null, true, SortBy.POPULARITY);
+
+        List<Prod_category> own_prod_categories;
+        for (List_category list_cat : list_categories) {
+            own_prod_categories = list_catDao.getProd_categories(list_cat, true);
+            own_prod_categoriesOflist_cat.add(own_prod_categories);
+        }
+
         pageContext.setAttribute("list_categories", list_categories);
         pageContext.setAttribute("prod_categories", prod_categories);
         pageContext.setAttribute("publicProducts", publicProducts);
+        pageContext.setAttribute("own_prod_categoriesOflist_cat", own_prod_categoriesOflist_cat);
     } catch (Exception ex) {
         System.err.println("Error loading admin (jsp)" + ex);
         if (!response.isCommitted()) {
@@ -115,12 +125,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-
-        <script>
-            var list_categories = ${List_category.toJSON(list_categories)};
-            var prod_categories = ${Prod_category.toJSON(prod_categories)};
-            var products = ${Product.toJSON(publicProducts)};
-        </script>
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
@@ -148,7 +152,7 @@
         <main role="main">
             <div class="jumbotron">
                 <div class="container-fluid">
-                    <h1 class="display-3">Welcome, ${user.firstname}.</h1>
+                    <h1 class="display-3">Welcome, ${user.firstname}</h1>
                     <p>You are logged as admin, in this area you can manage the shopping list categories, the product categories and the public products.</p>
                 </div>
             </div>
@@ -167,38 +171,18 @@
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                <!-- List categories -->
+                <!-- List categories search bar -->
                 <div class="tab-pane fade <c:if test="${currentTab.equals('listCats')}">show active</c:if>" id="nav-listCategories" role="tabpanel" aria-labelledby="nav-listCategories">
                     <div class="row mx-1">
                         <div class="row ml-auto mr-1 mt-2">
-                            <div class="row ml-2 mr-0 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>sort by</option>
-                                        <option value="0">name [a-Z]</option>
-                                        <option value="1">name [Z-a]</option>
-                                        <option value="2">rating ++</option>
-                                        <option value="3">rating --</option>
-                                        <option value="4">popularity ++</option>
-                                        <option value="5">popularity --</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>all categories</option>
-                                        <option value="0">category 1</option>
-                                        <option value="1">category 2</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="row ml-auto mx-2 my-2">
                                 <div class="input-group">                            
-                                    <input class="form-control" type="search" placeholder="public products..." aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>   
+                                    <input class="form-control" type="search" placeholder="list categories..." aria-label="Search" id="listCat-search-name" onkeyup="showListCategories()">
+                                    <div class="input-group-append">
+                                        <label class="input-group-text rounded" for="inputGroupSelect02">
+                                            <i class="fa fa-search"></i>
+                                        </label>
+                                    </div>    
                                     <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createListCategoryModal" data-toggle="modal">          
                                         <i class="fa fa-plus mr-auto"></i>
                                     </button>
@@ -206,153 +190,92 @@
                             </div>
                         </div>
                     </div>
-                    <div class="container-fluid">
-                    <c:forEach var="listCat" items="${list_categories}">
-                        <div class="card shadow-sm mb-2">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="row ml-0">
-                                        <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                        <div class="text-left my-auto">
-                                            ${listCat.name}
-                                        </div>
-                                    </div>
-                                    <div class="row ml-auto my-auto mr-1 pt-2">
-                                        <div class="input-group">
-                                            <a type="button" class="btn btn-primary btn-sm shadow-sm mr-2" href="list.cat.html?list_catID=${listCat.id}">
-                                                <i class="fa fa-list-alt" style="font-size: 25px"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editListCat-modal" data-toggle="modal" onclick="editListCatModal(${listCat.id})">
-                                                <i class="fa fa-edit" style="font-size: 25px"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+                    <!-- load list categories -->
+                    <div class="container-fluid" id="listCat-div">
+                    </div>
                 </div>
-            </div>
-            <!-- Product categories -->
-            <div class="tab-pane fade <c:if test="${currentTab.equals('prodCats')}">show active</c:if>" id="nav-prodCategories" role="tabpanel" aria-labelledby="nav-prodCategories">
+                <!-- Product categories search bar -->
+                <div class="tab-pane fade <c:if test="${currentTab.equals('prodCats')}">show active</c:if>" id="nav-prodCategories" role="tabpanel" aria-labelledby="nav-prodCategories">
                     <div class="row mx-1">
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>sort by</option>
-                                        <option value="0">name [a-Z]</option>
-                                        <option value="1">name [Z-a]</option>
-                                        <option value="2">rating ++</option>
-                                        <option value="3">rating --</option>
-                                        <option value="4">popularity ++</option>
-                                        <option value="5">popularity --</option>
+                                    <select class="custom-select" id="prodCat-search-sort" onchange="showProductCategories()">
+                                        <option value="Name">Name</option>
+                                        <option value="Renew time >">Renew time ></option>
+                                        <option value="Renew time <">Renew time <</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row mx-2 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>all categories</option>
-                                        <option value="0">category 1</option>
-                                        <option value="1">category 2</option>
-                                    </select>
-                                </div>
+                                    <select class="custom-select" id="prodCat-search-cat" onchange="showProductCategories()">
+                                        <option value="-1" selected>All categories</option>
+                                    <c:forEach var="listCat" varStatus="i" items="${list_categories}">
+                                        <option value="${i.index}">${listCat.name}</option>
+                                    </c:forEach>
+                                </select>
                             </div>
-                            <div class="row ml-auto mx-2 my-2">
-                                <div class="input-group">                            
-                                    <input class="form-control" type="search" placeholder="public products..." aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>   
-                                    <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProductCatModal" data-toggle="modal">          
-                                        <i class="fa fa-plus mr-auto"></i>
-                                    </button>
-                                </div>
+                        </div>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group">                            
+                                <input class="form-control" type="search" placeholder="product categories..." aria-label="Search" id="prodCat-search-name"  onkeyup="showProductCategories()">
+                                <div class="input-group-append">
+                                    <label class="input-group-text rounded" for="inputGroupSelect02">
+                                        <i class="fa fa-search"></i>
+                                    </label>
+                                </div>  
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProductCatModal" data-toggle="modal">          
+                                    <i class="fa fa-plus mr-auto"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="container-fluid">
-                    <c:forEach var="prodCat" items="${prod_categories}">
-                        <div class="card shadow-sm mb-2">
-                            <div class="card-body">
-                                <div class="row">
-                                    <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                    <div class="text-left my-auto">
-                                        ${prodCat.name}
-                                    </div>
-                                    <div class="row ml-auto my-auto mr-1 pt-2">
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editProdCat-modal" data-toggle="modal" onclick="editProdCatModal(${prodCat.id})">
-                                                <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+                </div>
+                <!-- load product categories -->
+                <div class="container-fluid" id="prodCat-div">
                 </div>
             </div>
-            <!-- Public products -->
+            <!-- Public products search bar -->
             <div class="tab-pane fade <c:if test="${currentTab.equals('publicProds')}">show active</c:if>" id="nav-publicProducts" role="tabpanel" aria-labelledby="nav-publicProducts">
                     <div class="row mx-1">
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>sort by</option>
-                                        <option value="0">name [a-Z]</option>
-                                        <option value="1">name [Z-a]</option>
-                                        <option value="2">rating ++</option>
-                                        <option value="3">rating --</option>
-                                        <option value="4">popularity ++</option>
-                                        <option value="5">popularity --</option>
+                                    <select class="custom-select" id="p-search-sort" onchange="showProducts()">
+                                        <option value="Name">Name</option>
+                                        <option value="Rating">Rating</option>
+                                        <option value="Popularity" selected="">Popularity</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row mx-2 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>all categories</option>
-                                        <option value="0">category 1</option>
-                                        <option value="1">category 2</option>
-                                    </select>
-                                </div>
+                                    <select class="custom-select" id="p-search-cat" onchange="showProducts()">
+                                        <option value="-1" selected>All categories</option>
+                                    <c:forEach var="cat" items="${prod_categories}">
+                                        <option value="${cat.id}">${cat.name}</option>
+                                    </c:forEach>
+                                </select>
                             </div>
-                            <div class="row ml-auto mx-2 my-2">
-                                <div class="input-group">                            
-                                    <input class="form-control" type="search" placeholder="public products..." aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>   
-                                    <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProduct-modal" data-toggle="modal">          
-                                        <i class="fa fa-plus mr-auto"></i>
-                                    </button>
-                                </div>
+                        </div>
+                        <div class="row ml-auto mx-2 my-2">
+                            <div class="input-group">                            
+                                <input class="form-control" type="search" placeholder="public products..." id="p-search-name" onkeyup="showProducts()" aria-label="Search">
+                                <div class="input-group-append">
+                                    <label class="input-group-text rounded" for="inputGroupSelect02">
+                                        <i class="fa fa-search"></i>
+                                    </label>
+                                </div>  
+                                <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#createProduct-modal" data-toggle="modal">          
+                                    <i class="fa fa-plus mr-auto"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="container-fluid">
-                    <c:forEach var = "product" items="${publicProducts}">
-                        <div class="card shadow-sm mb-2">
-                            <div class="card-body">
-                                <div class="row">
-                                    <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                    <div class="text-left my-auto">
-                                        ${product.name}
-                                    </div>
-                                    <div class="row ml-auto my-auto mr-1 pt-2">
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editProduct-modal" data-toggle="modal" onclick="editProductModal(${product.id})">
-                                                <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+                </div>
+                <!-- load public products -->
+                <div class="container-fluid" id="publicProd-div">
                 </div>
             </div>
         </div>    
@@ -509,7 +432,7 @@
                                 <i class="fa fa-image prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="editListCat-form">Logo</label>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" name="image">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
                                     <label class="custom-file-label" for="editListCat-form">Choose file</label>
                                 </div>
                             </div>
@@ -532,17 +455,6 @@
                 </div>
             </div>
         </div>
-        <script>
-            function editListCatModal(listCatID) {
-                list_cat = list_categories.filter(item => {
-                    return item.id === listCatID;
-                })[0];
-
-                $("#editListCat-id")[0].value = listCatID;
-                $("#editListCat-name")[0].value = list_cat.name;
-                $("#editListCat-desc")[0].value = list_cat.description;
-            }
-        </script>
 
         <!-- edit product category -->
         <div class="modal modal-fluid" id="editProdCat-modal" tabindex="-1" role="dialog">
@@ -564,7 +476,7 @@
                                 <i class="fa fa-image prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="editListCat-form">Logo</label>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" name="image">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
                                     <label class="custom-file-label" for="editListCat-form">Choose file</label>
                                 </div>
                             </div>
@@ -592,18 +504,6 @@
                 </div>
             </div>
         </div>
-        <script>
-            function editProdCatModal(prodCatID) {
-                prod_cat = prod_categories.filter(item => {
-                    return item.id === prodCatID;
-                })[0];
-
-                $("#editProdCat-id")[0].value = prodCatID;
-                $("#editProdCat-name")[0].value = prod_cat.name;
-                $("#editProdCat-desc")[0].value = prod_cat.description;
-                $("#editProdCat-renew")[0].value = prod_cat.renewtime;
-            }
-        </script>
 
         <!-- edit public products -->
         <div class="modal modal-fluid" id="editProduct-modal" tabindex="-1" role="dialog">
@@ -625,7 +525,7 @@
                                 <i class="fa fa-image prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="editProduct-form">Logo</label>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" name="image">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
                                     <label class="custom-file-label" for="editProduct-form">Choose file</label>
                                 </div>
                             </div>
@@ -658,22 +558,174 @@
                 </div>
             </div>
         </div>
-        <script>
-            function editProductModal(productID) {
-                product = products.filter(item => {
-                    return item.id === productID;
-                })[0];
 
+        <script>
+            var list_categories = ${List_category.toJSON(list_categories)};
+            var prod_categories = ${Prod_category.toJSON(prod_categories)};
+            var publicProducts = ${Product.toJSON(publicProducts)};
+            var own_prod_categoriesOflist_cat = [];
+            <c:forEach var="own_prod_categories" items="${own_prod_categoriesOflist_cat}">
+            own_prod_categoriesOflist_cat.push(${Prod_category.toJSON(own_prod_categories)});
+            </c:forEach>
+
+            function editListCatModal(listCatID) {
+                list_cat = list_categories.filter(item => {
+                    return item.id === listCatID;
+                })[0];
+                $("#editListCat-id")[0].value = listCatID;
+                $("#editListCat-name")[0].value = list_cat.name;
+                $("#editListCat-desc")[0].value = list_cat.description;
+            }
+
+            function editProdCatModal(prodCatID) {
+                prod_cat = prod_categories.filter(item => {
+                    return item.id === prodCatID;
+                })[0];
+                $("#editProdCat-id")[0].value = prodCatID;
+                $("#editProdCat-name")[0].value = prod_cat.name;
+                $("#editProdCat-desc")[0].value = prod_cat.description;
+                $("#editProdCat-renew")[0].value = prod_cat.renewtime;
+            }
+
+            function editProductModal(productID) {
+                product = publicProducts.filter(item => item.id === productID)[0];
                 $("#editProduct-id")[0].value = productID;
                 $("#editProduct-name")[0].value = product.name;
                 $("#editProduct-desc")[0].value = product.description;
                 $("#editProduct-category")[0].value = product.category.id;
             }
 
+            function showListCategories() {
+                let name = $('#listCat-search-name')[0].value;
+                let listCats = list_categories.slice();
+
+                listCats = listCats.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
+
+                let innerhtml = "";
+                for (listCategory of listCats) {
+                    innerhtml = innerhtml
+                            + '<div class="card shadow-sm mb-2">'
+                            + '<div class="card-body">'
+                            + '<div class="row">'
+                            + '<div class="row ml-2 mr-0 my-auto">'
+                            + '<img class="img-fluid rounded mr-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/list_categories/' + listCategory.id + '">'
+                            + '<div class="text-left my-auto">' + listCategory.name + '</div>'
+                            + '</div>'
+                            + '<div class="row ml-auto my-auto mr-1 pt-2">'
+                            + '<div class="input-group">'
+                            + '<a type="button" class="btn btn-primary btn-sm shadow-sm mr-2" href="list.cat.html?list_catID=' + listCategory.id + '">'
+                            + '<i class="fa fa-list-alt" style="font-size: 25px"></i>'
+                            + '</a>'
+                            + '<button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editListCat-modal" data-toggle="modal" onclick="editListCatModal(' + listCategory.id + ')">'
+                            + '<i class="fa fa-edit" style="font-size: 25px"></i>'
+                            + '</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>';
+                }
+                $('#listCat-div')[0].innerHTML = innerhtml;
+            }
+
+            function showProductCategories() {
+                let sortby = $('#prodCat-search-sort')[0].value;
+                let lcatID = $('#prodCat-search-cat')[0].value;
+                let name = $('#prodCat-search-name')[0].value;
+                let prodCategories;
+                if (lcatID !== "-1") {
+                    prodCategories = own_prod_categoriesOflist_cat[lcatID];
+                } else {
+                    prodCategories = prod_categories.slice();
+                }
+                prodCategories = prodCategories.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
+                switch (sortby) {
+                    case "Renew time >":
+                        prodCategories.sort((l, r) => l.renewtime > r.renewtime ? 1 : -1);
+                        break;
+                    case "Renew time <":
+                        prodCategories.sort((l, r) => l.renewtime < r.renewtime ? 1 : -1);
+                        break;
+                    default:
+                        // Name
+                        prodCategories.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
+                }
+                let innerhtml = "";
+                for (prodCat of prodCategories) {
+                    innerhtml = innerhtml
+                            + '<div class = "card shadow-sm mb-2">'
+                            + '<div class="card-body">'
+                            + '<div class="row">'
+                            + '<img class="img-fluid rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/product_categories/' + prodCat.id + '">'
+                            + '<div class="text-left my-auto">' + prodCat.name + '</div>'
+                            + '<div class="row ml-auto my-auto mr-1 pt-2">'
+                            + '<div class="input-group">'
+                            + '<button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editProdCat-modal" data-toggle="modal" onclick="editProdCatModal(' + prodCat.id + ')">'
+                            + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                            + '</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>';
+                }
+                $('#prodCat-div')[0].innerHTML = innerhtml;
+            }
+
+            function showProducts() {
+                let sortby = $('#p-search-sort')[0].value;
+                let pcatID = $('#p-search-cat')[0].value;
+                let name = $('#p-search-name')[0].value;
+                let products = publicProducts.slice();
+                if (pcatID !== "-1") {
+                    products = products.filter(p => p.category.id.toString() === pcatID);
+                }
+                products = products.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
+                switch (sortby) {
+                    case "Rating":
+                        products.sort((l, r) => l.rating > r.rating ? 1 : -1);
+                        break;
+
+                    case "Popularity":
+                        // already ordered
+                        break;
+
+                    default:
+                        // Name
+                        products.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
+                }
+                let innerhtml = "";
+                for (p of products) {
+                    innerhtml = innerhtml
+                            + '<div class="card shadow-sm mb-2">'
+                            + '<div class="card-body">'
+                            + '<div class="row">'
+                            + '<img class="img-fluid rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/products/' + p.id + '">'
+                            + '<div class="text-left my-auto">' + p.name + '</div>'
+                            + '<div class="row ml-auto my-auto mr-1 pt-2">'
+                            + '<div class="input-group">'
+                            + '<button type="button" class="btn btn-info btn-sm shadow-sm mr-2" href="#editProduct-modal" data-toggle="modal" onclick="editProductModal(' + p.id + ')">'
+                            + '<i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                            + '</button>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>';
+                }
+                $('#publicProd-div')[0].innerHTML = innerhtml;
+            }
+
             function changeTab(tab) {
                 window.history.pushState(null, null, '${contextPath}?tab=' + tab);
             }
+
             changeTab('${currentTab}');
+            showListCategories();
+            showProductCategories();
+            showProducts();
         </script>
 
         <footer class="footer font-small blue pt-3">

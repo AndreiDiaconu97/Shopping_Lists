@@ -177,7 +177,6 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
@@ -213,7 +212,7 @@
         <div class="container-fluid pt-2 pb-3 mb-2 shadow">
             <div class="container-fluid mx-auto my-auto">
                 <div class="col-12 col-sm-7 col-md-3 mx-auto my-2">
-                    <img class="img-fluid rounded shadow mx-auto" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                    <img class="img-fluid rounded shadow mx-auto" alt="Responsive image" src="../images/shopping_lists/${list.id}">
                 </div>
                 <div class="row">
                     <div class="my-auto mr-2" style="text-shadow: 2px 2px 8px #bbbbbb;">
@@ -399,27 +398,31 @@
                             </button>
                         </div>
                         <div class="modal-body mx-3">
-                            <div class="md-form mb-3">
-                                <i class="fa fa-image prefix grey-text"></i>
-                                <label data-error="error" data-success="success" for="defaultForm-email">Logo</label>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01">
-                                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                            <form id="editListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="list_id" value="${list.id}"/>
+                                <input type="hidden" name="action" value="edit"/>
+                                <div class="md-form mb-3">
+                                    <i class="fa fa-image prefix grey-text"></i>
+                                    <label data-error="error" data-success="success" for="defaultForm-email">Logo</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="inputGroupFile01" name="image" accept="image/*">
+                                        <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="md-form mb-3">
-                                <i class="fa fa-bookmark prefix grey-text"></i>
-                                <label data-error="error" data-success="success" for="defaultForm-email">List name</label>
-                                <input type="text" class="form-control validate" value="${list.name}"/>
-                            </div>
-                            <div class="md-form mb-3">
-                                <i class="fa fa-align-left prefix grey-text"></i>
-                                <label data-error="error" data-success="success" for="defaultForm-email">Description</label>
-                                <textarea class="form-control validate">${list.description}</textarea>
-                            </div>
+                                <div class="md-form mb-3">
+                                    <i class="fa fa-bookmark prefix grey-text"></i>
+                                    <label data-error="error" data-success="success">List name</label>
+                                    <input type="text" class="form-control validate" name="name" value="${list.name}"/>
+                                </div>
+                                <div class="md-form mb-3">
+                                    <i class="fa fa-align-left prefix grey-text"></i>
+                                    <label data-error="error" data-success="success">Description</label>
+                                    <textarea class="form-control validate" name="description">${list.description}</textarea>
+                                </div>
+                            </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary">Confirm<i class="fa fa-check ml-1"></i></button>
+                            <button type="button" class="btn btn-primary" onclick="$(editListForm)[0].submit()">Confirm<i class="fa fa-check ml-1"></i></button>
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel<i class="fa fa-times ml-1"></i></button>
                         </div>
                     </div>
@@ -444,7 +447,7 @@
                                 <div class="col-3 col-md-2">
                                     <div class="row">
                                         <img class="img-thumbnail shadow-sm" style="width: 100px; height: 100%; min-width: 50px; min-height: 100%"
-                                             alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                             alt="Responsive image" src="../images/avatars/${message.user.id}">
                                     </div>
                                     <div class="row">
                                         ${message.user.firstname} ${message.user.lastname}
@@ -482,7 +485,7 @@
                             <c:forEach var="shared_user" items="${list_regDao.getUsersSharedTo(list)}">
                                 <c:set var="shared_user_al" value="${userDao.getAccessLevel(shared_user, list)}"/>
                                 <div class="row mb-2 px-auto ml-0">
-                                    <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                    <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/avatars/${shared_user.id}">
                                     <p class="mr-2 my-auto">
                                         <c:out value="${shared_user.firstname} ${user.lastname}" />
                                     </p>
@@ -541,7 +544,7 @@
                             </div>
                             <c:forEach var="friend" items="${friends}">
                                 <div class="row px-auto ml-0">
-                                    <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                    <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/avatars/${friend.id}">
                                     <p class="mr-2 my-auto">
                                         ${friend.firstname} ${friend.lastname}
                                     </p>
@@ -854,7 +857,7 @@
                             + '<div class="card shadow-sm mb-2">'
                             + '    <div class="card-body">'
                             + '        <div class="row">'
-                            + '            <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '            <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/products/' + p.id + '">'
                             + '            <div class="text-left my-auto">'
                             + '                ' + p.name
                             + '            </div>'
@@ -896,7 +899,7 @@
                             + '<div class="card shadow-sm mb-2" style="background-color: whitesmoke">'
                             + '    <div class="card-body">'
                             + '        <div class="row">'
-                            + '            <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '            <img class="img-fluid img-thumbnail rounded mx-2" style="min-width: 50px; min-height: 100%; max-width: 100%; max-height: 60px"  alt="Responsive image" src="../images/products/' + p.id + '">'
                             + '            <div class="text-left my-auto">'
                             + '                ' + p.name
                             + '            </div>'
@@ -960,7 +963,7 @@
                     innerhtml = innerhtml
                             + '<div id="add-product-div-' + p.id + '" class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke" onclick="selectAddProduct(' + p.id + ')">'
                             + '          <div class="row my-2 ml-0">'
-                            + '              <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '              <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/products/' + p.id + '">'
                             + '              <div class="col my-auto">'
                             + '                  <div class="text-left" style="font-size: 18px">'
                             + '                      ' + p.name

@@ -26,10 +26,10 @@
 
     </head>
     <body>
-        <div class="container">
+        <div class="container mt-2">
             <form class="form-signin" action="auth" method="POST">
                 <div class="text-center mb-4">
-                    <img class="mb-4" src="images/unitn_logo_1024.png" alt="UNITN Logo" width="128" height="128">
+                    <img class="mb-4" src="images/login" alt="UNITN Logo" width="128" height="128">
                     <h3 class="h3 mb-3 font-weight-normal">Authentication Area</h3>
                     <p>You must authenticate to access, view, modify and share your Shopping Lists</p>
                 </div>

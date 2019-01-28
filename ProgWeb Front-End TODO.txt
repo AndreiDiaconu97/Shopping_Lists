@@ -7,6 +7,6 @@ TODOS:
 - products in shopping list have clickable icon that shows product info and allows rating
 - implement WARNING confirm/delete modal where needed
 - show elements situationally (if owner, ecc..)
+- Fix error when session times out (for Admin)
 
-- implement create buttons in admin homepage
-- implement save page position in admin homepage too
+- finish implementing searchbars for product categories and public products

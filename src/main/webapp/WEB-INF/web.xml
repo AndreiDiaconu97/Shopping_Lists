@@ -6,7 +6,7 @@
     </context-param>
     <context-param>
         <description>Location to store shopping lists images</description>
-        <param-name>uploadDir</param-name>
+        <param-name>imagesDir</param-name>
         <param-value>images</param-value>
     </context-param>
     <filter>
@@ -32,6 +32,10 @@
     <servlet>
         <servlet-name>Admin_jsp</servlet-name>
         <jsp-file>/WEB-INF/Admin/admin.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>ImageDownloadServlet</servlet-name>
+        <servlet-class>servlets.ImageDownloadServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Chat</servlet-name>
@@ -124,6 +128,8 @@
     <servlet-mapping>
         <servlet-name>Chat</servlet-name>
         <url-pattern>/restricted/chat</url-pattern>
+        <servlet-name>ImageDownloadServlet</servlet-name>
+        <url-pattern>/images/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

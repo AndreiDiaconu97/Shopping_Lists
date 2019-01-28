@@ -33,6 +33,8 @@ public class Product implements Serializable {
         this.category = category;
         this.creator = creator;
         this.description = description;
+        this.rating = 0F;
+        this.num_votes = 0;
     }
 
     public String getName() {

@@ -206,7 +206,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 throw new DAOException("list_reg update affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update the list_reg", ex);
+            throw new DAOException("Impossible to update the list_reg: " + ex, ex);
         }
     }
 

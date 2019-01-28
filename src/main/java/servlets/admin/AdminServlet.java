@@ -15,7 +15,10 @@ import db.entities.User;
 import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -29,29 +32,27 @@ import javax.servlet.http.Part;
 @MultipartConfig
 public class AdminServlet extends HttpServlet {
 
+    private String imagesPath;
     private Prod_categoryDAO prod_categoryDao;
     private List_categoryDAO list_categoryDao;
     private ProductDAO productDao; // maybe useless: create product = post to ProductServlet
-    public String uploadDir;
 
-    private void saveFile(HttpServletRequest request, HttpServletResponse response, String contextPath, Integer id, String subfolder) {
-        try {
-            Part filePart = request.getPart("image");
-            if (filePart != null) {
-                if (filePart.getContentType().contains("image")) {
-                    String imageFormat = filePart.getContentType().replaceFirst("image/", ".");
-                    //TODO: if folders do not exist, create them first
-                    filePart.write(uploadDir + "\\" + subfolder + "\\" + id + imageFormat);
-                }
-            }
-        } catch (IOException | ServletException ex) {
-            Logger.getLogger(AdminServlet.class.getName()).log(Level.SEVERE, null, ex);
+    private void saveImage(Part imagePart, String folder, String imageName) throws IOException {
+        if(imagePart.getSubmittedFileName().equals("")) {
+            return;
+        }
+
+        File imageFile = new File(imagesPath + folder + "/" + imageName);
+        imageFile.delete();
+        try (InputStream fileContent = imagePart.getInputStream()) {
+            Files.copy(fileContent, imageFile.toPath());
         }
     }
 
     @Override
     public void init() throws ServletException {
-        uploadDir = getServletContext().getInitParameter("uploadDir");
+        imagesPath = getServletContext().getInitParameter("imagesPath");
+
         DAOFactory daoFactory = (DAOFactory) super.getServletContext().getAttribute("daoFactory");
         if (daoFactory == null) {
             throw new ServletException("Impossible to get dao factory");
@@ -101,7 +102,7 @@ public class AdminServlet extends HttpServlet {
                         list_categoryDao.insert(cat);
                         System.err.println("Ok. Nome della categoria di lista inserita: " + cat.getName());
                     } else {
-                        saveFile(request, response, contextPath, id, "list_categories");
+                        saveImage(request.getPart("image"), "list_categories", id_s);
 
                         if (name != null) {
                             cat.setName(name);
@@ -142,7 +143,7 @@ public class AdminServlet extends HttpServlet {
                         prod_categoryDao.insert(prod_cat);
                         list_categoryDao.insertProd_category(list_category, prod_cat);
                     } else {
-                        saveFile(request, response, contextPath, id, "product_categories");
+                        saveImage(request.getPart("image"), "product_categories", id_s);
 
                         if (name != null) {
                             prod_cat.setName(name);
@@ -227,7 +228,7 @@ public class AdminServlet extends HttpServlet {
                         prod = new Product(name, prod_category, user, description);
                         productDao.insert(prod);
                     } else {
-                        saveFile(request, response, contextPath, id, "public_products");
+                        saveImage(request.getPart("image"), "products", id_s);
 
                         if (name != null) {
                             prod.setName(name);

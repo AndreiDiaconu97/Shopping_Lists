@@ -48,6 +48,8 @@ public class WebAppContextListener implements ServletContextListener {
             JDBCDAOFactory.configure(dburl);
             DAOFactory daoFactory = JDBCDAOFactory.getInstance();
             sce.getServletContext().setAttribute("daoFactory", daoFactory);
+            sce.getServletContext().setInitParameter("realPath", realPath);
+            sce.getServletContext().setInitParameter("imagesPath", (realPath + "\\src\\main\\webapp\\" + sce.getServletContext().getInitParameter("imagesDir") + "\\").replace("\\", "/"));
         } catch (DAOFactoryException ex) {
             Logger.getLogger(getClass().getName()).severe(ex.toString());
             throw new RuntimeException("Impossible to setup daofactory in listener", ex);

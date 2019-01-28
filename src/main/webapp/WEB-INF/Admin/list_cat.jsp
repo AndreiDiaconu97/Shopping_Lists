@@ -154,32 +154,21 @@
                         <div class="row justify-content-end">
                             <div class="row ml-0 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>sort by</option>
-                                        <option value="0">name [a-Z]</option>
-                                        <option value="1">name [Z-a]</option>
-                                        <option value="2">rating ++</option>
-                                        <option value="3">rating --</option>
-                                        <option value="4">popularity ++</option>
-                                        <option value="5">popularity --</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>all categories</option>
-                                        <option value="0">category 1</option>
-                                        <option value="1">category 2</option>
+                                    <select class="custom-select" id="linkedProdCat-search-sort" onchange="showProductCategories('linked')">
+                                        <option value="Name">Name</option>
+                                        <option value="Renew time >">Renew time ></option>
+                                        <option value="Renew time <">Renew time <</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row ml-1 mr-3 my-2">
                                 <div class="input-group">                            
-                                    <input class="form-control" type="search" placeholder="product categories..." aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>   
+                                    <input class="form-control" type="search" placeholder="product categories..." aria-label="Search" id="linkedProdCat-search-name"  onkeyup="showProductCategories('linked')">
+                                    <div class="input-group-append">
+                                        <label class="input-group-text rounded">
+                                            <i class="fa fa-search"></i>
+                                        </label>
+                                    </div>     
                                 </div>
                             </div>
                         </div>
@@ -196,40 +185,8 @@
                             </button>
                         </div>
                         <hr>
-                        <form id="unlinkProdCat-form" action="${contextPath}admin.handler" method="POST">
-                        <input type="hidden" name="tab" value="linkedProductCats"/>
-                        <input type="hidden" name="action" value="listproductcat"/>
-                        <input type="hidden" name="list_cat" value="${list_cat.id}"/>
-                        <c:forEach var="prod_cat" items="${own_prod_categories}">
-                            <div class="card shadow-sm mb-2">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <img class="img-thumbnail shadow-sm mx-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                        <p class="mr-2 my-auto">${prod_cat.name}</p>
-                                        <input type="hidden" id="unlinkProdCat-toggle${prod_cat.id}" name="" value="${prod_cat.id}"/>
-                                        <button type="button" id="unlinkProdCat-button${prod_cat.id}" class="btn btn-danger my-auto ml-auto mr-2 shadow-sm rounded" data-toggle="button" onclick="toggleParameter('unlink',${prod_cat.id})">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                    <hr>
-                                    <div class="panel panel-success autocollapse ml-2">
-                                        <div class="panel-heading clickable">
-                                            <div class="row">
-                                                <div class="text-left my-auto">Description</div>
-                                                <i class="fa fa-chevron-circle-down my-auto mx-2" style="font-size:20px;"></i>
-                                            </div>
-                                        </div>
-                                        <div class="panel-body">
-                                            <hr>
-                                            <div class="text-justify mx-4">
-                                                ${prod_cat.description}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach> 
-                    </form>
+                        <!-- load own product categories -->
+                        <form id="unlinkProdCat-form" action="${contextPath}admin.handler" method="POST"></form>
                     <hr>
                     <div class="row mx-auto mb-2 justify-content-end">
                         <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" onclick="$('#unlinkProdCat-form').submit()">  
@@ -248,32 +205,21 @@
                         <div class="row justify-content-end">
                             <div class="row ml-0 mr-0 my-2">
                                 <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>sort by</option>
-                                        <option value="0">name [a-Z]</option>
-                                        <option value="1">name [Z-a]</option>
-                                        <option value="2">rating ++</option>
-                                        <option value="3">rating --</option>
-                                        <option value="4">popularity ++</option>
-                                        <option value="5">popularity --</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select">
-                                        <option value="-1" selected>all categories</option>
-                                        <option value="0">category 1</option>
-                                        <option value="1">category 2</option>
+                                    <select class="custom-select" id="otherProdCat-search-sort" onchange="showProductCategories('other')">
+                                        <option value="Name">Name</option>
+                                        <option value="Renew time >">Renew time ></option>
+                                        <option value="Renew time <">Renew time <</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="row ml-1 mr-3 my-2">
                                 <div class="input-group">                            
-                                    <input class="form-control" type="search" placeholder="product categories..." aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>   
+                                    <input class="form-control" type="search" placeholder="product categories..." aria-label="Search" id="otherProdCat-search-name"  onkeyup="showProductCategories('other')">
+                                    <div class="input-group-append">
+                                        <label class="input-group-text rounded">
+                                            <i class="fa fa-search"></i>
+                                        </label>
+                                    </div>   
                                 </div>
                             </div>
                         </div>
@@ -290,40 +236,8 @@
                             </button>
                         </div>
                         <hr>
-                        <form id="linkProdCat-form" action="${contextPath}admin.handler" method="POST">
-                        <input type="hidden" name="tab" value="otherProductCats"/>
-                        <input type="hidden" name="action" value="listproductcat"/>
-                        <input type="hidden" name="list_cat" value="${list_cat.id}"/>
-                        <c:forEach var="prod_cat"  items="${other_prod_categories}">
-                            <div class="card shadow-sm mb-2">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <img class="img-thumbnail shadow-sm mx-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                        <p class="mr-2 my-auto">${prod_cat.name}</p>
-                                        <input type="hidden" id="linkProdCat-toggle${prod_cat.id}" name="" value="${prod_cat.id}"/>
-                                        <button type="button" id="linkProdCat-button${prod_cat.id}" class="btn btn-primary my-auto ml-auto mr-2 shadow-sm rounded-circle" data-toggle="button" onclick="toggleParameter('link',${prod_cat.id})">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                    <hr>
-                                    <div class="panel panel-success autocollapse ml-2">
-                                        <div class="panel-heading clickable">
-                                            <div class="row mx">
-                                                <div class="text-left my-auto">Description</div>
-                                                <i class="fa fa-chevron-circle-down my-auto mx-2" style="font-size:20px;"></i>
-                                            </div>
-                                        </div>
-                                        <div class="panel-body">
-                                            <hr>
-                                            <div class="text-justify mx-4">
-                                                ${prod_cat.description}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach> 
-                    </form>
+                        <!-- load other product categories -->
+                        <form id="linkProdCat-form" action="${contextPath}admin.handler" method="POST"></form>
                     <hr>
                     <div class="row mx-auto mb-2 justify-content-end">
                         <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" onclick="$('#linkProdCat-form').submit()">  
@@ -356,13 +270,14 @@
                     $panel_body.slideDown();
                 }
             });
-            $(document).ready(function (e) {
+            
+            function hideDescription() {
                 var $classy = '.panel.autocollapse';
-
                 var $found = $($classy);
                 $found.find('.panel-body').hide();
                 $found.removeClass($classy);
-            });
+            }
+            $(document).ready(hideDescription());
 
             function toggleParameter(action, prodCat_ID) {
                 let inputElement;
@@ -402,10 +317,79 @@
                 }
             }
 
+            function showProductCategories(which) {
+                let sortby = $('#' + which + 'ProdCat-search-sort')[0].value;
+                let name = $('#' + which + 'ProdCat-search-name')[0].value;
+
+                let btnAction;
+                let prodCategories;
+                switch (which) {
+                    case 'linked':
+                        prodCategories = own_prod_categories.slice();
+                        btnAction = 'unlink';
+                        break;
+                    case 'other':
+                    default:
+                        prodCategories = other_prod_categories.slice();
+                        btnAction = 'link';
+                        break;
+                }
+
+                prodCategories = prodCategories.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
+                switch (sortby) {
+                    case "Renew time >":
+                        prodCategories.sort((l, r) => l.renewtime > r.renewtime ? 1 : -1);
+                        break;
+                    case "Renew time <":
+                        prodCategories.sort((l, r) => l.renewtime < r.renewtime ? 1 : -1);
+                        break;
+                    default:
+                        // Name
+                        prodCategories.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
+                }
+                let innerhtml = ''
+                        + '<input type="hidden" name="tab" value="' + which + 'ProductCats"/>'
+                        + '<input type="hidden" name="action" value="listproductcat"/>'
+                        + '<input type="hidden" name="list_cat" value="${list_cat.id}"/>';
+                for (prod_cat of prodCategories) {
+                    innerhtml = innerhtml
+                            + '<div class="card shadow-sm mb-2">'
+                            + '<div class="card-body">'
+                            + '<div class="row">'
+                            + '<img class="img-thumbnail shadow-sm mx-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/product_categories/' + prod_cat.id + '">'
+                            + '<p class="mr-2 my-auto">' + prod_cat.name + '</p>'
+                            + '<input type="hidden" id="' + btnAction + 'ProdCat-toggle' + prod_cat.id + '" name="" value="' + prod_cat.id + '"/>'
+                            + '<button type="button" id="' + btnAction + 'ProdCat-button' + prod_cat.id + '" class="btn btn-' + (btnAction === 'link' ? 'primary rounded-circle' : 'danger rounded') + ' my-auto ml-auto mr-2 shadow-sm" data-toggle="button" onclick="toggleParameter(\'' + btnAction + '\',' + prod_cat.id + ')">'
+                            + '<i class="fa fa-' + (btnAction === 'link' ? 'plus' : 'trash') + '"></i>'
+                            + '</button>'
+                            + '</div>'
+                            + '<hr>'
+                            + '<div class="panel panel-success autocollapse ml-2">'
+                            + '<div class="panel-heading clickable">'
+                            + '<div class="row">'
+                            + '<div class="text-left my-auto">Description</div>'
+                            + '<i class="fa fa-chevron-circle-down my-auto mx-2" style="font-size:20px;"></i>'
+                            + '</div>'
+                            + '</div>'
+                            + '<div class="panel-body">'
+                            + '<hr>'
+                            + '<div class="text-justify mx-4">' + prod_cat.description + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>';
+                }
+                $('#' + btnAction + 'ProdCat-form')[0].innerHTML = innerhtml;
+                hideDescription();
+            }
+
             function changeTab(tab) {
                 window.history.pushState(null, null, '${contextPath}list.cat.html?list_catID=${list_cat_ID}&tab=' + tab);
             }
             changeTab('${currentTab}');
+            showProductCategories('linked');
+            showProductCategories('other');
         </script>
 
         <footer class="footer font-small blue pt-3">
