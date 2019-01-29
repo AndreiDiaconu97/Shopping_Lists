@@ -4,8 +4,8 @@
         <param-name>relative_dburl</param-name>
         <param-value>db.sl</param-value>
     </context-param>
-    <context-param> 
-        <description>Location to store shopping lists images</description> 
+    <context-param>
+        <description>Location to store shopping lists images</description>
         <param-name>uploadDir</param-name>
         <param-value>images</param-value>
     </context-param>
@@ -26,10 +26,6 @@
         <url-pattern>/admin/*</url-pattern>
     </filter-mapping>
     <servlet>
-        <servlet-name>ProductSearchServlet</servlet-name>
-        <servlet-class>servlets.ProductSearch</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AdminServlet</servlet-name>
         <servlet-class>servlets.admin.AdminServlet</servlet-class>
     </servlet>
@@ -37,17 +33,13 @@
         <servlet-name>Admin_jsp</servlet-name>
         <jsp-file>/WEB-INF/Admin/admin.jsp</jsp-file>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>ProductSearchServlet</servlet-name>
-        <url-pattern>/product.search</url-pattern>
-    </servlet-mapping>
+    <servlet>
+        <servlet-name>Chat</servlet-name>
+        <servlet-class>servlets.user.Chat</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>Homepage_jsp</servlet-name>
         <jsp-file>/WEB-INF/User/homepage.jsp</jsp-file>
-    </servlet>
-    <servlet>
-        <servlet-name>ListSearchServlet</servlet-name>
-        <servlet-class>servlets.user.ListSearchServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProductServlet</servlet-name>
@@ -126,12 +118,12 @@
         <url-pattern>/admin/admin.html</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ListSearchServlet</servlet-name>
-        <url-pattern>/restricted/list.search</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ProductServlet</servlet-name>
         <url-pattern>/restricted/product.handler</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Chat</servlet-name>
+        <url-pattern>/restricted/chat</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

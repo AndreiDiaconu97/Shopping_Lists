@@ -335,16 +335,15 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void insertMessage(Message message) throws DAOException {
         checkParam(message);
         
-        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, TIME, MESSAGE, IS_LOG) VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, MESSAGE, IS_LOG) VALUES (?,?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, message.getList().getId());
             stm.setInt(2, message.getUser().getId());
-            stm.setTimestamp(3, message.getTime());
-            stm.setString(4, message.getText());
-            stm.setBoolean(5, message.getIsLog());
+            stm.setString(3, message.getText());
+            stm.setBoolean(4, message.getIsLog());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to add message to list chat", ex);
+            throw new DAOException("Impossible to add message to list chat: "+ ex);
         }
     }
 

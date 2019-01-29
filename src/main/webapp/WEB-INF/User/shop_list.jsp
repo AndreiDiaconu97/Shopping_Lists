@@ -457,10 +457,11 @@
                             <hr>
                         </c:forEach>
                     </div>
-                    <div class="modal-footer form-horizontal">
-                        <input class="form-control mr-2" type="text" style="width: 92%" placeholder="write a message...">
-                        <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
-                    </div>
+                        <form action="${contextPath}restricted/chat" method="POST" class="modal-footer form-horizontal">
+                            <input type="hidden" name="list_id" value="${list.id}">
+                            <input class="form-control mr-2" type="text" name="text" style="width: 92%" placeholder="write a message...">
+                            <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
+                        </form>
                 </div>
             </div>
         </div>
@@ -848,7 +849,7 @@
                 let missinghtml = "";
                 for (p of missing) {
                     let day = 24 * 3600 * 1000;
-                    let need_reset = Math.random()>0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
+                    let need_reset = Math.random() > 0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     missinghtml = missinghtml
                             + '<div class="card shadow-sm mb-2">'
                             + '    <div class="card-body">'
@@ -862,9 +863,9 @@
                     if (userAccessLevel == "FULL" || userAccessLevel == "PRODUCTS") {
                         missinghtml = missinghtml
                                 + (need_reset ? (' <label class="input-group-text ml-auto" for="input-group-edit-product' + p.id + '" style="background-color: #F1C40F" data-toggle="tooltip" data-placement="top" title="It\'s been a while.\nReset suggested">'
-                                + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
-                                + '                </label>') : '')
-                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm '+(need_reset ? '' : 'ml-auto')+' mr-2" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
+                                        + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
+                                        + '                </label>') : '')
+                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm ' + (need_reset ? '' : 'ml-auto') + ' mr-2" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
                                 + '                   <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
                                 + '                </button>';
                     }
@@ -890,7 +891,7 @@
                 let purchasedhtml = "";
                 for (p of purchased) {
                     let day = 24 * 3600 * 1000;
-                    let need_reset = Math.random()>0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
+                    let need_reset = Math.random() > 0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     purchasedhtml = purchasedhtml
                             + '<div class="card shadow-sm mb-2" style="background-color: whitesmoke">'
                             + '    <div class="card-body">'
@@ -904,9 +905,9 @@
                     if (userAccessLevel == "FULL" || userAccessLevel == "PRODUCTS") {
                         purchasedhtml = purchasedhtml
                                 + (need_reset ? (' <label class="input-group-text ml-auto" for="input-group-edit-product' + p.id + '" style="background-color: #F1C40F" data-toggle="tooltip" data-placement="top" title="It\'s been a while.\nReset suggested">'
-                                + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
-                                + '                </label>') : '')
-                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm '+(need_reset ? '' : 'ml-auto')+'" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
+                                        + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
+                                        + '                </label>') : '')
+                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm ' + (need_reset ? '' : 'ml-auto') + '" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
                                 + '                   <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
                                 + '                </button>';
                     }
