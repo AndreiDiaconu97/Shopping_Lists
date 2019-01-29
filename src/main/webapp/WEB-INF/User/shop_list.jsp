@@ -107,6 +107,7 @@
         return;
     }
     if (list == null) {
+        System.err.println("List not found");
         if (!response.isCommitted()) {
             response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
         }
@@ -114,7 +115,8 @@
     }
 
     //check visibility
-    if ((user.getId() != list.getOwner().getId()) && !(list_regDao.getUsersSharedTo(list)).contains(user)) {
+    if (!(user.equals(list.getOwner())) && !(list_regDao.getUsersSharedTo(list)).contains(user)) {
+        System.err.println("Access to this list DENIED");
         if (!response.isCommitted()) {
             response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
         }
@@ -152,7 +154,7 @@
         friends.removeAll(shared_to);
         pageContext.setAttribute("friends", friends);
 
-        boolean isListOwner = (user.getId() == list.getOwner().getId());
+        boolean isListOwner = (user.equals(list.getOwner()));
         pageContext.setAttribute("isListOwner", isListOwner);
         pageContext.setAttribute("userDao", userDao);
         pageContext.setAttribute("list_regDao", list_regDao);
@@ -250,12 +252,14 @@
                 <button type="button" class="btn btn-dark btn-sm mx-1 ml-auto" href="#chatModal" onclick="scrollChat()" data-toggle="modal">
                     <i class="fa fa-comments" style="font-size:30px; color: graytext"></i>
                 </button>
-                <button type="button" class="btn btn-dark btn-sm mx-1" href="#participantsModal" data-toggle="modal">
-                    <i class="fa fa-users" style="font-size:30px; color: graytext"></i>
-                </button>
-                <button type="button" class="btn btn-dark btn-sm mx-1" href="#shareModal" data-toggle="modal">
-                    <i class="fa fa-share-alt" style="font-size:30px; color: graytext"></i>
-                </button>
+                <c:if test="${isListOwner}">
+                    <button type="button" class="btn btn-dark btn-sm mx-1" href="#participantsModal" data-toggle="modal">
+                        <i class="fa fa-users" style="font-size:30px; color: graytext"></i>
+                    </button>
+                    <button type="button" class="btn btn-dark btn-sm mx-1" href="#shareModal" data-toggle="modal">
+                        <i class="fa fa-share-alt" style="font-size:30px; color: graytext"></i>
+                    </button>
+                </c:if>
             </div>
         </div>
 
@@ -311,13 +315,15 @@
                             </div>
                             <div class="row ml-auto mx-2 my-2">
                                 <div class="input-group">
-                                    <input class="form-control" type="search" placeholder="List products..." id="p-search-name" onkeyup="showProducts()">
+                                    <input class="form-control" type="search" placeholder="Search name ..." id="p-search-name" onkeyup="showProducts()">
                                     <button class="btn btn-outline-success" onclick="showProducts()">
                                         <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">
-                                        <i class="fa fa-plus mr-auto"></i>
-                                    </button>
+                                    <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
+                                        <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">
+                                            <i class="fa fa-plus mr-auto"></i>
+                                        </button>
+                                    </c:if>
                                 </div>
                             </div>
                         </div>
@@ -325,6 +331,10 @@
                 </div>
             </div>
         </div>
+
+
+
+
         <div class="container-fluid">
             <div class="row mx-auto mb-2 justify-content-end">
                 <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#sendPurchasedModal" data-toggle="modal">
@@ -452,171 +462,183 @@
             </div>
         </div>
 
-        <!-- participants -->
-        <div class="modal modal-fluid" id="participantsModal">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header shadow">
-                        <i class="fa fa-users my-auto mr-auto" style="font-size:30px;"></i>
-                        <h5 class="modal-title">Participants</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
-                        <c:forEach var="shared_user" items="${list_regDao.getUsersSharedTo(list)}">
-                            <c:set var="shared_user_al" value="${userDao.getAccessLevel(shared_user, list)}"/>
-                            <div class="row mb-2 px-auto ml-0">
-                                <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                <p class="mr-2 my-auto">
-                                    <c:out value="${shared_user.firstname} ${user.lastname}" />
-                                </p>
-                                <p class="mr-2 my-auto" style="color: grey">
-                                    <c:out value="(${shared_user.email})" />
-                                </p>
-                                <div class="row ml-auto mx-2 my-2">
-                                    <div class="input-group my-auto">
-                                        <select class="custom-select" id="inputGroupSelect02">
-                                            <my:n>
-                                                <option value="2" <c:if test="${shared_user_al=='FULL'}">selected</c:if> >FULL</option>
-                                                <option value="1" <c:if test="${shared_user_al=='PRODUCTS'}">selected</c:if> >PRODUCTS</option>
-                                                <option value="0" <c:if test="${shared_user_al=='READ'}">selected</c:if> >READ</option>
-                                            </my:n>
-                                        </select>
-                                        <div class="input-group-append">
-                                            <label class="input-group-text" for="inputGroupSelect02">
-                                                <i class="fa fa-wrench"></i>
-                                            </label>
+        <c:if test="${isListOwner}">
+            <!-- participants -->
+            <div class="modal modal-fluid" id="participantsModal">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header shadow">
+                            <i class="fa fa-users my-auto mr-auto" style="font-size:30px;"></i>
+                            <h5 class="modal-title">Participants</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
+                            <c:forEach var="shared_user" items="${list_regDao.getUsersSharedTo(list)}">
+                                <c:set var="shared_user_al" value="${userDao.getAccessLevel(shared_user, list)}"/>
+                                <div class="row mb-2 px-auto ml-0">
+                                    <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                    <p class="mr-2 my-auto">
+                                        <c:out value="${shared_user.firstname} ${user.lastname}" />
+                                    </p>
+                                    <p class="mr-2 my-auto" style="color: grey">
+                                        <c:out value="(${shared_user.email})" />
+                                    </p>
+                                    <div class="row ml-auto mx-2 my-2">
+                                        <div class="input-group my-auto">
+                                            <select class="custom-select" id="inputGroupSelect02">
+                                                <my:n>
+                                                    <option value="2" <c:if test="${shared_user_al=='FULL'}">selected</c:if> >FULL</option>
+                                                    <option value="1" <c:if test="${shared_user_al=='PRODUCTS'}">selected</c:if> >PRODUCTS</option>
+                                                    <option value="0" <c:if test="${shared_user_al=='READ'}">selected</c:if> >READ</option>
+                                                </my:n>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="inputGroupSelect02">
+                                                    <i class="fa fa-wrench"></i>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
+                                    <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button"
+                                            >
+                                        <i class="fa fa-user-times" style="font-size:25px"></i>
+                                    </button>
                                 </div>
-                                <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button"
-                                        >
-                                    <i class="fa fa-user-times" style="font-size:25px"></i>
-                                </button>
-                            </div>
-                            <hr>
-                        </c:forEach>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <hr>
+                            </c:forEach>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </c:if>
 
-        <!-- share -->
-        <div class="modal modal-fluid" id="shareModal">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header shadow">
-                        <i class="fa fa-share-alt my-auto mr-auto" style="font-size:30px;"></i>
-                        <h5 class="modal-title ml-2">Share your shopping list</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body" style="height:62vh; overflow-y:scroll; width: 100%">
-                        <div class="modal-header my-2" style="background-color: #bbbbbb">
-                            <h5 class="modal-title ml-2">Recent contacts</h5>                                
+        <c:if test="${isListOwner}">
+            <!-- share -->
+            <div class="modal modal-fluid" id="shareModal">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header shadow">
+                            <i class="fa fa-share-alt my-auto mr-auto" style="font-size:30px;"></i>
+                            <h5 class="modal-title ml-2">Share your shopping list</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
                         </div>
-                        <c:forEach var="friend" items="${friends}">
-                            <div class="row px-auto ml-0">
-                                <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                <p class="mr-2 my-auto">
-                                    ${friend.firstname} ${friend.lastname}
-                                </p>
-                                <p class="mr-2 my-auto" style="color: grey">
-                                    ${friend.email}
-                                </p>
-                                <div class="row ml-auto mx-2 my-2">
-                                    <div class="input-group my-auto">
-                                        <select class="custom-select" id="sharePermssionsSelect${friend.id}">
-                                            <option value="2">FULL</option>
-                                            <option value="1">PRODUCTS</option>
-                                            <option value="0" selected>READ</option>
-                                        </select>
-                                        <div class="input-group-append">
-                                            <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
-                                                <i class="fa fa-wrench"></i>
-                                            </label>
+
+                        <div class="modal-body" style="height:62vh; overflow-y:scroll; width: 100%">
+                            <div class="modal-header my-2" style="background-color: #bbbbbb">
+                                <h5 class="modal-title ml-2">Recent contacts</h5>                                
+                            </div>
+                            <c:forEach var="friend" items="${friends}">
+                                <div class="row px-auto ml-0">
+                                    <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                    <p class="mr-2 my-auto">
+                                        ${friend.firstname} ${friend.lastname}
+                                    </p>
+                                    <p class="mr-2 my-auto" style="color: grey">
+                                        ${friend.email}
+                                    </p>
+                                    <div class="row ml-auto mx-2 my-2">
+                                        <div class="input-group my-auto">
+                                            <select class="custom-select" id="sharePermssionsSelect${friend.id}">
+                                                <option value="2">FULL</option>
+                                                <option value="1">PRODUCTS</option>
+                                                <option value="0" selected>READ</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                                    <i class="fa fa-wrench"></i>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
+                                    <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button">
+                                        <i class="fa fa-user-plus" style="font-size:25px"></i>
+                                    </button>
                                 </div>
-                                <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button">
-                                    <i class="fa fa-user-plus" style="font-size:25px"></i>
-                                </button>
-                            </div>
-                            <hr>
-                        </c:forEach>
-                    </div>
-                    <div class="modal-footer">
-                        <h5 class="row-sm my-2">Add by email</h5>                                
-                        <input class="form-control" type="text" style="width: 70%" placeholder="Insert user email...">
-                        <div class="row my-2">
-                            <div class="input-group my-auto">
-                                <select class="custom-select" id="sharePermssionsSelect${friend.id}">
-                                    <option value="2">FULL</option>
-                                    <option value="1">PRODUCTS</option>
-                                    <option value="0" selected>READ</option>
-                                </select>
-                                <div class="input-group-append">
-                                    <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
-                                        <i class="fa fa-wrench"></i>
-                                    </label>
+                                <hr>
+                            </c:forEach>
+                        </div>
+                        <div class="modal-footer">
+                            <h5 class="row-sm my-2">Add by email</h5>                                
+                            <input class="form-control" type="text" style="width: 70%" placeholder="Insert user email...">
+                            <div class="row my-2">
+                                <div class="input-group my-auto">
+                                    <select class="custom-select" id="sharePermssionsSelect${friend.id}">
+                                        <option value="2">FULL</option>
+                                        <option value="1">PRODUCTS</option>
+                                        <option value="0" selected>READ</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                            <i class="fa fa-wrench"></i>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <button type="button" class="btn btn-success mx-auto my-auto shadow-sm rounded" data-toggle="button">
-                            <i class="fa fa-user-plus" style="font-size:25px"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- add product -->
-        <div class="modal modal-fluid" id="addProductModal">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header shadow">
-                        <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
-                        <h5 class="modal-title">Add product to list</h5>
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-
-                    <!-- Other products (that can be added) -->
-                    <div class="modal-body" id="otherProducts" style="height:72vh; overflow-y:scroll; width: 100%">
-                    </div>
-
-                    <div class="modal-footer form-horizontal">
-                        <div class="input-group my-auto mx-auto">
-                            <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="showProductsAddModal()">
-                                <option value="Name">Name</option>
-                                <option value="Rating">Rating</option>
-                                <option value="Popularity">Popularity</option>
-                            </select>
-                            <select id="p-add-cat" class="custom-select" style="min-width: 135px" onchange="showProductsAddModal()">
-                                <option value="-1" selected>All categories</option>
-                                <c:forEach var="cat" items="${prod_categories}">
-                                    <option value="${cat.id}">${cat.name}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="input-group my-auto">
-                            <input id="p-add-name" class="form-control mr-2 my-1" style="min-width: 90px" type="text" placeholder="Insert product name..." onkeyup="showProductsAddModal()">
-                            <button type="submit" class="btn btn-secondary mx-auto">
-                                <i class="fa fa-search my-auto" style="font-size:23px;"></i>
+                            <button type="button" class="btn btn-success mx-auto my-auto shadow-sm rounded" data-toggle="button">
+                                <i class="fa fa-user-plus" style="font-size:25px"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </c:if>
+
+        <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
+            <!-- add product -->
+            <div class="modal modal-fluid" id="addProductModal">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header shadow">
+                            <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
+                            <h5 class="modal-title">Add product to list</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- Other products (that can be added) -->
+                        <div class="modal-body" id="otherProducts" style="height:72vh; overflow-y:scroll; width: 100%">
+                        </div>
+
+                        <div class="modal-footer form-horizontal">
+                            <div class="input-group my-auto ml-auto">
+                                <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="showProductsAddModal()">
+                                    <option value="Name">Name</option>
+                                    <option value="Rating">Rating</option>
+                                    <option value="Popularity">Popularity</option>
+                                </select>
+                                <select id="p-add-cat" class="custom-select" style="min-width: 135px" onchange="showProductsAddModal()">
+                                    <option value="-1" selected>All categories</option>
+                                    <c:forEach var="cat" items="${prod_categories}">
+                                        <option value="${cat.id}">${cat.name}</option>
+                                    </c:forEach>
+                                </select>
+                                <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="showProductsAddModal()">
+                            </div>
+                            <div class="input-group my-auto mr-auto" style="max-width: 200px">
+                                <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                                    <input type="hidden" name="list_id"value="${list.id}">
+                                    <input type="hidden" name="action" value="add">
+                                    <input type="hidden" id="add-Product-Hidden-Id" name="product_id">
+                                    <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="amount" placeholder="Amount">
+                                    <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn btn-primary shadow rounded-circle">
+                                        <i class="fa fa-plus" style="font-size:23px"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </c:if>
 
         <!-- manage product -->
         <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
@@ -788,6 +810,7 @@
             }
 
             var listProducts = ${ listProductsJSON };
+            var userAccessLevel = "${userAccessLevel}";
 
             // show products
             function showProducts() {
@@ -801,7 +824,7 @@
                 products = products.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
                 switch (sortby) {
                     case "Rating":
-                        products.sort((l, r) => l.rating > r.rating ? 1 : -1);
+                        products.sort((l, r) => l.rating < r.rating ? 1 : -1);
                         break;
 
                     case "Popularity":
@@ -827,7 +850,7 @@
                             + '            </div>'
                             + '                <div class="row ml-auto my-auto mx-1 pt-2">'
                             + '                    <div class="input-group" style="width: 300px">';
-                    if (${ isListOwner || (userAccessLevel=="FULL") || (userAccessLevel=="PRODUCTS") }) {
+                    if ((userAccessLevel == "FULL") || (userAccessLevel == "PRODUCTS")) {
                         missinghtml = missinghtml
                                 + '                    <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">'
                                 + '                       <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
@@ -893,7 +916,7 @@
                 products = products.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
                 switch (sortby) {
                     case "Rating":
-                        products.sort((l, r) => l.rating > r.rating ? 1 : -1);
+                        products.sort((l, r) => l.rating < r.rating ? 1 : -1);
                         break;
 
                     case "Popularity":
@@ -909,7 +932,7 @@
                 let innerhtml = "";
                 for (p of products) {
                     innerhtml = innerhtml
-                            + '<div class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke">'
+                            + '<div id="add-product-div-' + p.id + '" class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke" onclick="selectAddProduct(' + p.id + ')">'
                             + '          <div class="row my-2 ml-0">'
                             + '              <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
                             + '              <div class="col my-auto">'
@@ -962,6 +985,23 @@
                 }
             }
 
+            var selectedProduct = -1;
+            $('#add-Product-Send-Btn')[0].disabled = true;
+            function selectAddProduct(id) {
+                if (selectedProduct != -1) {
+                    $('#add-product-div-' + selectedProduct)[0].style['background-color'] = "whitesmoke";
+                }
+                $('#add-Product-Send-Btn')[0].disabled = false;
+                selectedProduct = id;
+                $('#add-product-div-' + id)[0].style['background-color'] = "#5DADE2";
+            }
+
+            function submitAddProduct() {
+                if (selectedProduct != -1 && $('#add-Product-Form-Amount')[0].value) {
+                    $('#add-Product-Hidden-Id')[0].value = selectedProduct;
+                    $('#add-Product-Form')[0].submit();
+                }
+            }
         </script>
     </body>
 
