@@ -93,6 +93,18 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(list_reg, true);
         checkParam(product, true);
         
+        String query_cat = "SELECT * FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT=? AND PRODUCT_CAT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query_cat)){
+            stm.setInt(1, list_reg.getCategory().getId());
+            stm.setInt(2, product.getCategory().getId());
+            
+            if(!stm.executeQuery().next()){
+                throw new SQLException("L_cat does not have this p_cat");
+            }
+        } catch (Exception ex) {
+            throw new DAOException("List category does not allow this product's category");
+        }
+        
         String query = "INSERT INTO " + L_P_TABLE + " (LIST, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_reg.getId());
@@ -323,12 +335,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void insertMessage(Message message) throws DAOException {
         checkParam(message);
         
-        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, TIME, TEXT, IS_LOG) VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, TIME, MESSAGE, IS_LOG) VALUES (?,?,?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, message.getList().getId());
             stm.setInt(2, message.getUser().getId());
             stm.setTimestamp(3, message.getTime());
-            stm.setNString(4, message.getText());
+            stm.setString(4, message.getText());
             stm.setBoolean(5, message.getIsLog());
             stm.executeUpdate();
         } catch (SQLException ex) {
@@ -337,7 +349,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
-    public List<Message> getListMessages(List_reg list_reg) throws DAOException {
+    public List<Message> getMessages(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
         
         String query = "SELECT * FROM " + CHATS_TABLE + " WHERE LIST = ?";
@@ -348,16 +360,16 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 while (rs.next()) {
                     Message m = new Message();
                     m.setList(list_reg);
-                    m.setUser(getUser(rs.getInt("USER"), CON));
+                    m.setUser(getUser(rs.getInt("USER_ID"), CON));
                     m.setTime(rs.getTimestamp("TIME"));
-                    m.setText(rs.getNString("TEXT"));
+                    m.setText(rs.getString("MESSAGE"));
                     m.setIsLog(rs.getBoolean("IS_LOG"));
                     messages.add(m);
                 }
                 return messages;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossigle to get messages for given list", ex);
+            throw new DAOException("Impossible to get messages for given list", ex);
         }
     }
 }

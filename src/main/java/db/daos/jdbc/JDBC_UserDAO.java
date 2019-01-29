@@ -53,10 +53,10 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
         }
 
         User user = getByEmail(email);
-        if(user==null){
+        if (user == null) {
             return null;
         }
-        
+
         // CHECK IF HASH IS MATCHING
         if (BCrypt.checkpw(password, user.getHashed_password())) {
             return user;
@@ -215,6 +215,32 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to update the user", ex);
+        }
+    }
+
+    @Override
+    public List<User> getFriends(User user) throws DAOException {
+        checkParam(user, true);
+
+        String query = ""
+                + "SELECT * FROM USERS WHERE ID IN\n"
+                + "((SELECT USER_ID FROM LISTS_SHARING WHERE LIST IN (SELECT ID FROM LISTS WHERE OWNER=?))\n"
+                + "UNION\n"
+                + "(SELECT OWNER FROM LISTS WHERE ID IN (SELECT LIST FROM LISTS_SHARING WHERE USER_ID=?)))";
+        try(PreparedStatement stm = CON.prepareStatement(query)){
+            stm.setInt(1, user.getId());
+            stm.setInt(2, user.getId());
+            
+            try (ResultSet rs = stm.executeQuery()) {
+                List<User> users = new ArrayList<>();
+
+                while (rs.next()) {
+                    users.add(resultSetToUser(rs, CON));
+                }
+                return users;
+            }
+        } catch(SQLException ex){
+            throw new DAOException("Impossible to get user's friends:\n" + ex);
         }
     }
 }

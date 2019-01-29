@@ -1,3 +1,8 @@
+<%@page import="java.util.HashSet"%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.function.Predicate"%>
+<%@page import="db.daos.jdbc.JDBC_utility.SortBy"%>
+<%@page import="db.entities.Message"%>
 <%@page import="org.json.JSONObject"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="java.util.HashMap"%>
@@ -15,6 +20,7 @@
 <%@page import="db.entities.List_reg"%>
 <%@page import="java.util.List"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="my" tagdir="/WEB-INF/tags" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="db.factories.DAOFactory"%>
 <%@page import="db.exceptions.DAOFactoryException"%>
@@ -73,6 +79,7 @@
     if (!contextPath.endsWith("/")) {
         contextPath += "/";
     }
+    pageContext.setAttribute("contextPath", contextPath);
 
     // get user
     User user = (User) session.getAttribute("user");
@@ -132,11 +139,26 @@
         }
         pageContext.setAttribute("listProductsJSON", listProductsJSON);
 
+        Set<Product> otherProducts = new HashSet<>();
+        for (Prod_category p_c : prod_categories) {
+            otherProducts.addAll(productDao.filterProducts(null, p_c, user, true, SortBy.POPULARITY));
+        }
+        otherProducts.removeAll(listProducts);
+        pageContext.setAttribute("otherProductsJSON", Product.toJSON(otherProducts));
+
         List<User> shared_to = list_regDao.getUsersSharedTo(list);
         pageContext.setAttribute("shared_to", shared_to);
+        List<User> friends = userDao.getFriends(user);
+        friends.removeAll(shared_to);
+        pageContext.setAttribute("friends", friends);
+
         boolean isListOwner = (user.getId() == list.getOwner().getId());
         pageContext.setAttribute("isListOwner", isListOwner);
         pageContext.setAttribute("userDao", userDao);
+        pageContext.setAttribute("list_regDao", list_regDao);
+        AccessLevel userAccessLevel = isListOwner ? AccessLevel.FULL : userDao.getAccessLevel(user, list);
+        pageContext.setAttribute("userAccessLevel", userAccessLevel);
+        System.err.println("User access level: " + userAccessLevel);
     } catch (DAOException ex) {
         System.err.println("Error getting some info: " + ex);
     }
@@ -148,7 +170,8 @@
         <title>Shopping lists manager</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
@@ -163,8 +186,7 @@
                 <i class="fa fa-shopping-cart" style="font-size:30px"></i>
                 Shopping lists
             </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -173,7 +195,7 @@
                         <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
                     </li>
                     <li class="dropdown ml-auto my-auto">
-                        <form class="form-inline" action="<%=contextPath%>auth" method="POST" method="POST">
+                        <form class="form-inline" action="${contextPath}auth" method="POST" method="POST">
                             <input class="form-control" type="hidden" name="action" value="logout" required>
                             <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
                         </form>
@@ -201,7 +223,7 @@
                             </span>
                         </small>
                     </h4>
-                    <c:if test="${isListOwner}">
+                    <c:if test="${userAccessLevel=='FULL'}">
                         <button type="button" class="btn btn-secondary ml-auto" href="#listSettingsModal" data-toggle="modal">
                             <i class="fa fa-cog" style="font-size:20px"></i>
                         </button>
@@ -225,7 +247,7 @@
                         <c:out value="(${list.owner.email})" />
                     </span>
                 </p>
-                <button type="button" class="btn btn-dark btn-sm mx-1 ml-auto" href="#chatModal" data-toggle="modal">
+                <button type="button" class="btn btn-dark btn-sm mx-1 ml-auto" href="#chatModal" onclick="scrollChat()" data-toggle="modal">
                     <i class="fa fa-comments" style="font-size:30px; color: graytext"></i>
                 </button>
                 <button type="button" class="btn btn-dark btn-sm mx-1" href="#participantsModal" data-toggle="modal">
@@ -289,13 +311,11 @@
                             </div>
                             <div class="row ml-auto mx-2 my-2">
                                 <div class="input-group">
-                                    <input class="form-control" type="search" placeholder="List products..." id="p-search-name"
-                                           onkeyup="showProducts()">
+                                    <input class="form-control" type="search" placeholder="List products..." id="p-search-name" onkeyup="showProducts()">
                                     <button class="btn btn-outline-success" onclick="showProducts()">
                                         <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal"
-                                            data-toggle="modal">
+                                    <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">
                                         <i class="fa fa-plus mr-auto"></i>
                                     </button>
                                 </div>
@@ -307,13 +327,13 @@
         </div>
         <div class="container-fluid">
             <div class="row mx-auto mb-2 justify-content-end">
-                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#">
-                    Update
+                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#sendPurchasedModal" data-toggle="modal">
+                    Confirm
                     <i class="fa fa-check ml-1"></i>
                 </button>
-                <button type="button" class="btn btn-danger my-auto shadow rounded" href="#">
-                    Cancel
-                    <i class="fa fa-times ml-1"></i>
+                <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetPurchased()">
+                    Reset
+                    <i class="fas fa-redo ml-1"></i>
                 </button>
             </div>
 
@@ -325,13 +345,13 @@
 
 
             <div class="row mx-auto mb-2 justify-content-end">
-                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#">
-                    Update
+                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#sendPurchasedModal" data-toggle="modal">
+                    Confirm
                     <i class="fa fa-check ml-1"></i>
                 </button>
-                <button type="button" class="btn btn-danger my-auto shadow rounded" href="#">
-                    Cancel
-                    <i class="fa fa-times ml-1"></i>
+                <button type="button" class="btn btn-danger my-auto shadow rounded"  onclick="resetPurchased()">
+                    Reset
+                    <i class="fas fa-redo ml-1"></i>
                 </button>
             </div>
 
@@ -354,15 +374,15 @@
         <!-- MODALS -->
 
         <!-- list settings -->
-        <c:if test="${isListOwner}">
-            <div class="modal modal-fluid" id="listSettingsModal" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <c:if test="${userAccessLevel=='FULL'}">
+            <div class="modal modal-fluid" id="listSettingsModal">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header shadow">
                             <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
                             <h5 class="modal-title">Shopping list edit</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
                             </button>
                         </div>
                         <div class="modal-body mx-3">
@@ -370,30 +390,19 @@
                                 <i class="fa fa-image prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="defaultForm-email">Logo</label>
                                 <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <input type="file" class="custom-file-input" id="inputGroupFile01">
                                     <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                                 </div>
                             </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="defaultForm-email">List name</label>
-                                <input type="text" class="form-control validate" />
+                                <input type="text" class="form-control validate" value="${list.name}"/>
                             </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-align-left prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="defaultForm-email">Description</label>
-                                <textarea class="form-control validate"></textarea>
-                            </div>
-                            <div class="input-group">
-                                <select class="form-control">
-                                    <option value="volvo" selected>Volvo</option>
-                                    <option value="saab">Saab</option>
-                                    <option value="mercedes">Mercedes</option>
-                                    <option value="audi">Audi</option>
-                                </select>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">Category</span>
-                                </div>
+                                <textarea class="form-control validate">${list.description}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -406,18 +415,18 @@
         </c:if>
 
         <!-- chat -->
-        <div class="modal modal-fluid" id="chatModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="chatModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-comments my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Group chat</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
-                        <c:forEach var="i" begin="0" end="15">
+                    <div class="modal-body" id="chatbody" style="height:72vh; overflow-y:scroll; width: 100%">
+                        <c:forEach var="message" items="${list_regDao.getMessages(list)}">
                             <div class="row mb-2 ml-0">
                                 <div class="col-3 col-md-2">
                                     <div class="row">
@@ -425,20 +434,18 @@
                                              alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
                                     </div>
                                     <div class="row">
-                                        User${i} can be a very long name too
+                                        ${message.user.firstname} ${message.user.lastname}
                                     </div>
                                 </div>
                                 <div class="col">
-                                    message${i} an be a very lon one sads asd saas dasd asd sasd asd wda awwad aw awaw dw
-                                    aw awwad waddaw wad
+                                    ${message.text}
                                 </div>
                             </div>
                             <hr>
                         </c:forEach>
                     </div>
                     <div class="modal-footer form-horizontal">
-                        <input class="form-control mr-2" type="text" style="width: 92%" placeholder="write a message..."
-                               aria-label="write a message...">
+                        <input class="form-control mr-2" type="text" style="width: 92%" placeholder="write a message...">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
                     </div>
                 </div>
@@ -446,54 +453,50 @@
         </div>
 
         <!-- participants -->
-        <div class="modal modal-fluid" id="participantsModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="participantsModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-users my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Participants</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
                     <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
-                        <%
-                            for (User shared_user : list_regDao.getUsersSharedTo(list)) {
-                                AccessLevel uAccessLevel = userDao.getAccessLevel(shared_user, list);
-                                pageContext.setAttribute("access_levels", AccessLevel.values());
-                                pageContext.setAttribute("uAccessLevel", uAccessLevel);
-                        %>
-                        <div class="row mb-2 px-auto ml-0">
-                            <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%"
-                                 alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                            <p class="mr-2 my-auto">
-                                <c:out value="${user.firstname} ${user.lastname}" />
-                            </p>
-                            <p class="mr-2 my-auto" style="color: grey">
-                                <c:out value="(${user.email})" />
-                            </p>
-                            <div class="row ml-auto mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="inputGroupSelect02">
-                                        <c:forEach var="access_level" varStatus="i" items="${access_levels}">
-                                            <option value="${i.index}" <c:if test="${access_level == uAccessLevel}">selected</c:if>>${access_level}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <div class="input-group-append">
-                                        <label class="input-group-text" for="inputGroupSelect02">
-                                            <i class="fa fa-wrench"></i>
-                                        </label>
+                        <c:forEach var="shared_user" items="${list_regDao.getUsersSharedTo(list)}">
+                            <c:set var="shared_user_al" value="${userDao.getAccessLevel(shared_user, list)}"/>
+                            <div class="row mb-2 px-auto ml-0">
+                                <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                <p class="mr-2 my-auto">
+                                    <c:out value="${shared_user.firstname} ${user.lastname}" />
+                                </p>
+                                <p class="mr-2 my-auto" style="color: grey">
+                                    <c:out value="(${shared_user.email})" />
+                                </p>
+                                <div class="row ml-auto mx-2 my-2">
+                                    <div class="input-group my-auto">
+                                        <select class="custom-select" id="inputGroupSelect02">
+                                            <my:n>
+                                                <option value="2" <c:if test="${shared_user_al=='FULL'}">selected</c:if> >FULL</option>
+                                                <option value="1" <c:if test="${shared_user_al=='PRODUCTS'}">selected</c:if> >PRODUCTS</option>
+                                                <option value="0" <c:if test="${shared_user_al=='READ'}">selected</c:if> >READ</option>
+                                            </my:n>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <label class="input-group-text" for="inputGroupSelect02">
+                                                <i class="fa fa-wrench"></i>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
+                                <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button"
+                                        >
+                                    <i class="fa fa-user-times" style="font-size:25px"></i>
+                                </button>
                             </div>
-                            <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button"
-                                    aria-pressed="false">
-                                <i class="fa fa-user-times" style="font-size:25px"></i>
-                            </button>
-                        </div>
-                        <hr>
-                        <%                        }
-                        %>
+                            <hr>
+                        </c:forEach>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button>
@@ -504,62 +507,70 @@
         </div>
 
         <!-- share -->
-        <div class="modal modal-fluid" id="shareModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="shareModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-share-alt my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title ml-2">Share your shopping list</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
-                    <!-- BEWARE! following jtsl are only temporary templates -->
-                    <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
-                        <c:forEach var="user_sharing" varStatus="i" begin="0" end="10">
+
+                    <div class="modal-body" style="height:62vh; overflow-y:scroll; width: 100%">
+                        <div class="modal-header my-2" style="background-color: #bbbbbb">
+                            <h5 class="modal-title ml-2">Recent contacts</h5>                                
+                        </div>
+                        <c:forEach var="friend" items="${friends}">
                             <div class="row px-auto ml-0">
-                                <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%"
-                                     alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
+                                <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
                                 <p class="mr-2 my-auto">
-                                    <c:out value="firstname lastname" />
+                                    ${friend.firstname} ${friend.lastname}
                                 </p>
                                 <p class="mr-2 my-auto" style="color: grey">
-                                    <c:out value="(email)" />
+                                    ${friend.email}
                                 </p>
                                 <div class="row ml-auto mx-2 my-2">
                                     <div class="input-group my-auto">
-                                        <select class="custom-select" id="sharePermssionsSelect${i.index}">
-                                            <%
-                                                pageContext.setAttribute("access_levels", AccessLevel.values());
-                                            %>
-                                            <c:forEach var="access_level" varStatus="i" items="${access_levels}">
-                                                <option value="${i.index}" <c:if test="${i.index == 0}">selected</c:if>>${access_level}</option>
-                                            </c:forEach>
+                                        <select class="custom-select" id="sharePermssionsSelect${friend.id}">
+                                            <option value="2">FULL</option>
+                                            <option value="1">PRODUCTS</option>
+                                            <option value="0" selected>READ</option>
                                         </select>
                                         <div class="input-group-append">
-                                            <label class="input-group-text" for="sharePermssionsSelect${i.index}">
+                                            <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
                                                 <i class="fa fa-wrench"></i>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button"
-                                        aria-pressed="false">
+                                <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button">
                                     <i class="fa fa-user-plus" style="font-size:25px"></i>
-                                </button>
-                                <button type="button" class="btn btn-info my-auto mr-2 shadow-sm rounded" data-toggle="button"
-                                        aria-pressed="false">
-                                    <i class="fa fa-clipboard" style="font-size:20px"></i>
                                 </button>
                             </div>
                             <hr>
                         </c:forEach>
                     </div>
                     <div class="modal-footer">
-                        <input class="form-control mr-2" type="text" style="width: 92%" placeholder="insert user name..."
-                               aria-label="insert user name...">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fa fa-search my-auto" style="font-size:23px;"></i>
+                        <h5 class="row-sm my-2">Add by email</h5>                                
+                        <input class="form-control" type="text" style="width: 70%" placeholder="Insert user email...">
+                        <div class="row my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="sharePermssionsSelect${friend.id}">
+                                    <option value="2">FULL</option>
+                                    <option value="1">PRODUCTS</option>
+                                    <option value="0" selected>READ</option>
+                                </select>
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                        <i class="fa fa-wrench"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success mx-auto my-auto shadow-sm rounded" data-toggle="button">
+                            <i class="fa fa-user-plus" style="font-size:25px"></i>
                         </button>
                     </div>
                 </div>
@@ -567,84 +578,37 @@
         </div>
 
         <!-- add product -->
-        <div class="modal modal-fluid" id="addProductModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="addProductModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
                         <h5 class="modal-title">Add product to list</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" style="height:72vh; overflow-y:scroll; width: 100%">
-                        <c:forEach var="i" begin="0" end="15">
-                            <div class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke">
-                                <div class="row my-2 ml-0">
-                                    <img class="img-thumbnail mx-auto my-auto" style="width: 100px; height: 100%; min-width: 50px; min-height: 100%"
-                                         alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">
-                                    <div class="col my-auto">
-                                        <div class="text-left">
-                                            Product${i} can be a very long name too rterg ge gr egg reg er eer er rer ege
-                                            er erer er
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mx-0 justify-content-between">
-                                    <div class="row mx-0 my-auto">
-                                        <div class="input-group mb-3 my-auto">
-                                            <c:forEach var="i" begin="0" end="3">
-                                                <i class="fa fa-star" style="font-size:21px;"></i>
-                                            </c:forEach>
-                                            <i class="fa fa-star-o" style="font-size:21px;"></i>
-                                        </div>
-                                    </div>
-                                    <div class="badge badge-pill badge-secondary shadow my-auto">Category</div>
-                                    <div class="text-left">31212242 ratings</div>
-                                </div>
-                                <hr>
-                                <div class="panel panel-success autocollapse">
-                                    <div class="panel-heading clickable">
-                                        <div class="row mx-auto">
-                                            <p>Description</p>
-                                            <i class="fa fa-chevron-circle-down ml-2" style="font-size:25px;"></i>
-                                            <div class="text ml-auto mr-2" style="color: grey">created by</div>
-                                            <div class="text" style="font-size: 18px">Author</div>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="text-justify mx-4 mb-4">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget ante sed
-                                            nisl semper bibendum vel id quam. Maecenas aliquam urna suscipit, posuere leo
-                                            eu, efficitur arcu. Phasellus convallis vel odio vitae viverra. Quisque a ipsum
-                                            sem. Duis interdum finibus iaculis. Nam metus eros, accumsan suscipit erat
-                                            malesuada, dictum ullamcorper purus. Aliquam viverra imperdiet hendrerit.
-                                            Maecenas condimentum massa non lectus elementum vestibulum. Nunc sodales nisl
-                                            ullamcorper diam porta varius. Nam viverra feugiat malesuada. Vivamus mollis
-                                            lectus quis metus egestas, eu molestie erat rutrum. Aliquam congue nisi sit
-                                            amet mauris rhoncus, sed finibus nisi vulputate. Etiam at rhoncus justo.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach>
+
+                    <!-- Other products (that can be added) -->
+                    <div class="modal-body" id="otherProducts" style="height:72vh; overflow-y:scroll; width: 100%">
                     </div>
+
                     <div class="modal-footer form-horizontal">
                         <div class="input-group my-auto mx-auto">
-                            <select class="custom-select" style="min-width: 90px">
-                                <option value="-1" selected>sort by</option>
-                                <option value="0">name [a-Z]</option>
-                                <option value="1">name [Z-a]</option>
+                            <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="showProductsAddModal()">
+                                <option value="Name">Name</option>
+                                <option value="Rating">Rating</option>
+                                <option value="Popularity">Popularity</option>
                             </select>
-                            <select class="custom-select" style="min-width: 135px">
-                                <option value="-1" selected>all categories</option>
-                                <option value="0">category 1</option>
-                                <option value="1">category 2</option>
+                            <select id="p-add-cat" class="custom-select" style="min-width: 135px" onchange="showProductsAddModal()">
+                                <option value="-1" selected>All categories</option>
+                                <c:forEach var="cat" items="${prod_categories}">
+                                    <option value="${cat.id}">${cat.name}</option>
+                                </c:forEach>
                             </select>
                         </div>
                         <div class="input-group my-auto">
-                            <input class="form-control mr-2 my-1" style="min-width: 90px" type="text" placeholder="insert product name..."
-                                   aria-label="insert product name...">
+                            <input id="p-add-name" class="form-control mr-2 my-1" style="min-width: 90px" type="text" placeholder="Insert product name..." onkeyup="showProductsAddModal()">
                             <button type="submit" class="btn btn-secondary mx-auto">
                                 <i class="fa fa-search my-auto" style="font-size:23px;"></i>
                             </button>
@@ -655,15 +619,15 @@
         </div>
 
         <!-- manage product -->
-        <c:if test="${isListOwner}">
-            <div class="modal modal-fluid" id="productManageModal" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
+            <div class="modal modal-fluid" id="productManageModal">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header shadow">
                             <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
                             <h5 class="modal-title">Manage product in list</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
                             </button>
                         </div>
                         <div class="modal-body mx-3">
@@ -676,11 +640,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="prodMngMinVal-label">10</span>
                                 </div>
-                                <input type="number" id="prodAmountManage0" class="form-control rounded shadow-sm my-auto"
-                                       style="appearance: none; margin: 0" name="quantity" min="10" value="10" placeholder="10"
-                                       oninput="handleChange(this)"><br>
-                                <button type="button" id="rightBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm"
-                                        onclick="changeValue(this, '+')">
+                                <input type="number" id="prodAmountManage0" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="quantity" min="10" value="10" placeholder="10" oninput="handleChange(this)"><br>
+                                <button type="button" id="rightBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm" onclick="changeValue(this, '+')">
                                     <i class="fa fa-chevron-right mr-auto"></i>
                                 </button>
                                 <button type="button" class="btn btn-danger shadow-sm ml-3">
@@ -697,6 +658,28 @@
                 </div>
             </div>
         </c:if>
+
+        <div class="modal modal-fluid"id="sendPurchasedModal">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <h5 class="modal-title">Confirm purchases ?</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <form id="sendPurchaseForm" action="${contextPath}" method="POST">
+                        <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
+                        <input type="hidden" name="action" value="delete"/>
+                        <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
+                    </form>
+                    <div class="modal-footer form-horizontal">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#sendPurchaseForm')[0].submit()">Confirm</button> 
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <footer class="page-footer font-small blue pt-3">
             <hr>
@@ -728,7 +711,10 @@
             });
 
             function intervalClick(button, operator) {
-                let interval = setInterval(() => {changeValue(button, operator, interval); console.log('interval trigger');}, 300);
+                let interval = setInterval(() => {
+                    changeValue(button, operator, interval);
+                    console.log('interval trigger');
+                }, 300);
                 changeValue(button, operator, interval);
                 console.log('interval started');
                 button.onmouseup = () => {
@@ -789,12 +775,12 @@
                 if (input.value > parseInt(input.max)) {
                     input.value = input.max;
                 }
-                if (input.value != input.max) {
+                if (input.value !== input.max) {
                     $('#rightBtn' + id)[0].disabled = false;
                 } else {
                     $('#rightBtn' + id)[0].disabled = true;
                 }
-                if (input.value != input.min) {
+                if (input.value !== input.min) {
                     $('#leftBtn' + id)[0].disabled = false;
                 } else {
                     $('#leftBtn' + id)[0].disabled = true;
@@ -808,7 +794,6 @@
                 let sortby = $('#p-search-sort')[0].value;
                 let pcatID = $('#p-search-cat')[0].value;
                 let name = $('#p-search-name')[0].value;
-                let innerhtml = "";
                 let products = listProducts.slice();
                 if (pcatID !== "-1") {
                     products = products.filter(p => p.category.id.toString() === pcatID);
@@ -832,7 +817,6 @@
                 let missing = products.filter(p => p.purchased !== p.total);
                 let missinghtml = "";
                 for (p of missing) {
-                    console.log(JSON.stringify(p));
                     missinghtml = missinghtml
                             + '<div class="card shadow-sm mb-2">'
                             + '    <div class="card-body">'
@@ -843,9 +827,9 @@
                             + '            </div>'
                             + '                <div class="row ml-auto my-auto mx-1 pt-2">'
                             + '                    <div class="input-group" style="width: 300px">';
-                    if (${ isListOwner }) {
+                    if (${ isListOwner || (userAccessLevel=="FULL") || (userAccessLevel=="PRODUCTS") }) {
                         missinghtml = missinghtml
-                                + '                    <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal" onclick="prodManageModalHandler()">'
+                                + '                    <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">'
                                 + '                       <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
                                 + '                    </button>';
                     }
@@ -853,7 +837,7 @@
                             + '                        <button type="button" id="leftBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" disabled onmousedown="intervalClick(this,\'-\')">'
                             + '                            <i class="fa fa-chevron-left mr-auto"></i>'
                             + '                        </button>'
-                            + '                        <input type="number" id="prodAmount' + p.id + '" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" oninput="handleChange(this,' + p.id + ')"><br>'
+                            + '                        <input type="number" id="prodAmount' + p.id + '" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" oninput="handleChange(this,' + p.id + ')"><br>'
                             + '                            <span class="input-group-text" id="basic-addon2">' + p.total + '</span>'
                             + '                        <button type="button" id="rightBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" onmousedown="intervalClick(this, \'+\')">'
                             + '                            <i class="fa fa-chevron-right mr-auto"></i>'
@@ -889,11 +873,95 @@
             }
 
             showProducts();
-            <c:if test="${isListOwner}">
-            // product manage modal handler
-            function prodManageModalHandler() {
+
+            function scrollChat() {
+                setTimeout(() => {
+                    var objDiv = document.getElementById("chatbody");
+                    objDiv.scrollTop = objDiv.scrollHeight;
+                }, 10);
             }
-            </c:if>
+
+            var otherProducts = ${otherProductsJSON};
+            function showProductsAddModal() {
+                let sortby = $('#p-add-sort')[0].value;
+                let pcatID = $('#p-add-cat')[0].value;
+                let name = $('#p-add-name')[0].value;
+                let products = otherProducts.slice();
+                if (pcatID !== "-1") {
+                    products = products.filter(p => p.category.id.toString() === pcatID);
+                }
+                products = products.filter(p => p.name.toUpperCase().includes(name.toUpperCase()));
+                switch (sortby) {
+                    case "Rating":
+                        products.sort((l, r) => l.rating > r.rating ? 1 : -1);
+                        break;
+
+                    case "Popularity":
+                        // already ordered
+                        break;
+
+                    default:
+                        // Name
+                        products.sort((l, r) => l.name > r.name ? 1 : -1);
+                        break;
+                }
+
+                let innerhtml = "";
+                for (p of products) {
+                    innerhtml = innerhtml
+                            + '<div class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke">'
+                            + '          <div class="row my-2 ml-0">'
+                            + '              <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo-Free.jpg">'
+                            + '              <div class="col my-auto">'
+                            + '                  <div class="text-left" style="font-size: 18px">'
+                            + '                      ' + p.name
+                            + '                  </div>'
+                            + '              </div>'
+                            + '          </div>'
+                            + '          <div class="row mx-0 justify-content-between">'
+                            + '              <div class="row mx-0 my-auto">'
+                            + '                  <div class="input-group mb-3 my-auto" data-toggle="tooltip" data-placement="top" title="Rating: ' + p.rating.toString().substr(0, 3) + '">'
+                            + '                      <i class="' + (p.rating >= 0.8 ? 'fas fa-star' : (p.rating >= 0.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '                      <i class="' + (p.num_votes > 0 ? (p.rating >= 1.8 ? 'fas fa-star' : (p.rating >= 1.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
+                            + '                      <i class="' + (p.rating >= 2.8 ? 'fas fa-star' : (p.rating >= 2.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '                      <i class="' + (p.num_votes > 0 ? (p.rating >= 3.8 ? 'fas fa-star' : (p.rating >= 3.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
+                            + '                      <i class="' + (p.rating >= 4.8 ? 'fas fa-star' : (p.rating >= 4.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '                  </div>'
+                            + '              </div>'
+                            + '              <div class="badge badge-pill badge-secondary shadow my-auto">' + p.category.name + '</div>'
+                            + '              <div class="text-left">Votes: ' + p.num_votes + '</div>'
+                            + '          </div>'
+                            + '          <hr>'
+                            + '          <div class="panel panel-success autocollapse">'
+                            + '              <div class="panel-heading clickable">'
+                            + '                  <div class="row mx-auto">'
+                            + '                      <p>Description</p>'
+                            + '                      <i class="fa fa-chevron-circle-down ml-2" style="font-size:25px;"></i>'
+                            + '                      <div class="text ml-auto mr-2" style="color: grey">created by</div>'
+                            + '                      <div class="text" style="font-size: 18px">' + p.creator.firstname + ' ' + p.creator.lastname + '</div>'
+                            + '                  </div>'
+                            + '              </div>'
+                            + '              <div class="panel-body">'
+                            + '                  <div class="text-justify mx-4 mb-4">'
+                            + '                      ' + p.description
+                            + '                  </div>'
+                            + '              </div>'
+                            + '          </div>'
+                            + '      </div>';
+                }
+                $('#otherProducts')[0].innerHTML = innerhtml;
+            }
+            showProductsAddModal();
+
+            function resetPurchased() {
+                let missing = listProducts.filter(p => p.purchased !== p.total);
+                for (p of missing) {
+                    $('#leftBtn' + p.id)[0].disabled = true;
+                    $('#rightBtn' + p.id)[0].disabled = false;
+                    $('#prodAmount' + p.id)[0].value = p.purchased;
+                }
+            }
+
         </script>
     </body>
 

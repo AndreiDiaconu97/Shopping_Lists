@@ -33,8 +33,8 @@ Date.prototype.toTimestamp = function () {
 
 let book = XLSX.readFile('Database ShoppingList.xlsx');
 
-let names = ["michele", "matteo", "giovanni", "anna", "fabrizia", "gianmaria", "mattea", "dora"];
-let lastnames = ["bini", "trump", "amadori", "castellaneta", "chiocco", "toldo"];
+let names = ["Michele", "Matteo", "Giovanni", "Anna", "Fabrizia", "Gianmaria", "Mattea", "Dora"];
+let lastnames = ["Bini", "Trump", "Amadori", "Castellaneta", "Chiocco", "Toldo"];
 let domains = ["@gmail.com", "@yahoo.it", "@alice.it", "@hotmail.com"];
 const TOT_USERS = 50;
 let users = [];
@@ -107,9 +107,10 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 	}
 	let owner = Math.random() > 0.8 ? 4 : Math.floor(Math.random() * (TOT_USERS / 2)) + 5;
 	let shared = [];
-	for (let s = 0; s < 5; s++) {
+	let s_n = Math.floor(Math.random() * 11);
+	for (let s = 0; s < s_n; s++) {
 		let sh = Math.random() > 0.6 ? [4, 5].randomItem() : Math.floor(Math.random() * (TOT_USERS / 2));
-		if (sh != s) shared.push(sh);
+		if (sh != owner) shared.push(sh);
 	}
 	let msgs = [];
 	let msg_am = 2 + Math.floor(Math.random() * 10);

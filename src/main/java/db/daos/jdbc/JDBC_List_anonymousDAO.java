@@ -107,6 +107,18 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         checkParam(list_anonymous, true);
         checkParam(product, true);
 
+        String query_cat = "SELECT * FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT=? AND PRODUCT_CAT=?";
+        try (PreparedStatement stm = CON.prepareStatement(query_cat)) {
+            stm.setInt(1, list_anonymous.getCategory().getId());
+            stm.setInt(2, product.getCategory().getId());
+
+            if (!stm.executeQuery().next()) {
+                throw new SQLException("L_cat does not have this p_cat");
+            }
+        } catch (Exception ex) {
+            throw new DAOException("List_anonymous category does not allow this product's category");
+        }
+
         String query = "INSERT INTO " + L_ANONYM_P_TABLE + " (LIST_ANONYMOUS, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_anonymous.getId());
@@ -181,7 +193,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("Impossible to get purchased amount", ex);
         }
     }
-    
+
     @Override
     public Timestamp getLastPurchase(List_anonymous list, Product product) throws DAOException {
         checkParam(list, true);

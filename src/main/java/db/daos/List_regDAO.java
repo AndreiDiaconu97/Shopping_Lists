@@ -43,5 +43,5 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
 
     public void insertMessage(Message message) throws DAOException;
 
-    public List<Message> getListMessages(List_reg list_reg) throws DAOException;
+    public List<Message> getMessages(List_reg list_reg) throws DAOException;
 }

@@ -16,6 +16,7 @@
 <%@page import="db.daos.List_regDAO"%>
 <%@page import="db.daos.Prod_categoryDAO"%>
 <%@page trimDirectiveWhitespaces="true" %>
+<%@taglib prefix="my" tagdir="/WEB-INF/tags" %>
 
 
 <%!
@@ -158,34 +159,38 @@
         </main>
         <nav>
             <div class="nav nav-tabs nav-justified shadow-sm" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('mylists')}">active</c:if>" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab" onclick="changeTab('mylists')">
-                        <h5>My lists</h5>
-                    </a>
-                    <a class="nav-item nav-link my-auto mx-1 <c:if test="${currentTab.equals('sharedlists')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab" onclick="changeTab('sharedlists')">
-                        <h5>Shared with me</h5>
-                    </a>
-                    <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('myproducts')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab" onclick="changeTab('myproducts')">
-                        <h5>My products</h5>
-                    </a>
-                </div>
-            </nav>
-            <div class="tab-content" id="nav-tabContent">
+                <my:n>
+                    <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('mylists')}">active</c:if>" id="myLists-tab" data-toggle="tab" href="#nav-myLists" role="tab" onclick="changeTab('mylists')">
+                            <h5>My lists</h5>
+                        </a>
+                        <a class="nav-item nav-link my-auto mx-1 <c:if test="${currentTab.equals('sharedlists')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-sharedLists" role="tab" onclick="changeTab('sharedlists')">
+                            <h5>Shared with me</h5>
+                        </a>
+                        <a class="nav-item nav-link my-auto <c:if test="${currentTab.equals('myproducts')}">active</c:if>" id="sharedLists-tab" data-toggle="tab" href="#nav-myProducts" role="tab" onclick="changeTab('myproducts')">
+                            <h5>My products</h5>
+                        </a>
+                </my:n>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <my:n>
                 <div class="tab-pane fade <c:if test="${currentTab.equals('mylists')}">show active</c:if>" id="nav-myLists" role="tabpanel">
-                    <div class="row  mx-1">
-                        <div class="row ml-auto mr-1 mt-2">
-                            <div class="row ml-2 mr-0 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="ml-search-sort" onchange="showLists()">
-                                        <option value="Name" selected>Name</option>
-                                        <option value="Completion >">Completion ></option>
-                                        <option value="Completion <">Completion <</option>
-                                    </select>
-                                </div>
+                </my:n>
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="ml-search-sort" onchange="showLists()">
+                                    <option value="Name" selected>Name</option>
+                                    <option value="Completion >">Completion ></option>
+                                    <option value="Completion <">Completion <</option>
+                                </select>
                             </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="ml-search-cat" onchange="showLists()">
-                                        <option value="-1" selected>All categories</option>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="ml-search-cat" onchange="showLists()">
+                                    <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -211,23 +216,23 @@
                 </div>
             </div>
 
-
-            <div class="tab-pane fade <c:if test="${currentTab.equals('sharedlists')}">show active</c:if>" id="nav-sharedLists" role="tabpanel">
-                    <div class="row  mx-1">
-                        <div class="row ml-auto mr-1 mt-2">
-                            <div class="row ml-2 mr-0 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="sl-search-sort" onchange="showLists(true)">
-                                        <option value="Name" selected>Name</option>
-                                        <option value="Completion >">Completion ></option>
-                                        <option value="Completion <">Completion <</option>
-                                    </select>
-                                </div>
+            <my:n><div class="tab-pane fade <c:if test="${currentTab.equals('sharedlists')}">show active</c:if>" id="nav-sharedLists" role="tabpanel">
+                </my:n>
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="sl-search-sort" onchange="showLists(true)">
+                                    <option value="Name" selected>Name</option>
+                                    <option value="Completion >">Completion ></option>
+                                    <option value="Completion <">Completion <</option>
+                                </select>
                             </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="sl-search-cat" onchange="showLists(true)">
-                                        <option value="-1" selected>All categories</option>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="sl-search-cat" onchange="showLists(true)">
+                                    <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${list_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -254,22 +259,23 @@
             </div>
 
 
-            <div class="tab-pane fade <c:if test="${currentTab.equals('myproducts')}">show active</c:if>" id="nav-myProducts" role="tabpanel">
-                    <div class="row  mx-1">
-                        <div class="row ml-auto mr-1 mt-2">
-                            <div class="row ml-2 mr-0 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="p-search-sort" onchange="showProducts()">
-                                        <option value="Name">Name</option>
-                                        <option value="Rating">Rating</option>
-                                        <option value="Popularity">Popularity</option>
-                                    </select>
-                                </div>
+            <my:n><div class="tab-pane fade <c:if test="${currentTab.equals('myproducts')}">show active</c:if>" id="nav-myProducts" role="tabpanel">
+                </my:n>
+                <div class="row  mx-1">
+                    <div class="row ml-auto mr-1 mt-2">
+                        <div class="row ml-2 mr-0 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="p-search-sort" onchange="showProducts()">
+                                    <option value="Name">Name</option>
+                                    <option value="Rating">Rating</option>
+                                    <option value="Popularity">Popularity</option>
+                                </select>
                             </div>
-                            <div class="row mx-2 my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="p-search-cat" onchange="showProducts()">
-                                        <option value="-1" selected>All categories</option>
+                        </div>
+                        <div class="row mx-2 my-2">
+                            <div class="input-group my-auto">
+                                <select class="custom-select" id="p-search-cat" onchange="showProducts()">
+                                    <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${prod_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
@@ -299,8 +305,8 @@
         <!-- MODALS -->
 
         <!-- create list -->
-        <div class="modal modal-fluid" id="createListModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="createListModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
@@ -344,8 +350,8 @@
         </div>
 
         <!-- import list -->
-        <div class="modal modal-fluid" id="importListModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="importListModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
@@ -366,8 +372,8 @@
         </div>
 
         <!-- create product -->
-        <div class="modal modal-fluid" id="createProductModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="createProductModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
@@ -411,8 +417,8 @@
         </div>
 
         <!--Edit product modal-->
-        <div class="modal modal-fluid" id="editProductModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal modal-fluid" id="editProductModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
@@ -457,8 +463,8 @@
         </div>
 
         <!--Delete product modal-->
-        <div class="modal modal-centered" id="deleteProductModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal modal-centered" id="deleteProductModal" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header shadow">
                         <h5 class="modal-title">Delete product ?</h5>
