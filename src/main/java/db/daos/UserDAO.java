@@ -31,5 +31,7 @@ public interface UserDAO extends DAO<User, Integer> {
     public AccessLevel getAccessLevel(User user, List_reg list_reg) throws DAOException;
     
     public List<User> getFriends(User user) throws DAOException;
+    
+    public List<List_reg> getInvites(User user) throws DAOException;
 
 }

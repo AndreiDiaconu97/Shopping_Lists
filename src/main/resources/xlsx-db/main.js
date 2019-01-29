@@ -43,7 +43,7 @@ for (let i = 4; i < TOT_USERS; i++) {
 	let lastname = lastnames.randomItem();
 	let domain = domains.randomItem();
 	let password = '$2a$10$zmo44mIGrEzF.2flUu13SOatFYW8LHaRoxSGPJeRRM.fe6IBfddCS';//bcrypt.hashSync("1234", saltRounds);
-	users.push({ email: firstname + '.' + lastname + i + domain, firstname, lastname, password, is_admin: false });
+	users.push({ email: firstname.toLowerCase() + '.' + lastname.toLowerCase() + i + domain, firstname, lastname, password, is_admin: false });
 }
 
 //console.log(users);
@@ -136,8 +136,15 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 
 //console.log(lists);
 
-
-
+let invites = [];
+for (l of lists) {
+	let possibles_invites = Array.from(new Array(TOT_USERS - 5), (x, i) => i + 4).filter(u => !l.SharedWith.includes(u.id));
+	let invites_num = Math.floor(Math.random() * 10);
+	for (let i = 0; i < invites_num; i++) {
+		invites.push({ list: l.Id, invited: possibles_invites.randomItem() });
+	}
+}
+invites = invites.unique();
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,11 +176,11 @@ fs.writeFileSync(filename, fs.readFileSync("../../../../structure.sql"));
 
 
 let query = `
-INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrea.matte@studenti.unitn.it', '$2a$10$zmo44mIGrEzF.2flUu13SOatFYW8LHaRoxSGPJeRRM.fe6IBfddCS', 'andrea', 'matto', true);
-INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrei.diaconu@studenti.unitn.it', '$2a$10$bek3pnCbDuA7YfLXHDpVi./CPITBTv.nPud1Q63WukdgtKsrr.NCe', 'andrei', 'kontorto', true);
-INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrea.iossa@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'andrea', 'ioza', true);
-INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('edoardo.meneghini@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'edoardo', 'meneghini', true);\n
-INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('matteo.bini@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'matteo', 'bini', false);\n
+INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrea.matte@studenti.unitn.it', '$2a$10$zmo44mIGrEzF.2flUu13SOatFYW8LHaRoxSGPJeRRM.fe6IBfddCS', 'Andrea', 'Matto', true);
+INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrei.diaconu@studenti.unitn.it', '$2a$10$bek3pnCbDuA7YfLXHDpVi./CPITBTv.nPud1Q63WukdgtKsrr.NCe', 'Andrei', 'Kontorto', true);
+INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('andrea.iossa@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'Andrea', 'Ioza', true);
+INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('edoardo.meneghini@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'Edoardo', 'Meneghini', true);
+INSERT INTO APP.USERS(EMAIL, PASSWORD, FIRSTNAME, LASTNAME, IS_ADMIN) VALUES('matteo.bini@studenti.unitn.it', '$2a$10$N9qdvU/PSaRyeaQbq8L7N.dOoZARRBCNmJc0puH3amiteKiuI7U9y', 'Matteo', 'Bini', false);
 `;
 for (u of users) {
 	query += `INSERT INTO APP.USERS (EMAIL,PASSWORD,FIRSTNAME,LASTNAME,IS_ADMIN) `;
@@ -236,7 +243,7 @@ query = "";
 for (l of lists) {
 	for (p of l.Products) {
 		let amount = Math.floor(Math.random() * 20) + 1;
-		let purchased = Math.random() > 0.1 ? [0, amount].randomItem() : Math.floor(Math.random() * (amount - 1) + 1);
+		let purchased = Math.random() > 0.3 ? [0, amount].randomItem() : Math.floor(Math.random() * (amount - 1) + 1);
 		let last_purchase = (new Date(new Date() - Math.floor(Math.random() * 5) * day - Math.floor(Math.random() * 20) * hour - day + 5 * hour)).toTimestamp();
 		query += `INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,AMOUNT,PURCHASED,LAST_PURCHASE) `;
 		query += `VALUES (${l.Id},${p + 1},${amount},${purchased},'${last_purchase}');\n`;
@@ -268,3 +275,9 @@ query += "\n\n\n\n";
 fs.appendFileSync(filename, query);
 
 
+query = "";
+for (i of invites) {
+	query += `INSERT INTO APP.INVITES (LIST,INVITED) VALUES(${i.list},${i.invited + 1});\n`;
+}
+query += "\n\n\n\n";
+fs.appendFileSync(filename, query);

@@ -41,6 +41,7 @@ public abstract class JDBC_utility {
     public static final String P_CAT_TABLE = "PRODUCTS_CATEGORIES";
     public static final String L_P_CAT_TABLE = "LISTS_PRODUCTS_CATEGORIES";
     public static final String CHATS_TABLE = "CHATS";
+    public static final String INVITES_TABLE = "INVITES";
 
     private static final String SYMBOLS = "ABCDEFGJKLMNPRSTUVWXYZ0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();

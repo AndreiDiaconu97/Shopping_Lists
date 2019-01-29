@@ -372,4 +372,26 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to get messages for given list", ex);
         }
     }
+
+    @Override
+    public void inviteUser(List_reg list_reg, User user) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(user, true);
+        
+        if(user.equals(list_reg.getOwner())){
+            throw new DAOException("Owner cannot self invite");
+        }
+        if(user.getIs_admin()){
+            throw new DAOException("Cannot invite admins");
+        }
+        
+        String query = "INSERT INTO " + INVITES_TABLE + " (LIST, INVITED) VALUES (?,?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, user.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to invite user to list", ex);
+        }
+    }
 }

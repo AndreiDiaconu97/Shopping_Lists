@@ -243,4 +243,27 @@ public class JDBC_UserDAO extends JDBC_DAO<User, Integer> implements UserDAO {
             throw new DAOException("Impossible to get user's friends:\n" + ex);
         }
     }
+
+    @Override
+    public List<List_reg> getInvites(User user) throws DAOException {
+        checkParam(user, true);
+        
+        checkParam(user, true);
+
+        String query = "SELECT LIST FROM " + INVITES_TABLE + " WHERE INVITED=?";
+        try(PreparedStatement stm = CON.prepareStatement(query)){
+            stm.setInt(1, user.getId());
+            
+            try (ResultSet rs = stm.executeQuery()) {
+                List<List_reg> invites = new ArrayList<>();
+
+                while (rs.next()) {
+                    invites.add(getList_reg(rs.getInt(1), CON));
+                }
+                return invites;
+            }
+        } catch(SQLException ex){
+            throw new DAOException("Impossible to get user's invites:\n" + ex);
+        }
+    }
 }
