@@ -1,3 +1,4 @@
+<%@page import="java.sql.Timestamp"%>
 <%@page import="java.util.HashSet"%>
 <%@page import="java.util.Set"%>
 <%@page import="java.util.function.Predicate"%>
@@ -134,9 +135,11 @@
         for (Product p : listProducts) {
             int purchased = list_regDao.getAmountPurchased(list, p);
             int total = list_regDao.getAmountTotal(list, p);
+            Timestamp last_purchase = list_regDao.getLastPurchase(list, p);
             JSONObject pJSON = Product.toJSON(p);
             pJSON.put("purchased", purchased);
             pJSON.put("total", total);
+            pJSON.put("last_purchase", last_purchase);
             listProductsJSON.put(pJSON);
         }
         pageContext.setAttribute("listProductsJSON", listProductsJSON);
@@ -533,7 +536,7 @@
 
                         <div class="modal-body" style="height:62vh; overflow-y:scroll; width: 100%">
                             <div class="modal-header my-2" style="background-color: #bbbbbb">
-                                <h5 class="modal-title ml-2">Recent contacts</h5>                                
+                                <h5 class="modal-title ml-2">Recent contacts</h5>
                             </div>
                             <c:forEach var="friend" items="${friends}">
                                 <div class="row px-auto ml-0">
@@ -566,7 +569,7 @@
                             </c:forEach>
                         </div>
                         <div class="modal-footer">
-                            <h5 class="row-sm my-2">Add by email</h5>                                
+                            <h5 class="row-sm my-2">Add by email</h5>
                             <input class="form-control" type="text" style="width: 70%" placeholder="Insert user email...">
                             <div class="row my-2">
                                 <div class="input-group my-auto">
@@ -610,18 +613,18 @@
 
                         <div class="modal-footer form-horizontal">
                             <div class="input-group my-auto ml-auto">
-                                <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="showProductsAddModal()">
+                                <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="fillProductsAddModal()">
                                     <option value="Name">Name</option>
                                     <option value="Rating">Rating</option>
                                     <option value="Popularity">Popularity</option>
                                 </select>
-                                <select id="p-add-cat" class="custom-select" style="min-width: 135px" onchange="showProductsAddModal()">
+                                <select id="p-add-cat" class="custom-select" style="min-width: 135px" onchange="fillProductsAddModal()">
                                     <option value="-1" selected>All categories</option>
                                     <c:forEach var="cat" items="${prod_categories}">
                                         <option value="${cat.id}">${cat.name}</option>
                                     </c:forEach>
                                 </select>
-                                <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="showProductsAddModal()">
+                                <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="fillProductsAddModal()">
                             </div>
                             <div class="input-group my-auto mr-auto" style="max-width: 200px">
                                 <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
@@ -642,8 +645,8 @@
 
         <!-- manage product -->
         <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
-            <div class="modal modal-fluid" id="productManageModal">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal" id="productManageModal">
+                <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
                     <div class="modal-content">
                         <div class="modal-header shadow">
                             <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
@@ -653,27 +656,31 @@
                             </button>
                         </div>
                         <div class="modal-body mx-3">
-                            <div class="input-group">
-                                <div class="text my-auto mr-2">Increase product amount</div>
-                                <button type="button" id="leftBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm"
-                                        disabled onclick="changeValue(this, '-')">
-                                    <i class="fa fa-chevron-left mr-auto"></i>
-                                </button>
+                            <div class="text my-auto mr-2">Change needed amount  (more than purchased)</div>
+                            <div id="manage-product-amount" class="input-group mb-2 justify-content-center" style="max-width: 300px" onclick="manageProduct('amount')">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="prodMngMinVal-label">10</span>
+                                    <span id="manage-product-min" class="input-group-text" style="min-width: 50px">10</span>
                                 </div>
-                                <input type="number" id="prodAmountManage0" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="quantity" min="10" value="10" placeholder="10" oninput="handleChange(this)"><br>
-                                <button type="button" id="rightBtnManage0" class="btn btn-secondary btn-sq-sm shadow-sm" onclick="changeValue(this, '+')">
-                                    <i class="fa fa-chevron-right mr-auto"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger shadow-sm ml-3">
-                                    Remove product
-                                    <i class="fa fa-trash mr-auto"></i>
-                                </button>
+                                <form id="manage-product-form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                                    <input id="manage-product-action" type="hidden" name="action">
+                                    <input id="manage-product-product_id" type="hidden" name="product_id">
+                                    <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="{
+                                                if (this.value < this.min)
+                                                    this.value = this.min
+                                            }">
+                                </form>
                             </div>
+                            <button id="manage-product-remove" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('remove')">
+                                Remove product
+                                <i class="fa fa-trash mr-auto"></i>
+                            </button>
+                            <button id="manage-product-reset" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('reset')">
+                                Reset purchased
+                                <i class="fa fa-trash mr-auto"></i>
+                            </button>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary">Confirm<i class="fa fa-check ml-1"></i></button>
+                            <button id="manage-product-confirm" type="button" class="btn btn-primary" onclick="$('#manage-product-form')[0].submit()">Confirm<i class="fa fa-check ml-1"></i></button>
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel<i class="fa fa-times ml-1"></i></button>
                         </div>
                     </div>
@@ -696,7 +703,7 @@
                         <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
                     </form>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#sendPurchaseForm')[0].submit()">Confirm</button> 
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#sendPurchaseForm')[0].submit()">Confirm</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -840,6 +847,8 @@
                 let missing = products.filter(p => p.purchased !== p.total);
                 let missinghtml = "";
                 for (p of missing) {
+                    let day = 24 * 3600 * 1000;
+                    let need_reset = Math.random()>0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     missinghtml = missinghtml
                             + '<div class="card shadow-sm mb-2">'
                             + '    <div class="card-body">'
@@ -848,24 +857,27 @@
                             + '            <div class="text-left my-auto">'
                             + '                ' + p.name
                             + '            </div>'
-                            + '                <div class="row ml-auto my-auto mx-1 pt-2">'
-                            + '                    <div class="input-group" style="width: 300px">';
-                    if ((userAccessLevel == "FULL") || (userAccessLevel == "PRODUCTS")) {
+                            + '            <div class="row ml-auto my-auto mx-1 pt-2">'
+                            + '                <div id="input-group-edit-product' + p.id + '" class="input-group" style="width: 300px">';
+                    if (userAccessLevel == "FULL" || userAccessLevel == "PRODUCTS") {
                         missinghtml = missinghtml
-                                + '                    <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm mr-2" data-toggle="modal" data-target="#productManageModal">'
-                                + '                       <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
-                                + '                    </button>';
+                                + (need_reset ? (' <label class="input-group-text ml-auto" for="input-group-edit-product' + p.id + '" style="background-color: #F1C40F" data-toggle="tooltip" data-placement="top" title="It\'s been a while.\nReset suggested">'
+                                + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
+                                + '                </label>') : '')
+                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm '+(need_reset ? '' : 'ml-auto')+' mr-2" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
+                                + '                   <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                                + '                </button>';
                     }
                     missinghtml = missinghtml
-                            + '                        <button type="button" id="leftBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" disabled onmousedown="intervalClick(this,\'-\')">'
-                            + '                            <i class="fa fa-chevron-left mr-auto"></i>'
-                            + '                        </button>'
-                            + '                        <input type="number" id="prodAmount' + p.id + '" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" oninput="handleChange(this,' + p.id + ')"><br>'
-                            + '                            <span class="input-group-text" id="basic-addon2">' + p.total + '</span>'
-                            + '                        <button type="button" id="rightBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" onmousedown="intervalClick(this, \'+\')">'
-                            + '                            <i class="fa fa-chevron-right mr-auto"></i>'
-                            + '                        </button>'
-                            + '                    </div>'
+                            + '                    <button type="button" id="leftBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" disabled onmousedown="intervalClick(this,\'-\')">'
+                            + '                        <i class="fa fa-chevron-left mr-auto"></i>'
+                            + '                    </button>'
+                            + '                    <input type="number" id="prodAmount' + p.id + '" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" oninput="handleChange(this,' + p.id + ')"><br>'
+                            + '                        <span class="input-group-text" id="basic-addon2">' + p.total + '</span>'
+                            + '                    <button type="button" id="rightBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" onmousedown="intervalClick(this, \'+\')">'
+                            + '                        <i class="fa fa-chevron-right mr-auto"></i>'
+                            + '                    </button>'
+                            + '                </div>'
                             + '            </div>'
                             + '        </div>'
                             + '    </div>'
@@ -877,6 +889,8 @@
                 let purchased = products.filter(p => p.purchased === p.total);
                 let purchasedhtml = "";
                 for (p of purchased) {
+                    let day = 24 * 3600 * 1000;
+                    let need_reset = Math.random()>0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     purchasedhtml = purchasedhtml
                             + '<div class="card shadow-sm mb-2" style="background-color: whitesmoke">'
                             + '    <div class="card-body">'
@@ -885,8 +899,19 @@
                             + '            <div class="text-left my-auto">'
                             + '                ' + p.name
                             + '            </div>'
-                            + '            <div class="row ml-auto my-auto mr-4 pt-2">'
-                            + '                <i class="fa fa-minus mr-auto"></i>'
+                            + '            <div class="row ml-auto my-auto mx-1 pt-2">'
+                            + '                <div id="input-group-edit-product' + p.id + '" class="input-group" style="width: 300px">';
+                    if (userAccessLevel == "FULL" || userAccessLevel == "PRODUCTS") {
+                        purchasedhtml = purchasedhtml
+                                + (need_reset ? (' <label class="input-group-text ml-auto" for="input-group-edit-product' + p.id + '" style="background-color: #F1C40F" data-toggle="tooltip" data-placement="top" title="It\'s been a while.\nReset suggested">'
+                                + '                    <i class="fas fa-exclamation-triangle" style="font-size: 28px"></i>'
+                                + '                </label>') : '')
+                                + '                <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm '+(need_reset ? '' : 'ml-auto')+'" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
+                                + '                   <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
+                                + '                </button>';
+                    }
+                    purchasedhtml = purchasedhtml
+                            + '                </div>'
                             + '            </div>'
                             + '        </div>'
                             + '    </div>'
@@ -905,7 +930,7 @@
             }
 
             var otherProducts = ${otherProductsJSON};
-            function showProductsAddModal() {
+            function fillProductsAddModal() {
                 let sortby = $('#p-add-sort')[0].value;
                 let pcatID = $('#p-add-cat')[0].value;
                 let name = $('#p-add-name')[0].value;
@@ -974,7 +999,7 @@
                 }
                 $('#otherProducts')[0].innerHTML = innerhtml;
             }
-            showProductsAddModal();
+            fillProductsAddModal();
 
             function resetPurchased() {
                 let missing = listProducts.filter(p => p.purchased !== p.total);
@@ -1001,6 +1026,29 @@
                     $('#add-Product-Hidden-Id')[0].value = selectedProduct;
                     $('#add-Product-Form')[0].submit();
                 }
+            }
+
+            function fillProductManageModal(id) {
+                let product = listProducts.filter(p => p.id == id)[0];
+                $('#manage-product-amount')[0].style.border = "";
+                $('#manage-product-remove')[0].style.border = "";
+                $('#manage-product-reset')[0].style.border = "";
+                $('#manage-product-confirm')[0].deactivated = true;
+                $('#manage-product-product_id')[0].value = product.id;
+                $('#manage-product-min')[0].innerHTML = product.purchased;
+                $('#manage-product-amount_input')[0].min = product.purchased;
+                $('#manage-product-amount_input')[0].placeholder = product.total;
+                $('#manage-product-amount_input')[0].value = product.total;
+            }
+
+            $('#manage-product-confirm')[0].deactivated = true;
+            function manageProduct(item) {
+                $('#manage-product-action')[0].value = item;
+                $('#manage-product-amount')[0].style.border = "";
+                $('#manage-product-remove')[0].style.border = "";
+                $('#manage-product-reset')[0].style.border = "";
+                $('#manage-product-' + item)[0].style.border = "3px solid blue";
+                $('#manage-product-confirm')[0].deactivated = false;
             }
         </script>
     </body>
