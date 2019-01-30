@@ -98,7 +98,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(user, true);
 
         String query = "DELETE FROM " + L_SHARING_TABLE + " WHERE LIST = ? AND USER_ID = ?";
-        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
             stm.executeUpdate();
@@ -164,7 +164,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(product, true);
 
         String query = "DELETE FROM " + L_P_TABLE + " WHERE LIST = ? AND PRODUCT = ?";
-        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, product.getId());
             stm.executeUpdate();
@@ -366,7 +366,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setInt(4, product.getId());
             int count = stm.executeUpdate();
             if (count != 1) {
-                throw new DAOException("Purchased amount updated affected an invalid number of records: " + count);
+                throw new DAOException("List purchased amount update affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to update purchased amount: " + ex);

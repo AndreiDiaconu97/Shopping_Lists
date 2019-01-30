@@ -109,7 +109,7 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 	let shared = [];
 	let s_n = Math.floor(Math.random() * 11);
 	for (let s = 0; s < s_n; s++) {
-		let sh = Math.random() > 0.6 ? [4, 5].randomItem() : Math.floor(Math.random() * (TOT_USERS / 2));
+		let sh = Math.floor(Math.random() * (TOT_USERS / 2)+4);
 		if (sh != owner) shared.push(sh);
 	}
 	let msgs = [];
@@ -138,10 +138,14 @@ for (let i = 1; i <= TOT_LISTS; i++) {
 
 let invites = [];
 for (l of lists) {
-	let possibles_invites = Array.from(new Array(TOT_USERS - 5), (x, i) => i + 4).filter(u => !l.SharedWith.includes(u.id));
+	let possible_invites = Array.from(new Array(TOT_USERS/2), (x, i) => i + 3);
+	possible_invites = possible_invites.filter(u => u!=l.Owner && !l.SharedWith.includes(u));
 	let invites_num = Math.floor(Math.random() * 10);
 	for (let i = 0; i < invites_num; i++) {
-		invites.push({ list: l.Id, invited: possibles_invites.randomItem() });
+		invites.push({ list: l.Id, invited: possible_invites.randomItem() });
+	}
+	if(possible_invites.includes(4) && Math.random()>0.7){
+		invites.push({ list: l.Id, invited: 4 });
 	}
 }
 invites = invites.unique();

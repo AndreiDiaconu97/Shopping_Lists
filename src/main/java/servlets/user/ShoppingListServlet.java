@@ -232,7 +232,7 @@ public class ShoppingListServlet extends HttpServlet {
 
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
                 } catch (DAOException ex) {
-                    System.err.println("Cannot purchase products: " + ex);
+                    System.err.println("LIST_REGGG Cannot purchase products: " + ex);
                     response.sendRedirect(contextPath + "error.html");
                 }
                 break;

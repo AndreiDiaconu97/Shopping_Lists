@@ -77,5 +77,11 @@
                 </c:when>
             </c:choose>
         </div>
+        <button>
+            <a class="navbar-brand " href="anonymous/homepage.html">
+                <i class="fa fa-shopping-cart" style="font-size:30px"></i>
+                Shopping lists - admin area
+            </a>
+        </button>
     </body>
 </html>

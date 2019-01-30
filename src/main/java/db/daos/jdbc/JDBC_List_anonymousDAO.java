@@ -42,12 +42,11 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
     public void insert(List_anonymous list_anonymous) throws DAOException {
         checkParam(list_anonymous, false);
 
-        String query = "INSERT INTO " + L_ANONYM_TABLE + " (name, description, category, last_seen) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO " + L_ANONYM_TABLE + " (name, description, category) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, list_anonymous.getName());
             stm.setString(2, list_anonymous.getDescription());
             stm.setInt(3, list_anonymous.getCategory().getId());
-            stm.setTimestamp(4, list_anonymous.getLast_seen());
             stm.executeUpdate();
 
             ResultSet rs = stm.getGeneratedKeys();
@@ -98,7 +97,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         try {
             return getList_anonymous(id, CON);
         } catch (SQLException ex) {
-            throw new DAOException("Cannot get list_anonymous by id " + id, ex);
+            throw new DAOException("Cannot get list_anonymous by id " + id + ": " + ex);
         }
     }
 
@@ -127,6 +126,21 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to add new product", ex);
+        }
+    }
+
+    @Override
+    public void removeProduct(List_anonymous list_anonymous, Product product) throws DAOException {
+        checkParam(list_anonymous, true);
+        checkParam(product, true);
+
+        String query = "DELETE FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS = ? AND PRODUCT = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_anonymous.getId());
+            stm.setInt(2, product.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove product from list_anonymous: " + ex);
         }
     }
 
@@ -199,7 +213,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         checkParam(list, true);
         checkParam(product, true);
 
-        String query = "SELECT LAST_PURCHASE FROM " + L_ANONYM_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
+        String query = "SELECT LAST_PURCHASE FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list.getId());
             stm.setInt(2, product.getId());
@@ -247,10 +261,10 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             stm.setInt(3, product.getId());
             int count = stm.executeUpdate();
             if (count != 1) {
-                throw new DAOException("Purchased amount updated affected an invalid number of records: " + count);
+                throw new DAOException("List_anonymous purchased amount update affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update purchased amount", ex);
+            throw new DAOException("Impossible to update purchased amount :" + ex);
         }
     }
 }

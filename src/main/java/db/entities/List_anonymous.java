@@ -29,11 +29,10 @@ public class List_anonymous implements Serializable {
     public List_anonymous() {
     }
 
-    public List_anonymous(String name, String description, List_category category, Timestamp last_seen) {
+    public List_anonymous(String name, String description, List_category category) {
         this.name = name;
         this.description = description;
         this.category = category;
-        this.last_seen = last_seen;
         this.purchased = 0;
         this.total = 0;
     }

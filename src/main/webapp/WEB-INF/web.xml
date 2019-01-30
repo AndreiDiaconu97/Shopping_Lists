@@ -141,6 +141,22 @@
         <servlet-name>ShareShoppingListServlet</servlet-name>
         <url-pattern>/restricted/shareShoppingList.handler</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>AnonymousHomepage</servlet-name>
+        <jsp-file>/WEB-INF/Anonymous/homepage.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnonymousHomepage</servlet-name>
+        <url-pattern>/anonymous/homepage.html</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AnonymousListServlet</servlet-name>
+        <servlet-class>servlets.anonymous.AnonymousListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnonymousListServlet</servlet-name>
+        <url-pattern>/anonymous/anonymous.lists.handler</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
