@@ -277,7 +277,7 @@ fs.appendFileSync(filename, query);
 
 query = "";
 for (i of invites) {
-	query += `INSERT INTO APP.INVITES (LIST,INVITED) VALUES(${i.list},${i.invited + 1});\n`;
+	query += `INSERT INTO APP.INVITES (LIST,INVITED,ACCESS) VALUES(${i.list},${i.invited + 1},${[0,1,2].randomItem()});\n`;
 }
 query += "\n\n\n\n";
 fs.appendFileSync(filename, query);

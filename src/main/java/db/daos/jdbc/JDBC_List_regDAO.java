@@ -70,18 +70,22 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
-    public void shareListToUser(List_reg list_reg, User user) throws DAOException {
+    public void shareListToUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException {
         checkParam(list_reg, true);
         checkParam(user, true);
+        if (accessLevel == null) {
+            throw new DAOException("Cannot share: AccessLevel null");
+        }
 
         if (user.equals(list_reg.getOwner())) {
             throw new DAOException("User is arleady owner of the given list_reg.");
         }
 
-        String query = "INSERT INTO " + L_SHARING_TABLE + " (list, user) VALUES (?, ?)";
+        String query = "INSERT INTO " + L_SHARING_TABLE + " (LIST, USER, ACCESS) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
+            stm.setInt(3, (accessLevel == AccessLevel.FULL) ? 2 : (accessLevel == AccessLevel.PRODUCTS ? 1 : 0));
             stm.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Impossible to share list to user", ex);
@@ -92,19 +96,19 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void insertProduct(List_reg list_reg, Product product, Integer amount) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query_cat = "SELECT * FROM " + L_P_CAT_TABLE + " WHERE LIST_CAT=? AND PRODUCT_CAT=?";
-        try (PreparedStatement stm = CON.prepareStatement(query_cat)){
+        try (PreparedStatement stm = CON.prepareStatement(query_cat)) {
             stm.setInt(1, list_reg.getCategory().getId());
             stm.setInt(2, product.getCategory().getId());
-            
-            if(!stm.executeQuery().next()){
+
+            if (!stm.executeQuery().next()) {
                 throw new SQLException("L_cat does not have this p_cat");
             }
         } catch (Exception ex) {
             throw new DAOException("List category does not allow this product's category");
         }
-        
+
         String query = "INSERT INTO " + L_P_TABLE + " (LIST, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_reg.getId());
@@ -120,7 +124,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void removeProduct(List_reg list_reg, Product product) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "DELETE FROM " + L_P_TABLE + " WHERE LIST = ? AND PRODUCT = ?";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_reg.getId());
@@ -134,7 +138,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     @Override
     public List<Product> getProducts(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
-        
+
         String query = "SELECT * FROM " + P_TABLE + " WHERE ID IN (SELECT PRODUCT FROM " + L_P_TABLE + " WHERE LIST = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -153,7 +157,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     @Override
     public void delete(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
-        
+
         String query = "DELETE FROM " + L_TABLE + " WHERE ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -209,7 +213,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     @Override
     public List<User> getUsersSharedTo(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
-        
+
         String query = "SELECT * FROM " + U_TABLE + " WHERE ID IN (SELECT USER_ID FROM " + L_SHARING_TABLE + " WHERE LIST = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -230,7 +234,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public Integer getAmountTotal(List_reg list_reg, Product product) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "SELECT AMOUNT FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -252,7 +256,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public Integer getAmountPurchased(List_reg list_reg, Product product) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "SELECT PURCHASED FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -269,12 +273,12 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to get purchased amount", ex);
         }
     }
-    
+
     @Override
-    public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException{
+    public Timestamp getLastPurchase(List_reg list_reg, Product product) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "SELECT LAST_PURCHASE FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -296,7 +300,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void updateAmountTotal(List_reg list_reg, Product product, Integer total) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "UPDATE " + L_P_TABLE + " SET TOTAL=? WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, total);
@@ -315,7 +319,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     public void updateAmountPurchased(List_reg list_reg, Product product, Integer purchased) throws DAOException {
         checkParam(list_reg, true);
         checkParam(product, true);
-        
+
         String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=?, SET LAST_PURCHASE=? WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, purchased);
@@ -334,7 +338,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     @Override
     public void insertMessage(Message message) throws DAOException {
         checkParam(message);
-        
+
         String query = "INSERT INTO " + CHATS_TABLE + " (LIST, USER_ID, MESSAGE, IS_LOG) VALUES (?,?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, message.getList().getId());
@@ -343,14 +347,14 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setBoolean(4, message.getIsLog());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to add message to list chat: "+ ex);
+            throw new DAOException("Impossible to add message to list chat: " + ex);
         }
     }
 
     @Override
     public List<Message> getMessages(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
-        
+
         String query = "SELECT * FROM " + CHATS_TABLE + " WHERE LIST = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -373,24 +377,43 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
-    public void inviteUser(List_reg list_reg, User user) throws DAOException {
+    public void inviteUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException {
         checkParam(list_reg, true);
         checkParam(user, true);
-        
-        if(user.equals(list_reg.getOwner())){
+        if (accessLevel == null) {
+            throw new DAOException("Cannot invite: AccessLevel null");
+        }
+
+        if (user.equals(list_reg.getOwner())) {
             throw new DAOException("Owner cannot self invite");
         }
-        if(user.getIs_admin()){
+        if (user.getIs_admin()) {
             throw new DAOException("Cannot invite admins");
         }
-        
-        String query = "INSERT INTO " + INVITES_TABLE + " (LIST, INVITED) VALUES (?,?)";
+
+        String query = "INSERT INTO " + INVITES_TABLE + " (LIST, INVITED, ACCESS) VALUES (?,?,?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, user.getId());
+            stm.setInt(3, (accessLevel == AccessLevel.FULL) ? 2 : (accessLevel == AccessLevel.PRODUCTS ? 1 : 0));
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to invite user to list", ex);
+        }
+    }
+
+    @Override
+    public void cancelInvite(List_reg list_reg, User user) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(user, true);
+
+        String query = "DELETE FROM " + INVITES_TABLE + " WHERE LIST = ? AND INVITED = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to invite user to list", ex);
+            throw new DAOException("Impossible to cancel invite: " + ex);
         }
     }
 }

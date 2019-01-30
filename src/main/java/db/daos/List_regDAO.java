@@ -5,6 +5,7 @@
  */
 package db.daos;
 
+import db.daos.jdbc.JDBC_utility.AccessLevel;
 import db.entities.Product;
 import db.entities.User;
 import db.entities.List_reg;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface List_regDAO extends DAO<List_reg, Integer> {
 
-    public void shareListToUser(List_reg list_reg, User user) throws DAOException;
+    public void shareListToUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException;
 
     public List<User> getUsersSharedTo(List_reg list_reg) throws DAOException;
 
@@ -45,5 +46,7 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
 
     public List<Message> getMessages(List_reg list_reg) throws DAOException;
     
-    public void inviteUser(List_reg list_reg, User user) throws DAOException;
+    public void inviteUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException;
+    
+    public void cancelInvite(List_reg list_reg, User user) throws DAOException;
 }
