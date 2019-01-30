@@ -422,6 +422,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setInt(3, accessLevelToInt(accessLevel));
             stm.executeUpdate();
         } catch (SQLException ex) {
+            System.err.println(ex);
             throw new DAOException("Impossible to invite user to list: " + ex);
         }
     }
@@ -461,6 +462,32 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             }
         } catch (SQLException ex) {
             throw new DAOException("Impossible to cancel invite: " + ex);
+        }
+    }
+    
+    @Override
+    public List<User> getUserInviteTo(List_reg list_reg) throws DAOException {
+        checkParam(list_reg, true);
+        
+        
+      
+        String query = "SELECT * FROM " + U_TABLE + " WHERE ID IN (SELECT INVITED FROM " + INVITES_TABLE + " WHERE LIST = ?)";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            try (ResultSet rs = stm.executeQuery()) {
+                List<User> users = new ArrayList<>();
+
+                while (rs.next()) {
+                    users.add(resultSetToUser(rs, CON));
+                }
+                System.err.println("ciao");
+                return users;
+                
+               
+            }
+        } catch (SQLException ex) {
+            System.err.println("ciao");
+            throw new DAOException("Impossible to get the users for the passed list_reg: " + ex);
         }
     }
 }

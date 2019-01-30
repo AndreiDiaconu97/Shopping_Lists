@@ -199,7 +199,7 @@
                         <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
                     </li>
                     <li class="dropdown ml-auto my-auto">
-                        <form class="form-inline" action="${contextPath}auth" method="POST" method="POST">
+                        <form class="form-inline" action="${contextPath}auth" method="POST">
                             <input class="form-control" type="hidden" name="action" value="logout" required>
                             <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
                         </form>
@@ -553,7 +553,7 @@
                                     </p>
                                     <div class="row ml-auto mx-2 my-2">
                                         <div class="input-group my-auto">
-                                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST" method="POST">
+                                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
                                                 <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
                                                     <option value="2">FULL</option>
                                                     <option value="1">PRODUCTS</option>
@@ -564,7 +564,7 @@
                                                         <i class="fa fa-wrench"></i>
                                                     </label>
                                                 </div>
-                                                <input type="hidden" name="sharing" value="true" >
+                                                <input type="hidden" name="action" value="sharing" >
                                                 <input type="hidden" name="userToshare" value="${friend.email}" >
                                                 <input type="hidden" name="listToshare" value="${list.id}">
                                                 <input type="hidden" name="access" value="${list.id}">
@@ -579,25 +579,30 @@
                             </c:forEach>
                         </div>
                         <div class="modal-footer">
-                            <h5 class="row-sm my-2">Add by email</h5>
-                            <input class="form-control" type="text" style="width: 70%" placeholder="Insert user email...">
-                            <div class="row my-2">
-                                <div class="input-group my-auto">
-                                    <select class="custom-select" id="sharePermssionsSelect${friend.id}">
-                                        <option value="2">FULL</option>
-                                        <option value="1">PRODUCTS</option>
-                                        <option value="0" selected>READ</option>
-                                    </select>
-                                    <div class="input-group-append">
-                                        <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
-                                            <i class="fa fa-wrench"></i>
-                                        </label>
+                         <h5 class="row-sm my-2">Add by email</h5>
+                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                <input class="form-control" type="text" name="userToshare" style="width: 70%" placeholder="Insert user email...">
+                                <div class="row my-2">
+                                    <div class="input-group my-auto">
+                                        <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
+                                            <option value="2">FULL</option>
+                                            <option value="1">PRODUCTS</option>
+                                            <option value="0" selected>READ</option>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                                <i class="fa fa-wrench"></i>
+                                            </label>
+                                        </div>
+                                        <input type="hidden" name="action" value="sharing" >
+                                        <input type="hidden" name="listToshare" value="${list.id}">
+                                        <input type="hidden" name="access" value="${list.id}">
+                                        <button type="submit" class="btn btn-success my-auto mr-2 shadow-sm rounded">
+                                            <i class="fa fa-user-plus" style="font-size:25px"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                            <button type="button" class="btn btn-success mx-auto my-auto shadow-sm rounded" data-toggle="button">
-                                <i class="fa fa-user-plus" style="font-size:25px"></i>
-                            </button>
+                            </form>
                         </div>
                     </div>
                 </div>
