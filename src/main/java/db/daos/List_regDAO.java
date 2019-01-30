@@ -49,4 +49,6 @@ public interface List_regDAO extends DAO<List_reg, Integer> {
     public void inviteUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException;
     
     public void cancelInvite(List_reg list_reg, User user) throws DAOException;
+    
+    public void acceptInvite(List_reg list_reg, User user) throws DAOException;
 }

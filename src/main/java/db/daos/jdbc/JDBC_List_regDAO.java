@@ -416,4 +416,27 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to cancel invite: " + ex);
         }
     }
+
+    @Override
+    public void acceptInvite(List_reg list_reg, User user) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(user, true);
+
+        String query = "SELECT ACCESS FROM " + INVITES_TABLE + " WHERE LIST = ? AND INVITED = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, user.getId());
+            try(ResultSet rs = stm.executeQuery()){
+                if(rs.next()){
+                    int accessLevel = rs.getInt(1);
+                    cancelInvite(list_reg, user);
+                    shareListToUser(list_reg, user, intToAccessLevel(accessLevel));
+                } else {
+                    throw new DAOException("Cannot find invite");
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to cancel invite: " + ex);
+        }
+    }
 }
