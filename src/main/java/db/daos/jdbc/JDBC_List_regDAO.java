@@ -93,6 +93,21 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
+    public void removeShared(List_reg list_reg, User user) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(user, true);
+
+        String query = "DELETE FROM " + L_SHARING_TABLE + " WHERE LIST = ? AND USER_ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stm.setInt(1, list_reg.getId());
+            stm.setInt(2, user.getId());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to remove user from list: " + ex);
+        }
+    }
+
+    @Override
     public void changeAccessLevel(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException {
         checkParam(list_reg, true);
         checkParam(user, true);

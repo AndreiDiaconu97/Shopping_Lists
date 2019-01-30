@@ -507,13 +507,15 @@
                                                 </my:n>
                                             </select>
                                             <div class="input-group-append">
-                                                <label class="input-group-text" for="inputGroupSelect02">
+                                                <label class="input-group-text">
                                                     <i class="fa fa-wrench"></i>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button">
+                                    <button id="participantsModal-remove-${shared_user.id}" type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button" onclick="{
+                                        this.style.border = (this.style.border=='3px solid blue') ? '' : '3px solid blue';
+                                    }">
                                         <i class="fa fa-user-times" style="font-size:25px"></i>
                                     </button>
                                 </div>
@@ -1091,6 +1093,7 @@
                     console.log('Changed access to ' + u.name);
                     inputs += '<input type="hidden" name="user_id[]" value="' + u.id + '">';
                     inputs += '<input type="hidden" name="access_' + u.id + '" value="' + $('#participantsModal-access-' + u.id)[0].value + '">';
+                    inputs += '<input type="hidden" name="remove_' + u.id + '" value="' + ($('#participantsModal-remove-' + u.id)[0].style.border!=='') + '">';
                 }
                 $('#participantsModal-form')[0].innerHTML += inputs;
                 $('#participantsModal-form')[0].submit();

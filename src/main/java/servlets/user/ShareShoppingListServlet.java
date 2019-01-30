@@ -114,7 +114,7 @@ public class ShareShoppingListServlet extends HttpServlet {
                     Integer list_id = Integer.parseInt(request.getParameter("list_id"));
                     List_reg list = list_regDao.getByPrimaryKey(list_id);
                     list_regDao.acceptInvite(list, user);
-                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedLists");
+                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedlists");
                 } catch (DAOException ex) {
                     System.err.println("Cannot accept invite to list: " + ex);
                     response.sendRedirect(contextPath + "error.html");
@@ -130,7 +130,7 @@ public class ShareShoppingListServlet extends HttpServlet {
                     Integer list_id = Integer.parseInt(request.getParameter("list_id"));
                     List_reg list = list_regDao.getByPrimaryKey(list_id);
                     list_regDao.declineInvite(list, user);
-                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedLists");
+                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedlists");
                 } catch (DAOException ex) {
                     System.err.println("Cannot decline invite to list: " + ex);
                     response.sendRedirect(contextPath + "error.html");
@@ -152,7 +152,9 @@ public class ShareShoppingListServlet extends HttpServlet {
                     for (String user_id_s : user_ids_s) {
                         User shared = userDao.getByPrimaryKey(Integer.parseInt(user_id_s));
                         AccessLevel accessLevel = intToAccessLevel(Integer.parseInt(request.getParameter("access_" + shared.getId())));
-                        if (userDao.getAccessLevel(shared, list) != accessLevel) {
+                        if (request.getParameter("remove_" + shared.getId()).equals("true")) {
+                            list_regDao.removeShared(list, shared);
+                        } else if (userDao.getAccessLevel(shared, list) != accessLevel) {
                             list_regDao.changeAccessLevel(list, shared, accessLevel);
                         }
                     }
