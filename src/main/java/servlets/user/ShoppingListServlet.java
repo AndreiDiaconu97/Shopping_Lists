@@ -125,8 +125,6 @@ public class ShoppingListServlet extends HttpServlet {
 
             case "edit": {
                 try {
-                    HttpSession session = request.getSession(false);
-                    User user = (User) session.getAttribute("user");
                     String name = request.getParameter("name");
                     String description = request.getParameter("description");
                     List_reg list = list_regDao.getByPrimaryKey(Integer.parseInt(request.getParameter("list_id")));

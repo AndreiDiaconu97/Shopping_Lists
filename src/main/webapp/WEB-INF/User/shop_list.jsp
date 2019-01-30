@@ -154,8 +154,9 @@
         List<User> shared_to = list_regDao.getUsersSharedTo(list);
         pageContext.setAttribute("shared_to", shared_to);
         List<User> friends = userDao.getFriends(user);
-        friends.removeAll(shared_to);
-        pageContext.setAttribute("friends", friends);
+        friends.removeAll(shared_to);        
+        friends.removeAll(list_regDao.getInvitedUsers(list));
+        pageContext.setAttribute("uninv_friends", friends);
 
         boolean isListOwner = (user.equals(list.getOwner()));
         pageContext.setAttribute("isListOwner", isListOwner);
@@ -487,7 +488,7 @@
                                 <div class="row mb-2 px-auto ml-0">
                                     <img class="img-thumbnail shadow-sm mr-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/avatars/${shared_user.id}">
                                     <p class="mr-2 my-auto">
-                                        <c:out value="${shared_user.firstname} ${user.lastname}" />
+                                        <c:out value="${shared_user.firstname} ${shared_user.lastname}" />
                                     </p>
                                     <p class="mr-2 my-auto" style="color: grey">
                                         <c:out value="(${shared_user.email})" />
@@ -542,7 +543,7 @@
                             <div class="modal-header my-2" style="background-color: #bbbbbb">
                                 <h5 class="modal-title ml-2">Recent contacts</h5>
                             </div>
-                            <c:forEach var="friend" items="${friends}">
+                            <c:forEach var="friend" items="${uninv_friends}">
                                 <div class="row px-auto ml-0">
                                     <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/avatars/${friend.id}">
                                     <p class="mr-2 my-auto">

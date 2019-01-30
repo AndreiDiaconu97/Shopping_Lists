@@ -90,6 +90,7 @@
     List<List_category> list_categories;
     List<Product> userProducts;
     List<Prod_category> prod_categories;
+    List<List_reg> invites;
 
     try {
         myLists = userDao.getOwnedLists(user);
@@ -97,6 +98,7 @@
         list_categories = list_catDao.getAll();
         userProducts = productDao.filterProducts(null, null, user, false, SortBy.POPULARITY);
         prod_categories = prod_categoryDao.getAll();
+        invites = userDao.getInvites(user);
         pageContext.setAttribute("myLists", myLists);
         pageContext.setAttribute("sharedLists", sharedLists);
         pageContext.setAttribute("list_categories", list_categories);
@@ -105,6 +107,7 @@
         pageContext.setAttribute("list_catDao", list_catDao);
         pageContext.setAttribute("list_regDao", list_regDao);
         pageContext.setAttribute("contextPath", contextPath);
+        pageContext.setAttribute("invites", invites);
     } catch (DAOException ex) {
         System.err.println("Error loading shopping lists (jsp)" + ex);
         if (!response.isCommitted()) {
@@ -118,7 +121,7 @@
         <title>Shopping lists manager</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
         <!-- Bootstrap core JavaScript ================================================== -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -361,18 +364,39 @@
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header shadow">
-                        <i class="fa fa-cart-plus my-auto mr-auto" style="font-size:30px;"></i>
-                        <h5 class="modal-title">Import friend's lists</h5>
+                        <i class="fa fa-share-alt my-auto mr-auto" style="font-size:30px;"></i>
+                        <h5 class="modal-title ml-2">Pending list invites</h5>
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-
-                    </div>
-                    <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button> 
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <div class="modal-body" style="height:62vh; overflow-y:scroll; width: 100%">
+                        <c:forEach var="invite" items="${invites}">
+                            <div class="row px-auto ml-0">
+                                <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/shopping_lists/${invite.id}">
+                                <p class="mr-2 my-auto">
+                                    ${invite.name}
+                                </p>
+                                <p class="mr-2 ml-auto my-auto" style="color: grey">
+                                    ${invite.owner.firstname}&nbsp;${invite.owner.lastname}
+                                </p>
+                                <div class="row ml-auto mx-2 my-2">
+                                    <div class="input-group my-auto">
+                                        <form id="invites-form-${invite.id}" class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                            <input id="invites-action-${invite.id}" type="hidden" name="action">
+                                            <input type="hidden" name="list_id" value="${invite.id}">
+                                            <button type="submit" class="btn btn-success my-auto mx-2 ml-auto shadow-sm rounded" onclick="acceptInvite(${invite.id})">
+                                                <i class="fas fa-check" style="font-size:25px"></i>
+                                            </button>
+                                            <button class="btn btn-danger my-auto mx-2 shadow-sm rounded" onclick="declineInvite(${invite.id})">
+                                                <i class="fas fa-times" style="font-size:25px"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                        </c:forEach>
                     </div>
                 </div>
             </div>
@@ -648,6 +672,16 @@
             showLists(true);
             showProducts();
             changeTab('${currentTab}');
+            
+            function acceptInvite(id){
+                $('#invites-action-' + id)[0].value = 'accept';
+                $('#invites-form-' + id)[0].submit();
+            }
+            
+            function declineInvite(id){
+                $('#invites-action-' + id)[0].value = 'decline';
+                $('#invites-form-' + id)[0].submit();
+            }
         </script>
     </body>
 </html>

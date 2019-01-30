@@ -81,7 +81,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("User is arleady owner of the given list_reg.");
         }
 
-        String query = "INSERT INTO " + L_SHARING_TABLE + " (LIST, USER, ACCESS) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + L_SHARING_TABLE + " (LIST, USER_ID, ACCESS) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
@@ -413,8 +413,6 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Cannot invite admins");
         }
 
-
-
         String query = "INSERT INTO " + INVITES_TABLE + " (LIST, INVITED, ACCESS) VALUES (?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -428,7 +426,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
     }
 
     @Override
-    public void cancelInvite(List_reg list_reg, User user) throws DAOException {
+    public void declineInvite(List_reg list_reg, User user) throws DAOException {
         checkParam(list_reg, true);
         checkParam(user, true);
 
@@ -451,11 +449,11 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
-            try(ResultSet rs = stm.executeQuery()){
-                if(rs.next()){
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
                     int accessLevel = rs.getInt(1);
-                    cancelInvite(list_reg, user);
                     shareListToUser(list_reg, user, intToAccessLevel(accessLevel));
+                    declineInvite(list_reg, user);
                 } else {
                     throw new DAOException("Cannot find invite");
                 }
@@ -464,13 +462,11 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Impossible to cancel invite: " + ex);
         }
     }
-    
+
     @Override
-    public List<User> getUserInviteTo(List_reg list_reg) throws DAOException {
+    public List<User> getInvitedUsers(List_reg list_reg) throws DAOException {
         checkParam(list_reg, true);
-        
-        
-      
+
         String query = "SELECT * FROM " + U_TABLE + " WHERE ID IN (SELECT INVITED FROM " + INVITES_TABLE + " WHERE LIST = ?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
@@ -480,14 +476,10 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 while (rs.next()) {
                     users.add(resultSetToUser(rs, CON));
                 }
-                System.err.println("ciao");
                 return users;
-                
-               
             }
         } catch (SQLException ex) {
-            System.err.println("ciao");
-            throw new DAOException("Impossible to get the users for the passed list_reg: " + ex);
+            throw new DAOException("Impossible to get invited users for the passed list_reg: " + ex);
         }
     }
 }

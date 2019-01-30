@@ -71,83 +71,73 @@ public class ShareShoppingListServlet extends HttpServlet {
 
         switch (action) {
             case "sharing": {
-                Integer access = Integer.parseInt(request.getParameter("selectAccess"));
-                Integer id = Integer.parseInt(request.getParameter("listToshare"));
-                String email = request.getParameter("userToshare");
-                response.setCharacterEncoding("UTF-8");
-                String ownerEmail;
-                User owner;
-                Boolean check = true;
-
                 try {
-                    User receiver = userDao.getByEmail(email);
-                    List_reg list = list_regDao.getByPrimaryKey(id);
-                    List<User> users = list_regDao.getUsersSharedTo(list);
-                    List<User> invites = list_regDao.getUserInviteTo(list);
-                    owner = list.getOwner();
-                    ownerEmail = owner.getEmail();
+                    Integer access = Integer.parseInt(request.getParameter("selectAccess"));
+                    Integer id = Integer.parseInt(request.getParameter("listToshare"));
+                    String email = request.getParameter("userToshare");
 
-                    if (receiver.getIs_admin()) {
-                        check = false;
-                        System.err.println(receiver.getEmail() + "is admin");
-                    }
-                    for (User user : users) {
-                        if (user.getEmail().equals(email)) {
-                            check = false;
-                            System.err.println(receiver.getEmail() + "has already access to the list");
-                        }
-                    }
-                    for (User user : invites) {
-                        if (user.getEmail().equals(email)) {
-                            check = false;
-                            System.err.println(receiver.getEmail() + "has already been invited to the list");
-                        }
-                    }
-                    if (check) {
+                    User invited = userDao.getByEmail(email);
+                    List_reg list = list_regDao.getByPrimaryKey(id);
+                    List<User> shared_users = list_regDao.getUsersSharedTo(list);
+                    List<User> invited_users = list_regDao.getInvitedUsers(list);
+
+                    if (invited.equals(list.getOwner())) {
+                        System.err.println("Cannot invite " + invited.getEmail() + ": is owner");
+                    } else if (invited.getIs_admin()) {
+                        System.err.println("Cannot invite " + invited.getEmail() + ": is admin");
+                    } else if (shared_users.contains(invited)) {
+                        System.err.println("Cannot invite " + invited.getEmail() + ": already shared");
+                    } else if (invited_users.contains(invited)) {
+                        System.err.println("Cannot invite " + invited.getEmail() + ": already invited");
+                    } else {
                         JDBC_utility.AccessLevel accesslv = utility.intToAccessLevel(access);
-                        list_regDao.inviteUser(list, receiver, accesslv);
+                        list_regDao.inviteUser(list, invited, accesslv);
+                        System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName());
                     }
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + id);
 
                 } catch (DAOException ex) {
-                    System.err.println("errors");
+                    System.err.println("Cannot invite user to list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
                 }
+                break;
             }
+
             case "accept": {
-                User user = new User();
-                Integer id = Integer.parseInt(request.getParameter("list"));
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    user = (User) session.getAttribute("user");
-                }
-                
                 try {
-                    List_reg list = list_regDao.getByPrimaryKey(id);
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    List_reg list = list_regDao.getByPrimaryKey(list_id);
                     list_regDao.acceptInvite(list, user);
-                    
+                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedLists");
                 } catch (DAOException ex) {
-                    System.err.println("errors");
+                    System.err.println("Cannot accept invite to list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
                 }
-                
-                response.sendRedirect(contextPath + "restricted/homepage.html");
+                break;
+
             }
+
             case "decline": {
-                User user = new User();
-                Integer id = Integer.parseInt(request.getParameter("list"));
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    user = (User) session.getAttribute("user");
-                }
-                
                 try {
-                    List_reg list = list_regDao.getByPrimaryKey(id);
-                    list_regDao.cancelInvite(list, user);
-                    
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    List_reg list = list_regDao.getByPrimaryKey(list_id);
+                    list_regDao.declineInvite(list, user);
+                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedLists");
                 } catch (DAOException ex) {
-                    System.err.println("errors");
+                    System.err.println("Cannot decline invite to list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
                 }
-                
-                response.sendRedirect(contextPath + "restricted/homepage.html");
+                break;
+            }
+
+            default: {
+                System.err.println("ShoppingListServlet: unsupported parameter: " + action);
+                response.sendRedirect(contextPath + "error.html");
+                break;
             }
         }
     }
