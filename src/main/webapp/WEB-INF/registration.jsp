@@ -23,9 +23,13 @@
     </head>
 
     <body>
+        <div class="jumbotron text-center mb-4">
+            <img class="mb-4" src="images/registration" width="128" height="128">
+            <h3 class="h3 mb-3 font-weight-normal">Registration Area</h3>
+            <p>Please compile the following registration form</p>
+        </div>
         <div class="container">
-            <div class="jumbotron">
-                <div>TODO write content</div>
+            <div class="col-12 col-lg-6 mx-auto">
                 <form action="auth" method="POST">
                     <div class="form-group">
                         <label for="emailInput">Email</label>
@@ -44,8 +48,15 @@
                         <input type="password" class="form-control" name="password" id='passwordInput' placeholder="enter yor password" required>
                     </div>
                     <input type="checkbox" required>I agree..<br>
-                    <input type="submit" name="action" value="register"><br>
+                    <input class="btn btn-primary mt-2" type="submit" name="action" value="register">
                 </form>
+                <div class="row justify-content-between">
+                    <button class="btn btn-secondary btn-sm ml-auto mt-2" type="submit">
+                        <a href="login.html" class="my-auto" style="color: white; text-decoration: none">
+                            Go to login
+                        </a>
+                    </button>
+                </div>
                 <c:choose>
                     <c:when test="${param.status=='success'}">
                         Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br>
@@ -59,5 +70,11 @@
                 </c:choose>
             </div>
         </div>
+
+        <footer class="footer font-small blue mt-4">
+            <div class="p-3 bg-dark text-white">
+                Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
+            </div>
+        </footer>
     </body>
 </html>

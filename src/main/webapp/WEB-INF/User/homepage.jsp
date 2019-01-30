@@ -139,11 +139,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="nav navbar-nav ml-auto">
-                    <li class="dropdown ml-auto">
-                        <div class="text-white mx-2">logged in as <b>${user.firstname} ${user.lastname}</b></div>
+                    <li class="dropdown ml-auto my-auto">
+                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
                     </li>                    
                     <li class="dropdown ml-auto">
-                        <form class="form-inline" action="${contextPath}auth" method="POST" method="POST">
+                        <form class="form-inline" action="${contextPath}auth" method="POST">
                             <input class="form-control" type="hidden" name="action" value="logout" required/>
                             <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
                         </form>
@@ -351,7 +351,7 @@
                             </div>
                         </div>
                         <div class="modal-footer form-horizontal">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$(createListForm)[0].submit()">Confirm changes</button> 
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#createListForm')[0].submit()">Confirm changes</button> 
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
                     </form>
@@ -413,10 +413,18 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="myproducts" id="tab-input-1"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
+                            <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                            </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="productForm">Product name</label>
@@ -481,16 +489,6 @@
                                 <label data-error="error" data-success="success" for="productForm">Description</label>
                                 <textarea class="form-control validate" name="description" id="editProductForm-description"></textarea>
                             </div>
-                            <div class="input-group">
-                                <select class="form-control" name="category" id="editProductForm-category">
-                                    <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
-                                        <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
-                                    </c:forEach>
-                                </select>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">Category</span>
-                                </div>
-                            </div>
                         </form>
                     </div>
                     <div class="modal-footer form-horizontal">
@@ -506,7 +504,8 @@
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header shadow">
-                        <h5 class="modal-title">Delete product ?</h5>
+                        <i class="fa fa-exclamation-triangle my-auto mr-auto" style="font-size:25px; color: crimson"></i>
+                        <h5 class="modal-title">Delete product?</h5>
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
@@ -517,8 +516,8 @@
                         <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
                     </form>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#deleteProductForm')[0].submit()">Delete</button> 
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#deleteProductForm')[0].submit()">Confirm</button> 
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>

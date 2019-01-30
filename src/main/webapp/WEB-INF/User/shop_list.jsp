@@ -154,7 +154,7 @@
         List<User> shared_to = list_regDao.getUsersSharedTo(list);
         pageContext.setAttribute("shared_to", shared_to);
         List<User> friends = userDao.getFriends(user);
-        friends.removeAll(shared_to);        
+        friends.removeAll(shared_to);
         friends.removeAll(list_regDao.getInvitedUsers(list));
         pageContext.setAttribute("uninv_friends", friends);
 
@@ -228,8 +228,18 @@
                             </span>
                         </small>
                     </h4>
+                    <c:if test="${user.equals(list.getOwner())}">
+                        <button type="button" class="btn btn-danger ml-auto" href="#listDeleteModal" data-toggle="modal">
+                            <i class="fa fa-trash" style="font-size:20px"></i>
+                        </button>
+                    </c:if>
+                    <c:if test="${!user.equals(list.getOwner())}">
+                        <button type="button" class="btn btn-danger ml-auto" href="#listUnsubscribeModal" data-toggle="modal">
+                            <i class="fa fa-ban" style="font-size:20px"></i>
+                        </button>
+                    </c:if>
                     <c:if test="${userAccessLevel=='FULL'}">
-                        <button type="button" class="btn btn-secondary ml-auto" href="#listSettingsModal" data-toggle="modal">
+                        <button type="button" class="btn btn-secondary ml-2" href="#listSettingsModal" data-toggle="modal">
                             <i class="fa fa-cog" style="font-size:20px"></i>
                         </button>
                     </c:if>
@@ -514,8 +524,8 @@
                                         </div>
                                     </div>
                                     <button id="participantsModal-remove-${shared_user.id}" type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button" onclick="{
-                                        this.style.border = (this.style.border=='3px solid blue') ? '' : '3px solid blue';
-                                    }">
+                                                this.style.border = (this.style.border == '3px solid blue') ? '' : '3px solid blue';
+                                            }">
                                         <i class="fa fa-user-times" style="font-size:25px"></i>
                                     </button>
                                 </div>
@@ -548,7 +558,7 @@
                             <div class="modal-header my-2" style="background-color: #bbbbbb">
                                 <h5 class="modal-title ml-2">Recent contacts</h5>
                             </div>
-                            <c:forEach var="friend" items="${uninv_friends}">
+                            <c:forEach var="friend" varStatus="i" items="${uninv_friends}">
                                 <div class="row px-auto ml-0">
                                     <img class="img-thumbnail shadow-sm mr-2 mb-2" style="width: 70px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/avatars/${friend.id}">
                                     <p class="mr-2 my-auto">
@@ -557,9 +567,13 @@
                                     <p class="mr-2 my-auto" style="color: grey">
                                         ${friend.email}
                                     </p>
-                                    <div class="row ml-auto mx-2 my-2">
-                                        <div class="input-group my-auto">
-                                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                    <div class="row ml-auto mx-2 my-auto">
+                                        <form id="shareList-form${i.index}" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                            <input type="hidden" name="action" value="sharing" >
+                                            <input type="hidden" name="userToshare" value="${friend.email}" >
+                                            <input type="hidden" name="listToshare" value="${list.id}">
+                                            <input type="hidden" name="access" value="${list.id}">
+                                            <div class="input-group my-auto">
                                                 <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
                                                     <option value="2">FULL</option>
                                                     <option value="1">PRODUCTS</option>
@@ -570,46 +584,44 @@
                                                         <i class="fa fa-wrench"></i>
                                                     </label>
                                                 </div>
-                                                <input type="hidden" name="action" value="sharing" >
-                                                <input type="hidden" name="userToshare" value="${friend.email}" >
-                                                <input type="hidden" name="listToshare" value="${list.id}">
-                                                <input type="hidden" name="access" value="${list.id}">
-                                                <button type="submit" class="btn btn-success my-auto mr-2 shadow-sm rounded">
-                                                    <i class="fa fa-user-plus" style="font-size:25px"></i>
-                                                </button>
-                                            </form>
-                                        </div>
+                                            </div>
+                                        </form>
                                     </div>
+                                    <button type="submit" class="btn btn-success my-auto mr-3 shadow-sm rounded" onclick="$('#shareList-form${i.index}')[0].submit()">
+                                        <i class="fa fa-user-plus" style="font-size:25px"></i>
+                                    </button>
                                 </div>
                                 <hr>
                             </c:forEach>
                         </div>
-                        <div class="modal-footer">
-                         <h5 class="row-sm my-2">Add by email</h5>
-                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
-                                <input class="form-control" type="text" name="userToshare" style="width: 70%" placeholder="Insert user email...">
-                                <div class="row my-2">
-                                    <div class="input-group my-auto">
-                                        <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
-                                            <option value="2">FULL</option>
-                                            <option value="1">PRODUCTS</option>
-                                            <option value="0" selected>READ</option>
-                                        </select>
-                                        <div class="input-group-append">
-                                            <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
-                                                <i class="fa fa-wrench"></i>
-                                            </label>
-                                        </div>
-                                        <input type="hidden" name="action" value="sharing" >
-                                        <input type="hidden" name="listToshare" value="${list.id}">
-                                        <input type="hidden" name="access" value="${list.id}">
-                                        <button type="submit" class="btn btn-success my-auto mr-2 shadow-sm rounded">
-                                            <i class="fa fa-user-plus" style="font-size:25px"></i>
-                                        </button>
-                                    </div>
+                        <form class="modal-footer form-inline justify-content-between" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                            <input type="hidden" name="action" value="sharing" >
+                            <input type="hidden" name="listToshare" value="${list.id}">
+                            <input type="hidden" name="access" value="${list.id}">
+                            <div class="input-group my-1">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text bl" for="sharePermssionsSelect${friend.id}">
+                                        Add by email
+                                    </label>
                                 </div>
-                            </form>
-                        </div>
+                                <input class="form-control" type="text" name="userToshare" placeholder="Insert user email...">
+                            </div>
+                            <div class="input-group my-1">
+                                <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
+                                    <option value="2">FULL</option>
+                                    <option value="1">PRODUCTS</option>
+                                    <option value="0" selected>READ</option>
+                                </select>
+                                <div class="input-group-append ml-auto">
+                                    <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                        <i class="fa fa-wrench"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success my-1 ml-auto shadow-sm rounded">
+                                <i class="fa fa-user-plus" style="font-size:25px"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -629,10 +641,10 @@
                         </div>
 
                         <!-- Other products (that can be added) -->
-                        <div class="modal-body" id="otherProducts" style="height:72vh; overflow-y:scroll; width: 100%">
+                        <div class="modal-body" id="otherProducts" style="height:65vh; overflow-y:scroll; width: 100%">
                         </div>
 
-                        <div class="modal-footer form-horizontal">
+                        <div class="modal-footer">
                             <div class="input-group my-auto ml-auto">
                                 <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="fillProductsAddModal()">
                                     <option value="Name">Name</option>
@@ -647,17 +659,18 @@
                                 </select>
                                 <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="fillProductsAddModal()">
                             </div>
-                            <div class="input-group my-auto mr-auto" style="max-width: 200px">
-                                <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                            <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                                <div class="input-group my-auto mr-auto" style="max-width: 200px">
                                     <input type="hidden" name="list_id"value="${list.id}">
                                     <input type="hidden" name="action" value="addProduct">
                                     <input type="hidden" id="add-Product-Hidden-Id" name="product_id">
-                                    <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="amount" placeholder="Amount">
-                                    <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn btn-primary shadow rounded-circle">
-                                        <i class="fa fa-plus" style="font-size:23px"></i>
+                                    <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" name="amount" placeholder="Amount">
+                                    <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn ml-2 btn-primary shadow rounded-circle">
+                                        <i class="fa fa-plus"></i>
                                     </button>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -686,10 +699,7 @@
                                     <input type="hidden" name="list_id" value="${list.id}">
                                     <input id="manage-product-action" type="hidden" name="action">
                                     <input id="manage-product-product_id" type="hidden" name="product_id">
-                                    <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="{
-                                                if (this.value < this.min)
-                                                    this.value = this.min
-                                            }">
+                                    <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="mouseUpInput_check(this, 'manage-product-confirm')" onfocusout="focusOutInput_check(this, 'manage-product-confirm')">
                                 </form>
                             </div>
                             <button id="manage-product-removeProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('removeProduct')">
@@ -710,6 +720,7 @@
             </div>
         </c:if>
 
+        <!-- confirm purchase modal -->
         <div class="modal modal-fluid"id="sendPurchasedModal">
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
@@ -726,6 +737,58 @@
                     <div class="modal-footer form-horizontal">
                         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="sendPurchased()">Confirm</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- delete list modal -->
+        <div class="modal modal-fluid" id="listDeleteModal">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <i class="fa fa-exclamation-triangle my-auto mr-auto" style="font-size:25px; color: crimson"></i>
+                        <h5 class="modal-title">Warning!</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Delete this list definitely?
+                    </div>
+                    <div class="modal-footer form-horizontal">
+                        <form action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="list_id" value="${list.id}">
+                            <button type="submit" class="btn btn-danger">Confirm</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- remove list from shared -->
+        <div class="modal modal-fluid" id="listUnsubscribeModal">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header shadow">
+                        <i class="fa fa-exclamation-triangle my-auto mr-auto" style="font-size:25px; color: crimson"></i>
+                        <h5 class="modal-title">Warning!</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Remove this list from your shared?
+                    </div>
+                    <div class="modal-footer form-horizontal">
+                        <form action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                            <input type="hidden" name="action" value="removeFromShared">
+                            <input type="hidden" name="list_id" value="${list.id}">
+                            <button type="submit" class="btn btn-danger">Confirm</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -817,6 +880,8 @@
             // product input range limiter
             function handleChange(input, id) {
                 if (!input.value) {
+                    input.value = input.placeholder;
+                    $('#leftBtn' + id)[0].disabled = true;
                     return;
                 }
                 if (input.value < parseInt(input.min)) {
@@ -839,6 +904,21 @@
 
             var listProducts = ${ listProductsJSON };
             var userAccessLevel = "${userAccessLevel}";
+
+            function mouseUpInput_check(input_bar, confirmBtn_id) {
+                if (!parseInt(input_bar.value) || (parseInt(input_bar.value) < parseInt(input_bar.min))) {
+                    $('#' + confirmBtn_id)[0].disabled = true;
+                } else if ((parseInt(input_bar.max)) && (parseInt(input_bar.value) > parseInt(input_bar.max))) {
+                    $('#' + confirmBtn_id)[0].disabled = true;
+                } else {
+                    $('#' + confirmBtn_id)[0].disabled = false;
+                }
+            }
+            function focusOutInput_check(input_bar, confirmBtn_id) {
+                if (!parseInt(input_bar.value) || (parseInt(input_bar.value) < parseInt(input_bar.min)))
+                    input_bar.value = input_bar.placeholder;
+                $('#' + confirmBtn_id)[0].disabled = false;
+            }
 
             // show products
             function showProducts() {
@@ -1084,16 +1164,16 @@
                 $('#sendPurchaseForm')[0].innerHTML += inputs;
                 $('#sendPurchaseForm')[0].submit();
             }
-            
-            function sendChangeAccess(){
+
+            function sendChangeAccess() {
                 var shared_users = ${User.toJSON(shared_to)};
-                
+
                 let inputs = "";
                 for (u of shared_users) {
                     console.log('Changed access to ' + u.name);
                     inputs += '<input type="hidden" name="user_id[]" value="' + u.id + '">';
                     inputs += '<input type="hidden" name="access_' + u.id + '" value="' + $('#participantsModal-access-' + u.id)[0].value + '">';
-                    inputs += '<input type="hidden" name="remove_' + u.id + '" value="' + ($('#participantsModal-remove-' + u.id)[0].style.border!=='') + '">';
+                    inputs += '<input type="hidden" name="remove_' + u.id + '" value="' + ($('#participantsModal-remove-' + u.id)[0].style.border !== '') + '">';
                 }
                 $('#participantsModal-form')[0].innerHTML += inputs;
                 $('#participantsModal-form')[0].submit();

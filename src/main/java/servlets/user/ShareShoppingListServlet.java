@@ -58,6 +58,8 @@ public class ShareShoppingListServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -96,7 +98,7 @@ public class ShareShoppingListServlet extends HttpServlet {
                     } else {
                         JDBC_utility.AccessLevel accesslv = utility.intToAccessLevel(access);
                         list_regDao.inviteUser(list, invited, accesslv);
-                        System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName());
+                        System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName() + " with permissions: " + accesslv.name());
                     }
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
 

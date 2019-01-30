@@ -6,7 +6,12 @@ TODOS:
 - add resources folder and needed icons
 - products in shopping list have clickable icon that shows product info and allows rating
 - implement WARNING confirm/delete modal where needed
-- show elements situationally (if owner, ecc..)
 - Fix error when session times out (for Admin)
 
-- finish implementing searchbars for product categories and public products
+- fix add product to lst modal Front-end
+- add buttons to self remove from list
+- add sign in button option in login page
+- add sign in and login buttons in navbar on NR_user
+- allow product rating
+- allow user edit
+- show user avatar to himself

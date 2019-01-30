@@ -298,6 +298,14 @@
                             <input type="hidden" name="action" value="listcat"/>
                             <input type="hidden" name="tab" value="listCats"/>
                             <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label">Choose file</label>
+                                </div>
+                            </div>
+                            <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success">List category name</label>
                                 <input type="text" class="form-control validate" name="name"/>
@@ -332,6 +340,14 @@
                         <form id="createProdCat-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="productcat"/>
                             <input type="hidden" name="tab" value="prodCats"/>
+                            <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="editListCat-form">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label" for="editListCat-form">Choose file</label>
+                                </div>
+                            </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success">List category name</label>
@@ -382,6 +398,14 @@
                         <form id="createProduct-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="product"/>
                             <input type="hidden" name="tab" value="publicProds"/>
+                            <div class="md-form mb-3">
+                                <i class="fa fa-image prefix grey-text"></i>
+                                <label data-error="error" data-success="success" for="editListCat-form">Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="image" accept="image/*">
+                                    <label class="custom-file-label" for="editListCat-form">Choose file</label>
+                                </div>
+                            </div>
                             <div class="md-form mb-3">
                                 <i class="fa fa-bookmark prefix grey-text"></i>
                                 <label data-error="error" data-success="success">Product name</label>
@@ -538,16 +562,6 @@
                                 <i class="fa fa-align-left prefix grey-text"></i>
                                 <label data-error="error" data-success="success" for="editProduct-form">Description</label>
                                 <textarea class="form-control validate" name="description"  id="editProduct-desc"></textarea>
-                            </div>
-                            <div class="input-group">
-                                <select name="category" id="editProduct-category" class="form-control">
-                                    <c:forEach var="prod_cat" items="${prod_categories}" varStatus="i">
-                                        <option value="${prod_cat.id}" <c:if test="${i.index==0}">selected</c:if>>${prod_cat.name}</option>
-                                    </c:forEach>
-                                </select>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">List category</span>
-                                </div>
                             </div>
                         </form>
                     </div>

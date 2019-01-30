@@ -75,6 +75,7 @@ public class ProductServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -96,6 +97,7 @@ public class ProductServlet extends HttpServlet {
                     Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
                     Product product = new Product(name, p_cat, user, description);
                     productDao.insert(product);
+                    saveImage(request.getPart("image"), "products", product.getId().toString());
                     System.err.println("Ok, product created: " + product.getId());
                 } catch (DAOException | NumberFormatException ex) {
                     System.err.println("Cannot create product: " + ex);
@@ -110,13 +112,14 @@ public class ProductServlet extends HttpServlet {
                     String description = request.getParameter("description");
                     Integer cat_id = Integer.parseInt(request.getParameter("category"));
                     Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
-                    
+
+                    System.err.println("NAME: " + name);
+
                     Product product = productDao.getByPrimaryKey(prodID);
                     product.setName(name);
                     product.setDescription(description);
                     product.setCategory(p_cat);
                     productDao.update(product);
-                    
                     saveImage(request.getPart("image"), "products", product.getId().toString());
                     System.err.println("Ok, product modified: " + product.getId());
                 } catch (DAOException ex) {

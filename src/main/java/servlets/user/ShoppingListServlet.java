@@ -93,6 +93,7 @@ public class ShoppingListServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -114,6 +115,7 @@ public class ShoppingListServlet extends HttpServlet {
                     List_category l_cat = list_categoryDao.getByPrimaryKey(cat_id);
                     List_reg list = new List_reg(name, user, l_cat, description);
                     list_regDao.insert(list);
+                    saveImage(request.getPart("image"), "shopping_lists", list.getId().toString());
                     System.err.println("Ok, list created: " + list.getId());
                     response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
                 } catch (Exception ex) {
@@ -131,7 +133,6 @@ public class ShoppingListServlet extends HttpServlet {
                     list.setName(name);
                     list.setDescription(description);
                     list_regDao.update(list);
-
                     saveImage(request.getPart("image"), "shopping_lists", list.getId().toString());
                     System.err.println("Ok, list modified: " + list.getId());
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + request.getParameter("list_id"));
@@ -150,6 +151,22 @@ public class ShoppingListServlet extends HttpServlet {
                     deleteImage("list_categories", id.toString());
                     System.err.println("Ok, list deleted");
                     response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
+                } catch (DAOException ex) {
+                    System.err.println("Impossible to delete list by given ID: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+                break;
+            }
+
+            case "removeFromShared": {
+                try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    Integer id = Integer.parseInt(request.getParameter("list_id"));
+                    List_reg list = list_regDao.getByPrimaryKey(id);
+                    list_regDao.removeShared(list, user);
+                    System.err.println("Ok, " + user.getEmail() + " removed " + list.getName() + " from his shared lists");
+                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedlists");
                 } catch (DAOException ex) {
                     System.err.println("Impossible to delete list by given ID: " + ex);
                     response.sendRedirect(contextPath + "error.html");

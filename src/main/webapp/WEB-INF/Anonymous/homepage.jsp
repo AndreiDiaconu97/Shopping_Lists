@@ -173,6 +173,23 @@
                 <i class="fa fa-shopping-cart" style="font-size:30px"></i>
                 My list
             </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="nav navbar-nav ml-auto">              
+                    <li class="dropdown ml-auto my-1">
+                        <button class="btn btn-outline-secondary">
+                            <a href="../registration.html" style="color: white; text-decoration: none"/>Sign-up</a>
+                        </button>
+                    </li>                            
+                    <li class="dropdown ml-auto my-1">
+                        <button class="btn btn-outline-secondary ml-2">
+                            <a href="../login.html" style="color: white; text-decoration: none">Log-in</a>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
         <c:choose>

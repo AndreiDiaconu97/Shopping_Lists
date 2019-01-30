@@ -38,7 +38,7 @@ public class AdminServlet extends HttpServlet {
     private ProductDAO productDao; // maybe useless: create product = post to ProductServlet
 
     private void saveImage(Part imagePart, String folder, String imageName) throws IOException {
-        if(imagePart.getSubmittedFileName().equals("")) {
+        if (imagePart.getSubmittedFileName().equals("")) {
             return;
         }
 
@@ -77,6 +77,8 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -102,8 +104,6 @@ public class AdminServlet extends HttpServlet {
                         list_categoryDao.insert(cat);
                         System.err.println("Ok. Nome della categoria di lista inserita: " + cat.getName());
                     } else {
-                        saveImage(request.getPart("image"), "list_categories", id_s);
-
                         if (name != null) {
                             cat.setName(name);
                         }
@@ -113,6 +113,7 @@ public class AdminServlet extends HttpServlet {
                         list_categoryDao.update(cat);
                         System.err.println("Ok. Nome della categoria di lista modificata: " + cat.getName());
                     }
+                    saveImage(request.getPart("image"), "list_categories", cat.getId().toString());
 
                 } catch (DAOException ex) {
                     System.err.println("Errore DAO: " + ex.getMessage());
@@ -143,8 +144,6 @@ public class AdminServlet extends HttpServlet {
                         prod_categoryDao.insert(prod_cat);
                         list_categoryDao.insertProd_category(list_category, prod_cat);
                     } else {
-                        saveImage(request.getPart("image"), "product_categories", id_s);
-
                         if (name != null) {
                             prod_cat.setName(name);
                         }
@@ -156,6 +155,8 @@ public class AdminServlet extends HttpServlet {
                         }
                         prod_categoryDao.update(prod_cat);
                     }
+                    saveImage(request.getPart("image"), "product_categories", prod_cat.getId().toString());
+
                 } catch (Exception ex) {
                     System.err.println(ex.getMessage());
                     response.sendRedirect(response.encodeRedirectURL(contextPath + "error.html?admin"));
@@ -186,7 +187,6 @@ public class AdminServlet extends HttpServlet {
                                 }
                             }
                         }
-
                         if (request.getParameter("prod_category_rem") != null) {
                             String[] p_c_ids_rem = request.getParameterValues("prod_category_rem");
                             for (String p_c_s : p_c_ids_rem) {
@@ -228,8 +228,6 @@ public class AdminServlet extends HttpServlet {
                         prod = new Product(name, prod_category, user, description);
                         productDao.insert(prod);
                     } else {
-                        saveImage(request.getPart("image"), "products", id_s);
-
                         if (name != null) {
                             prod.setName(name);
                         }
@@ -241,6 +239,8 @@ public class AdminServlet extends HttpServlet {
                         }
                         productDao.update(prod);
                     }
+                    saveImage(request.getPart("image"), "products", prod.getId().toString());
+
                 } catch (Exception ex) {
                     response.sendRedirect(response.encodeRedirectURL(contextPath + "error.html?admin"));
                 }
