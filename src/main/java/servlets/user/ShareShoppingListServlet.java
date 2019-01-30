@@ -5,12 +5,11 @@
  */
 package servlets.user;
 
-import db.daos.List_categoryDAO;
 import db.daos.List_regDAO;
-import db.daos.Prod_categoryDAO;
-import db.daos.ProductDAO;
 import db.daos.UserDAO;
 import db.daos.jdbc.JDBC_utility;
+import db.daos.jdbc.JDBC_utility.AccessLevel;
+import static db.daos.jdbc.JDBC_utility.intToAccessLevel;
 import db.entities.List_reg;
 import db.entities.User;
 import db.exceptions.DAOException;
@@ -72,16 +71,21 @@ public class ShareShoppingListServlet extends HttpServlet {
         switch (action) {
             case "sharing": {
                 try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+
                     Integer access = Integer.parseInt(request.getParameter("selectAccess"));
-                    Integer id = Integer.parseInt(request.getParameter("listToshare"));
+                    Integer list_id = Integer.parseInt(request.getParameter("listToshare"));
                     String email = request.getParameter("userToshare");
 
                     User invited = userDao.getByEmail(email);
-                    List_reg list = list_regDao.getByPrimaryKey(id);
+                    List_reg list = list_regDao.getByPrimaryKey(list_id);
                     List<User> shared_users = list_regDao.getUsersSharedTo(list);
                     List<User> invited_users = list_regDao.getInvitedUsers(list);
 
-                    if (invited.equals(list.getOwner())) {
+                    if (!user.equals(list.getOwner())) {
+                        System.err.println("Cannot invite: only owner can invite");
+                    } else if (invited.equals(list.getOwner())) {
                         System.err.println("Cannot invite " + invited.getEmail() + ": is owner");
                     } else if (invited.getIs_admin()) {
                         System.err.println("Cannot invite " + invited.getEmail() + ": is admin");
@@ -94,7 +98,7 @@ public class ShareShoppingListServlet extends HttpServlet {
                         list_regDao.inviteUser(list, invited, accesslv);
                         System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName());
                     }
-                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + id);
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
 
                 } catch (DAOException ex) {
                     System.err.println("Cannot invite user to list: " + ex);
@@ -129,6 +133,33 @@ public class ShareShoppingListServlet extends HttpServlet {
                     response.sendRedirect(contextPath + "restricted/homepage.html?tab=sharedLists");
                 } catch (DAOException ex) {
                     System.err.println("Cannot decline invite to list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+                break;
+            }
+
+            case "changeAccess": {
+                try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    List_reg list = list_regDao.getByPrimaryKey(list_id);
+                    if (!user.equals(list.getOwner()) && userDao.getAccessLevel(user, list) != AccessLevel.FULL) {
+                        throw new DAOException("Only owner or FULL users can change access");
+                    }
+
+                    String[] user_ids_s = request.getParameterValues("user_id[]");
+                    for (String user_id_s : user_ids_s) {
+                        User shared = userDao.getByPrimaryKey(Integer.parseInt(user_id_s));
+                        AccessLevel accessLevel = intToAccessLevel(Integer.parseInt(request.getParameter("access_" + shared.getId())));
+                        if (userDao.getAccessLevel(shared, list) != accessLevel) {
+                            list_regDao.changeAccessLevel(list, shared, accessLevel);
+                        }
+                    }
+
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list.getId());
+                } catch (DAOException ex) {
+                    System.err.println("Cannot modify access to list: " + ex);
                     response.sendRedirect(contextPath + "error.html");
                 }
                 break;

@@ -100,10 +100,11 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Cannot update access: AccessLevel null");
         }
 
-        String query = "UPDATE " + L_SHARING_TABLE + " SET ACCESS = ? WHERE ID = ?";
+        String query = "UPDATE " + L_SHARING_TABLE + " SET ACCESS = ? WHERE LIST=? AND USER_ID = ?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, accessLevelToInt(accessLevel));
             stm.setInt(2, list_reg.getId());
+            stm.setInt(3, user.getId());
 
             int count = stm.executeUpdate();
             if (count != 1) {

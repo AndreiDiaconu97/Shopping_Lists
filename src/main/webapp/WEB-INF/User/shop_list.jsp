@@ -476,6 +476,10 @@
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header shadow">
+                            <form id="participantsModal-form" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                <input type="hidden" name="action" value="changeAccess">
+                                <input type="hidden" name="list_id" value="${list.id}">
+                            </form>
                             <i class="fa fa-users my-auto mr-auto" style="font-size:30px;"></i>
                             <h5 class="modal-title">Participants</h5>
                             <button type="button" class="close" data-dismiss="modal">
@@ -495,7 +499,7 @@
                                     </p>
                                     <div class="row ml-auto mx-2 my-2">
                                         <div class="input-group my-auto">
-                                            <select class="custom-select" id="inputGroupSelect02">
+                                            <select class="custom-select" id="participantsModal-access-${shared_user.id}">
                                                 <my:n>
                                                     <option value="2" <c:if test="${shared_user_al=='FULL'}">selected</c:if> >FULL</option>
                                                     <option value="1" <c:if test="${shared_user_al=='PRODUCTS'}">selected</c:if> >PRODUCTS</option>
@@ -509,8 +513,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button"
-                                            >
+                                    <button type="button" class="btn btn-danger my-auto mr-2 shadow-sm rounded" data-toggle="button">
                                         <i class="fa fa-user-times" style="font-size:25px"></i>
                                     </button>
                                 </div>
@@ -518,7 +521,7 @@
                             </c:forEach>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm changes</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="sendChangeAccess()">Confirm changes</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
@@ -974,44 +977,44 @@
                 for (p of products) {
                     innerhtml = innerhtml
                             + '<div id="add-product-div-' + p.id + '" class="container-fluid rounded shadow border mb-2" style="background-color: whitesmoke" onclick="selectAddProduct(' + p.id + ')">'
-                            + '          <div class="row my-2 ml-0">'
-                            + '              <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/products/' + p.id + '">'
-                            + '              <div class="col my-auto">'
-                            + '                  <div class="text-left" style="font-size: 18px">'
-                            + '                      ' + p.name
-                            + '                  </div>'
-                            + '              </div>'
-                            + '          </div>'
-                            + '          <div class="row mx-0 justify-content-between">'
-                            + '              <div class="row mx-0 my-auto">'
-                            + '                  <div class="input-group mb-3 my-auto" data-toggle="tooltip" data-placement="top" title="Rating: ' + p.rating.toString().substr(0, 3) + '">'
-                            + '                      <i class="' + (p.rating >= 0.8 ? 'fas fa-star' : (p.rating >= 0.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
-                            + '                      <i class="' + (p.num_votes > 0 ? (p.rating >= 1.8 ? 'fas fa-star' : (p.rating >= 1.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
-                            + '                      <i class="' + (p.rating >= 2.8 ? 'fas fa-star' : (p.rating >= 2.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
-                            + '                      <i class="' + (p.num_votes > 0 ? (p.rating >= 3.8 ? 'fas fa-star' : (p.rating >= 3.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
-                            + '                      <i class="' + (p.rating >= 4.8 ? 'fas fa-star' : (p.rating >= 4.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
-                            + '                  </div>'
-                            + '              </div>'
-                            + '              <div class="badge badge-pill badge-secondary shadow my-auto">' + p.category.name + '</div>'
-                            + '              <div class="text-left">Votes: ' + p.num_votes + '</div>'
-                            + '          </div>'
-                            + '          <hr>'
-                            + '          <div class="panel panel-success autocollapse">'
-                            + '              <div class="panel-heading clickable">'
-                            + '                  <div class="row mx-auto">'
-                            + '                      <p>Description</p>'
-                            + '                      <i class="fa fa-chevron-circle-down ml-2" style="font-size:25px;"></i>'
-                            + '                      <div class="text ml-auto mr-2" style="color: grey">created by</div>'
-                            + '                      <div class="text" style="font-size: 18px">' + p.creator.firstname + ' ' + p.creator.lastname + '</div>'
-                            + '                  </div>'
-                            + '              </div>'
-                            + '              <div class="panel-body">'
-                            + '                  <div class="text-justify mx-4 mb-4">'
-                            + '                      ' + p.description
-                            + '                  </div>'
-                            + '              </div>'
-                            + '          </div>'
-                            + '      </div>';
+                            + '    <div class="row my-2 ml-0">'
+                            + '        <img class="img-thumbnail mx-auto my-auto" style="width: 80px; height: 100%; min-width: 50px; min-height: 100%" alt="Responsive image" src="../images/products/' + p.id + '">'
+                            + '        <div class="col my-auto">'
+                            + '            <div class="text-left" style="font-size: 18px">'
+                            + '                ' + p.name
+                            + '            </div>'
+                            + '        </div>'
+                            + '    </div>'
+                            + '    <div class="row mx-0 justify-content-between">'
+                            + '        <div class="row mx-0 my-auto">'
+                            + '            <div class="input-group mb-3 my-auto" data-toggle="tooltip" data-placement="top" title="Rating: ' + p.rating.toString().substr(0, 3) + '">'
+                            + '                <i class="' + (p.rating >= 0.8 ? 'fas fa-star' : (p.rating >= 0.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '                <i class="' + (p.num_votes > 0 ? (p.rating >= 1.8 ? 'fas fa-star' : (p.rating >= 1.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
+                            + '                <i class="' + (p.rating >= 2.8 ? 'fas fa-star' : (p.rating >= 2.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '                <i class="' + (p.num_votes > 0 ? (p.rating >= 3.8 ? 'fas fa-star' : (p.rating >= 3.3 ? 'fa fa-star-half-alt' : 'far fa-star')) : 'far fa-question-circle') + '" style="font-size:21px;"></i>'
+                            + '                <i class="' + (p.rating >= 4.8 ? 'fas fa-star' : (p.rating >= 4.3 ? 'fa fa-star-half-alt' : 'far fa-star')) + '" style="font-size:21px;"></i>'
+                            + '            </div>'
+                            + '        </div>'
+                            + '        <div class="badge badge-pill badge-secondary shadow my-auto">' + p.category.name + '</div>'
+                            + '        <div class="text-left">Votes: ' + p.num_votes + '</div>'
+                            + '    </div>'
+                            + '    <hr>'
+                            + '    <div class="panel panel-success autocollapse">'
+                            + '        <div class="panel-heading clickable">'
+                            + '            <div class="row mx-auto">'
+                            + '                <p>Description</p>'
+                            + '                <i class="fa fa-chevron-circle-down ml-2" style="font-size:25px;"></i>'
+                            + '                <div class="text ml-auto mr-2" style="color: grey">created by</div>'
+                            + '                <div class="text" style="font-size: 18px">' + p.creator.firstname + ' ' + p.creator.lastname + '</div>'
+                            + '            </div>'
+                            + '        </div>'
+                            + '        <div class="panel-body">'
+                            + '            <div class="text-justify mx-4 mb-4">'
+                            + '                ' + p.description
+                            + '            </div>'
+                            + '        </div>'
+                            + '    </div>'
+                            + '</div>';
                 }
                 $('#otherProducts')[0].innerHTML = innerhtml;
             }
@@ -1073,11 +1076,24 @@
                 let inputs = "";
                 for (p of changed) {
                     console.log('Changed ' + p.name);
-                    inputs += '<input type="hidden" name="product_id" value="' + p.id + '">';
+                    inputs += '<input type="hidden" name="product_id[]" value="' + p.id + '">';
                     inputs += '<input type="hidden" name="purchased_' + p.id + '" value="' + $('#prodAmount' + p.id)[0].value + '">';
                 }
                 $('#sendPurchaseForm')[0].innerHTML += inputs;
                 $('#sendPurchaseForm')[0].submit();
+            }
+            
+            function sendChangeAccess(){
+                var shared_users = ${User.toJSON(shared_to)};
+                
+                let inputs = "";
+                for (u of shared_users) {
+                    console.log('Changed access to ' + u.name);
+                    inputs += '<input type="hidden" name="user_id[]" value="' + u.id + '">';
+                    inputs += '<input type="hidden" name="access_' + u.id + '" value="' + $('#participantsModal-access-' + u.id)[0].value + '">';
+                }
+                $('#participantsModal-form')[0].innerHTML += inputs;
+                $('#participantsModal-form')[0].submit();
             }
         </script>
     </body>
