@@ -702,13 +702,12 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="sendPurchaseForm" action="${contextPath}" method="POST">
-                        <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
-                        <input type="hidden" name="action" value="delete"/>
-                        <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
+                    <form id="sendPurchaseForm" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                        <input type="hidden" name="action" value="purchaseProducts">
+                        <input type="hidden" name="list_id" value="${list.id}">
                     </form>
                     <div class="modal-footer form-horizontal">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#sendPurchaseForm')[0].submit()">Confirm</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="sendPurchased()">Confirm</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -853,7 +852,7 @@
                 let missinghtml = "";
                 for (p of missing) {
                     let day = 24 * 3600 * 1000;
-                    let need_reset = Math.random() > 0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
+                    let need_reset = (new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     missinghtml = missinghtml
                             + '<div class="card shadow-sm mb-2">'
                             + '    <div class="card-body">'
@@ -895,7 +894,7 @@
                 let purchasedhtml = "";
                 for (p of purchased) {
                     let day = 24 * 3600 * 1000;
-                    let need_reset = Math.random() > 0.5;//(new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
+                    let need_reset = (new Date(p.last_purchase) + day * p.category.renew_time) < new Date();
                     purchasedhtml = purchasedhtml
                             + '<div class="card shadow-sm mb-2" style="background-color: whitesmoke">'
                             + '    <div class="card-body">'
@@ -1054,6 +1053,19 @@
                 $('#manage-product-resetProduct')[0].style.border = "";
                 $('#manage-product-' + item)[0].style.border = "3px solid blue";
                 $('#manage-product-confirm')[0].deactivated = false;
+            }
+
+            function sendPurchased() {
+                let missing = listProducts.filter(p => p.purchased !== p.total);
+                let changed = missing.filter(p => $('#prodAmount' + p.id)[0].value !== p.purchased.toString());
+                let inputs = "";
+                for (p of changed) {
+                    console.log('Changed ' + p.name);
+                    inputs += '<input type="hidden" name="product_id" value="' + p.id + '">';
+                    inputs += '<input type="hidden" name="purchased_' + p.id + '" value="' + $('#prodAmount' + p.id)[0].value + '">';
+                }
+                $('#sendPurchaseForm')[0].innerHTML += inputs;
+                $('#sendPurchaseForm')[0].submit();
             }
         </script>
     </body>
