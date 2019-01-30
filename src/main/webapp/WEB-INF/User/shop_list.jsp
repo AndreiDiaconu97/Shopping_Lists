@@ -553,21 +553,27 @@
                                     </p>
                                     <div class="row ml-auto mx-2 my-2">
                                         <div class="input-group my-auto">
-                                            <select class="custom-select" id="sharePermssionsSelect${friend.id}">
-                                                <option value="2">FULL</option>
-                                                <option value="1">PRODUCTS</option>
-                                                <option value="0" selected>READ</option>
-                                            </select>
-                                            <div class="input-group-append">
-                                                <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
-                                                    <i class="fa fa-wrench"></i>
-                                                </label>
-                                            </div>
+                                            <form class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST" method="POST">
+                                                <select class="custom-select" name="selectAccess" id="sharePermssionsSelect${friend.id}">
+                                                    <option value="2">FULL</option>
+                                                    <option value="1">PRODUCTS</option>
+                                                    <option value="0" selected>READ</option>
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <label class="input-group-text" for="sharePermssionsSelect${friend.id}">
+                                                        <i class="fa fa-wrench"></i>
+                                                    </label>
+                                                </div>
+                                                <input type="hidden" name="sharing" value="true" >
+                                                <input type="hidden" name="userToshare" value="${friend.email}" >
+                                                <input type="hidden" name="listToshare" value="${list.id}">
+                                                <input type="hidden" name="access" value="${list.id}">
+                                                <button type="submit" class="btn btn-success my-auto mr-2 shadow-sm rounded">
+                                                    <i class="fa fa-user-plus" style="font-size:25px"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success my-auto mr-2 shadow-sm rounded" data-toggle="button">
-                                        <i class="fa fa-user-plus" style="font-size:25px"></i>
-                                    </button>
                                 </div>
                                 <hr>
                             </c:forEach>

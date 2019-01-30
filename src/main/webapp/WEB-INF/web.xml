@@ -49,6 +49,10 @@
         <servlet-name>ProductServlet</servlet-name>
         <servlet-class>servlets.user.ProductServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ShareShoppingListServlet</servlet-name>
+        <servlet-class>servlets.user.ShareShoppingListServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Homepage_jsp</servlet-name>
         <url-pattern>/restricted/homepage.html</url-pattern>
@@ -132,6 +136,10 @@
     <servlet-mapping>
         <servlet-name>ImageDownloadServlet</servlet-name>
         <url-pattern>/images/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShareShoppingListServlet</servlet-name>
+        <url-pattern>/restricted/shareShoppingList.handler</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

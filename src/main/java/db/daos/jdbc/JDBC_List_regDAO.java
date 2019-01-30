@@ -413,6 +413,8 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("Cannot invite admins");
         }
 
+
+
         String query = "INSERT INTO " + INVITES_TABLE + " (LIST, INVITED, ACCESS) VALUES (?,?,?)";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
