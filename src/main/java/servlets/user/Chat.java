@@ -6,16 +6,12 @@
 package servlets.user;
 
 import db.daos.List_regDAO;
-import db.daos.Prod_categoryDAO;
-import db.daos.ProductDAO;
 import db.entities.List_reg;
 import db.entities.Message;
 import db.entities.User;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Timestamp;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

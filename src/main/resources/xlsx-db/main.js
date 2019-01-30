@@ -242,11 +242,11 @@ fs.appendFileSync(filename, query);
 query = "";
 for (l of lists) {
 	for (p of l.Products) {
-		let amount = Math.floor(Math.random() * 20) + 1;
-		let purchased = Math.random() > 0.3 ? [0, amount].randomItem() : Math.floor(Math.random() * (amount - 1) + 1);
+		let total = Math.floor(Math.random() * 20) + 1;
+		let purchased = Math.random() > 0.3 ? [0, total].randomItem() : Math.floor(Math.random() * (total - 1) + 1);
 		let last_purchase = (new Date(new Date() - Math.floor(Math.random() * 5) * day - Math.floor(Math.random() * 20) * hour - day + 5 * hour)).toTimestamp();
-		query += `INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,AMOUNT,PURCHASED,LAST_PURCHASE) `;
-		query += `VALUES (${l.Id},${p + 1},${amount},${purchased},'${last_purchase}');\n`;
+		query += `INSERT INTO APP.LISTS_PRODUCTS (LIST,PRODUCT,TOTAL,PURCHASED,LAST_PURCHASE) `;
+		query += `VALUES (${l.Id},${p + 1},${total},${purchased},'${last_purchase}');\n`;
 	}
 }
 query += "\n\n\n\n";

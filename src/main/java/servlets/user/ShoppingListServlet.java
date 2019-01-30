@@ -16,16 +16,6 @@ import db.exceptions.DAOException;
 import db.exceptions.DAOFactoryException;
 import db.factories.DAOFactory;
 import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Authenticator;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -48,12 +38,6 @@ public class ShoppingListServlet extends HttpServlet {
     private List_categoryDAO list_categoryDao;
     private ProductDAO productDao;
     private Prod_categoryDAO prod_categoryDao;
-    final String m_host = "smtp.gmail.com";
-    final String m_port = "465";
-    final String m_username = "test.progetto.lopardo@gmail.com";
-    final String m_password = "Abcde1234%";
-    Properties props;
-    Session session;
 
     private void saveImage(Part imagePart, String folder, String imageName) throws IOException {
         if (imagePart.getSubmittedFileName().equals("")) {
@@ -105,123 +89,6 @@ public class ShoppingListServlet extends HttpServlet {
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for user", ex);
         }
-
-        props = System.getProperties();
-        props.setProperty("mail.smtp.host", m_host);
-        props.setProperty("mail.smtp.port", m_port);
-        props.setProperty("mail.smtp.socketFactory.port", m_port);
-        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.smtp.auth", "true");
-        props.setProperty("mail.smtp.starttls.enable", "true");
-
-        session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(m_username, m_password);
-            }
-        });
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String contextPath = getServletContext().getContextPath();
-        if (!contextPath.endsWith("/")) {
-            contextPath += "/";
-        }
-
-        if (request.getParameter("sharedlist") != null) {
-            Integer id = Integer.parseInt(request.getParameter("sharedlist"));
-            String email = request.getParameter("email");
-            response.setCharacterEncoding("UTF-8");
-            String ownerEmail;
-            User owner;
-            Integer check = 1;
-            try {
-                List_reg list = list_regDao.getByPrimaryKey(id);
-                owner = list.getOwner();
-                ownerEmail = owner.getEmail();
-                List<User> users = list_regDao.getUsersSharedTo(list);
-
-                for (User user : users) {
-                    if (user.getEmail().equals(email)) {
-                        check = 2;
-                    }
-                }
-                if (ownerEmail.equals(email)) {
-                    check = 3;
-                }
-            } catch (DAOException ex) {
-                System.err.println("errors");
-            }
-
-            System.err.println(check);
-
-            if (check == 2) {
-                response.getWriter().print("already");
-            } else if (check == 3) {
-                response.getWriter().print("same");
-            } else {
-                List_reg list = new List_reg();
-                User Owner = new User();
-
-                try {
-                    list = list_regDao.getByPrimaryKey(id);
-                    Owner = list.getOwner();
-                } catch (DAOException ex) {
-                    System.err.println("");
-                }
-
-                String firstname = Owner.getFirstname();
-                String lastname = Owner.getLastname();
-                String message = "Ehi " + firstname + " invited you to join his list! Click on the link below to join!"
-                        + "\n\n http://localhost:8084/Shopping/restricted/shopping.lists.handler?share=true&list_id=" + id + "&email=" + email;
-
-                Message msg = new MimeMessage(session);
-                try {
-                    msg.setFrom(new InternetAddress(m_username));
-                    msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email, false));
-                    msg.setSubject("Invite from " + firstname + " " + lastname);
-                    msg.setText(message);
-                    msg.setSentDate(new java.util.Date());
-                    Transport.send(msg);
-                } catch (MessagingException me) {
-                    me.printStackTrace(System.err);
-                    response.getWriter().print("error");
-                }
-                response.getWriter().print("success");
-            }
-        }
-
-        if (request.getParameter("share") != null) {
-            String email = request.getParameter("email");
-            Integer id = Integer.parseInt(request.getParameter("list_id"));
-
-            try {
-                List_reg list = list_regDao.getByPrimaryKey(id);
-                User user = userDao.getByEmail(email);
-                list_regDao.shareListToUser(list, user);
-
-            } catch (DAOException ex) {
-                System.err.println("Cannot share the list");
-            }
-
-            response.sendRedirect(contextPath + "restricted/homepage.html");
-        }
-
-        if (request.getParameter("shareurl") != null) {
-            Integer id = Integer.parseInt(request.getParameter("id"));
-            HttpSession session = request.getSession(false);
-            User user = null;
-            user = (User) session.getAttribute("user");
-
-            try {
-                List_reg list = list_regDao.getByPrimaryKey(id);
-                list_regDao.shareListToUser(list, user);
-
-            } catch (DAOException ex) {
-                System.err.println("Cannot share the list");
-            }
-        }
     }
 
     @Override
@@ -248,77 +115,136 @@ public class ShoppingListServlet extends HttpServlet {
                     List_reg list = new List_reg(name, user, l_cat, description);
                     list_regDao.insert(list);
                     System.err.println("Ok, list created: " + list.getId());
-                } catch (Exception ex) {
-                    System.err.println("Cannot insert list: " + ex.getMessage());
-                    response.sendRedirect(contextPath + "error.html");
-                }
-                if (!response.isCommitted()) {
                     response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
+                } catch (Exception ex) {
+                    System.err.println("Cannot insert list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
-            case "edit": {
-                Integer list_id = Integer.parseInt(request.getParameter("list_id"));
-                String name = request.getParameter("name");
-                String description = request.getParameter("description");
-                try {
-                    List_reg list = list_regDao.getByPrimaryKey(list_id);
 
+            case "edit": {
+                try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+                    String name = request.getParameter("name");
+                    String description = request.getParameter("description");
+                    List_reg list = list_regDao.getByPrimaryKey(Integer.parseInt(request.getParameter("list_id")));
                     list.setName(name);
                     list.setDescription(description);
-                    System.err.println("NAME: " + name);
                     list_regDao.update(list);
 
                     saveImage(request.getPart("image"), "shopping_lists", list.getId().toString());
                     System.err.println("Ok, list modified: " + list.getId());
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + request.getParameter("list_id"));
                 } catch (DAOException ex) {
                     System.err.println("Cannot edit list: " + ex);
-                    //response.sendRedirect(contextPath + "error.html");
-                }
-
-                if (!response.isCommitted()) {
-                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + request.getParameter("list_id"));
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
+
             case "delete": {
-                Integer id = Integer.parseInt(request.getParameter("list_id"));
                 try {
+                    Integer id = Integer.parseInt(request.getParameter("list_id"));
                     List_reg list = list_regDao.getByPrimaryKey(id);
                     list_regDao.delete(list);
                     deleteImage("list_categories", id.toString());
                     System.err.println("Ok, list deleted");
-                } catch (DAOException ex) {
-                    System.err.println("Impossible to delete list by given ID");
-                    response.sendRedirect(contextPath + "error.html");
-                }
-                if (!response.isCommitted()) {
                     response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
+                } catch (DAOException ex) {
+                    System.err.println("Impossible to delete list by given ID: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
                 }
                 break;
             }
-            case "add": {
-                Integer list_id = Integer.parseInt(request.getParameter("list_id"));
-                Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
-                Integer amount = Integer.parseInt(request.getParameter("amount"));
+
+            case "addProduct": {
                 try {
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
+                    Integer amount = Integer.parseInt(request.getParameter("amount"));
                     List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
                     Product product = productDao.getByPrimaryKey(prod_id);
                     list_regDao.insertProduct(list_reg, product, amount);
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
                 } catch (DAOException ex) {
-                    System.err.println("Cannot add product to list");
+                    System.err.println("Cannot add product to list: " + ex);
                     response.sendRedirect(contextPath + "error.html");
-                }
-                if (!response.isCommitted()) {
-                    response.sendRedirect(contextPath + "restricted/homepage.html?tab=" + request.getParameter("tab"));
                 }
                 break;
             }
-            default:
-                System.err.println("ShoppingListServlet: unsupported parameter");
+
+            case "removeProduct": {
+                try {
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
+                    List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
+                    Product product = productDao.getByPrimaryKey(prod_id);
+                    list_regDao.removeProduct(list_reg, product);
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
+                } catch (DAOException ex) {
+                    System.err.println("Cannot remove product from list: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+                break;
+            }
+
+            case "resetProduct": {
+                try {
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
+                    List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
+                    Product product = productDao.getByPrimaryKey(prod_id);
+                    list_regDao.updateAmountPurchased(list_reg, product, 0);
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
+                } catch (DAOException ex) {
+                    System.err.println("Cannot reset product purchased amount: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+                break;
+            }
+
+            case "changeProductTotal": {
+                try {
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    Integer prod_id = Integer.parseInt(request.getParameter("product_id"));
+                    Integer amount = Integer.parseInt(request.getParameter("amount"));
+                    List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
+                    Product product = productDao.getByPrimaryKey(prod_id);
+                    list_regDao.updateAmountTotal(list_reg, product, amount);
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
+                } catch (DAOException ex) {
+                    System.err.println("Cannot change product total amount: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+            }
+
+            case "purchaseProducts": {
+                try {
+                    Integer list_id = Integer.parseInt(request.getParameter("list_id"));
+                    List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
+                    String[] prod_ids_s = request.getParameterValues("product_id");
+                    for (String prod_id_s : prod_ids_s) {
+                        Integer prod_id = Integer.parseInt(prod_id_s);
+                        Product product = productDao.getByPrimaryKey(prod_id);
+                        Integer purchased = Integer.parseInt(request.getParameter("purchased_" + prod_id));
+                        list_regDao.updateAmountPurchased(list_reg, product, purchased);
+                    }
+
+                    response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
+                } catch (DAOException ex) {
+                    System.err.println("Cannot purchase products: " + ex);
+                    response.sendRedirect(contextPath + "error.html");
+                }
+                break;
+            }
+
+            default: {
+                System.err.println("ShoppingListServlet: unsupported parameter: " + action);
                 response.sendRedirect(contextPath + "error.html");
                 break;
+            }
         }
     }
 

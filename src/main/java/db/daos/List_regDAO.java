@@ -21,6 +21,8 @@ import java.util.List;
 public interface List_regDAO extends DAO<List_reg, Integer> {
 
     public void shareListToUser(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException;
+    
+    public void changeAccessLevel(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException;
 
     public List<User> getUsersSharedTo(List_reg list_reg) throws DAOException;
 

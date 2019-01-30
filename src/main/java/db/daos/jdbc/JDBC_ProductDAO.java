@@ -73,7 +73,7 @@ public class JDBC_ProductDAO extends JDBC_DAO<Product, Integer> implements Produ
         switch (sortby) {
             case POPULARITY:
                 query += "GROUP BY ID, NAME, UPPER_NAME, DESCRIPTION, CATEGORY, CREATOR, NUM_VOTES, RATING\n";
-                query += "ORDER BY COALESCE(SUM(AMOUNT), 0) DESC";
+                query += "ORDER BY COALESCE(SUM(TOTAL), 0) DESC";
                 break;
             case NAME:
                 query += "ORDER BY UPPER_NAME";

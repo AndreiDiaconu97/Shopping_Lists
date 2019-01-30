@@ -119,7 +119,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
             throw new DAOException("List_anonymous category does not allow this product's category");
         }
 
-        String query = "INSERT INTO " + L_ANONYM_P_TABLE + " (LIST_ANONYMOUS, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + L_ANONYM_P_TABLE + " (LIST_ANONYMOUS, PRODUCT, TOTAL) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_anonymous.getId());
             stm.setInt(2, product.getId());
@@ -155,7 +155,7 @@ public class JDBC_List_anonymousDAO extends JDBC_DAO<List_anonymous, Integer> im
         checkParam(list_anonymous, true);
         checkParam(product, true);
 
-        String query = "SELECT AMOUNT FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
+        String query = "SELECT TOTAL FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_anonymous.getId());
             stm.setInt(2, product.getId());

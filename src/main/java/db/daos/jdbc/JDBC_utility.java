@@ -172,7 +172,7 @@ public abstract class JDBC_utility {
         list_reg.setCategory(getList_category(rs.getInt("CATEGORY"), con));
         list_reg.setOwner(getUser(rs.getInt("OWNER"), con));
         
-        String query = "SELECT COUNT(*) FROM " + L_P_TABLE + " WHERE LIST=? AND PURCHASED=AMOUNT";
+        String query = "SELECT COUNT(*) FROM " + L_P_TABLE + " WHERE LIST=? AND PURCHASED=TOTAL";
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, list_reg.getId());
         ResultSet rs_p = stm.executeQuery();
@@ -231,7 +231,7 @@ public abstract class JDBC_utility {
         list_anonymous.setLast_seen(rs.getTimestamp("LAST_SEEN"));
         list_anonymous.setName(rs.getString("NAME"));
         
-        String query = "SELECT COUNT(*) FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PURCHASED=AMOUNT";
+        String query = "SELECT COUNT(*) FROM " + L_ANONYM_P_TABLE + " WHERE LIST_ANONYMOUS=? AND PURCHASED=TOTAL";
         PreparedStatement stm = con.prepareStatement(query);
         stm.setInt(1, list_anonymous.getId());
         ResultSet rs_p = stm.executeQuery();
@@ -308,6 +308,10 @@ public abstract class JDBC_utility {
             default:
                 return AccessLevel.READ;
         }
+    }
+    
+    public static int accessLevelToInt(AccessLevel accessLevel){
+        return (accessLevel == AccessLevel.FULL) ? 2 : (accessLevel == AccessLevel.PRODUCTS ? 1 : 0);
     }
 
     public static void checkParam(User user, boolean expectID) throws DAOException {

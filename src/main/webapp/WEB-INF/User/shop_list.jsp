@@ -460,11 +460,11 @@
                             <hr>
                         </c:forEach>
                     </div>
-                        <form action="${contextPath}restricted/chat" method="POST" class="modal-footer form-horizontal">
-                            <input type="hidden" name="list_id" value="${list.id}">
-                            <input class="form-control mr-2" type="text" name="text" style="width: 92%" placeholder="write a message...">
-                            <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
-                        </form>
+                    <form action="${contextPath}restricted/chat" method="POST" class="modal-footer form-horizontal">
+                        <input type="hidden" name="list_id" value="${list.id}">
+                        <input class="form-control mr-2" type="text" name="text" style="width: 92%" placeholder="write a message...">
+                        <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -633,7 +633,7 @@
                             <div class="input-group my-auto mr-auto" style="max-width: 200px">
                                 <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
                                     <input type="hidden" name="list_id"value="${list.id}">
-                                    <input type="hidden" name="action" value="add">
+                                    <input type="hidden" name="action" value="addProduct">
                                     <input type="hidden" id="add-Product-Hidden-Id" name="product_id">
                                     <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="amount" placeholder="Amount">
                                     <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn btn-primary shadow rounded-circle">
@@ -661,11 +661,12 @@
                         </div>
                         <div class="modal-body mx-3">
                             <div class="text my-auto mr-2">Change needed amount  (more than purchased)</div>
-                            <div id="manage-product-amount" class="input-group mb-2 justify-content-center" style="max-width: 300px" onclick="manageProduct('amount')">
+                            <div id="manage-product-changeProductTotal" class="input-group mb-2 justify-content-center" style="max-width: 300px" onclick="manageProduct('changeProductTotal')">
                                 <div class="input-group-prepend">
                                     <span id="manage-product-min" class="input-group-text" style="min-width: 50px">10</span>
                                 </div>
                                 <form id="manage-product-form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                                    <input type="hidden" name="list_id" value="${list.id}">
                                     <input id="manage-product-action" type="hidden" name="action">
                                     <input id="manage-product-product_id" type="hidden" name="product_id">
                                     <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="{
@@ -674,11 +675,11 @@
                                             }">
                                 </form>
                             </div>
-                            <button id="manage-product-remove" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('remove')">
+                            <button id="manage-product-removeProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('removeProduct')">
                                 Remove product
                                 <i class="fa fa-trash mr-auto"></i>
                             </button>
-                            <button id="manage-product-reset" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('reset')">
+                            <button id="manage-product-resetProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('resetProduct')">
                                 Reset purchased
                                 <i class="fa fa-trash mr-auto"></i>
                             </button>
@@ -1034,9 +1035,9 @@
 
             function fillProductManageModal(id) {
                 let product = listProducts.filter(p => p.id == id)[0];
-                $('#manage-product-amount')[0].style.border = "";
-                $('#manage-product-remove')[0].style.border = "";
-                $('#manage-product-reset')[0].style.border = "";
+                $('#manage-product-changeProductTotal')[0].style.border = "";
+                $('#manage-product-removeProduct')[0].style.border = "";
+                $('#manage-product-resetProduct')[0].style.border = "";
                 $('#manage-product-confirm')[0].deactivated = true;
                 $('#manage-product-product_id')[0].value = product.id;
                 $('#manage-product-min')[0].innerHTML = product.purchased;
@@ -1048,9 +1049,9 @@
             $('#manage-product-confirm')[0].deactivated = true;
             function manageProduct(item) {
                 $('#manage-product-action')[0].value = item;
-                $('#manage-product-amount')[0].style.border = "";
-                $('#manage-product-remove')[0].style.border = "";
-                $('#manage-product-reset')[0].style.border = "";
+                $('#manage-product-changeProductTotal')[0].style.border = "";
+                $('#manage-product-removeProduct')[0].style.border = "";
+                $('#manage-product-resetProduct')[0].style.border = "";
                 $('#manage-product-' + item)[0].style.border = "3px solid blue";
                 $('#manage-product-confirm')[0].deactivated = false;
             }

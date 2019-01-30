@@ -65,7 +65,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 return lists;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get lists for the passed owner", ex);
+            throw new DAOException("Impossible to get lists for the passed owner: " + ex);
         }
     }
 
@@ -85,10 +85,32 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
-            stm.setInt(3, (accessLevel == AccessLevel.FULL) ? 2 : (accessLevel == AccessLevel.PRODUCTS ? 1 : 0));
+            stm.setInt(3, accessLevelToInt(accessLevel));
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to share list to user", ex);
+            throw new DAOException("Impossible to share list to user: " + ex);
+        }
+    }
+
+    @Override
+    public void changeAccessLevel(List_reg list_reg, User user, AccessLevel accessLevel) throws DAOException {
+        checkParam(list_reg, true);
+        checkParam(user, true);
+        if (accessLevel == null) {
+            throw new DAOException("Cannot update access: AccessLevel null");
+        }
+
+        String query = "UPDATE " + L_SHARING_TABLE + " SET ACCESS = ? WHERE ID = ?";
+        try (PreparedStatement stm = CON.prepareStatement(query)) {
+            stm.setInt(1, accessLevelToInt(accessLevel));
+            stm.setInt(2, list_reg.getId());
+
+            int count = stm.executeUpdate();
+            if (count != 1) {
+                throw new DAOException("AccessLevel change affected an invalid number of records: " + count);
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Impossible to update the list_reg: " + ex);
         }
     }
 
@@ -109,14 +131,14 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             throw new DAOException("List category does not allow this product's category");
         }
 
-        String query = "INSERT INTO " + L_P_TABLE + " (LIST, PRODUCT, AMOUNT) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + L_P_TABLE + " (LIST, PRODUCT, TOTAL) VALUES (?, ?, ?)";
         try (PreparedStatement stm = CON.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, product.getId());
             stm.setInt(3, amount);
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to add new product", ex);
+            throw new DAOException("Impossible to add new product: " + ex);
         }
     }
 
@@ -131,7 +153,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setInt(2, product.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to remove product from list", ex);
+            throw new DAOException("Impossible to remove product from list: " + ex);
         }
     }
 
@@ -163,7 +185,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             stm.setInt(1, list_reg.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to remove list_reg", ex);
+            throw new DAOException("Impossible to remove list_reg: " + ex);
         }
     }
 
@@ -186,7 +208,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
             }
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());
-            throw new DAOException("Impossible to add list_reg to DB", ex);
+            throw new DAOException("Impossible to add list_reg to DB: " + ex);
         }
     }
 
@@ -206,7 +228,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 throw new DAOException("list_reg update affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update the list_reg: " + ex, ex);
+            throw new DAOException("Impossible to update the list_reg: " + ex);
         }
     }
 
@@ -226,7 +248,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 return users;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get the users for the passed list_reg", ex);
+            throw new DAOException("Impossible to get the users for the passed list_reg: " + ex);
         }
     }
 
@@ -235,7 +257,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(list_reg, true);
         checkParam(product, true);
 
-        String query = "SELECT AMOUNT FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
+        String query = "SELECT TOTAL FROM " + L_P_TABLE + " WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, product.getId());
@@ -248,7 +270,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 }
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get total amount", ex);
+            throw new DAOException("Impossible to get total amount: " + ex);
         }
     }
 
@@ -270,7 +292,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 }
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get purchased amount", ex);
+            throw new DAOException("Impossible to get purchased amount: " + ex);
         }
     }
 
@@ -292,7 +314,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 }
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get last_purchase date", ex);
+            throw new DAOException("Impossible to get last_purchase date: " + ex);
         }
     }
 
@@ -311,7 +333,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 throw new DAOException("Total amount updated affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update total amount", ex);
+            throw new DAOException("Impossible to update total amount: " + ex);
         }
     }
 
@@ -320,18 +342,18 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         checkParam(list_reg, true);
         checkParam(product, true);
 
-        String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=?, SET LAST_PURCHASE=? WHERE LIST=? AND PRODUCT=?";
+        String query = "UPDATE " + L_P_TABLE + " SET PURCHASED=?, LAST_PURCHASE=? WHERE LIST=? AND PRODUCT=?";
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, purchased);
-            stm.setInt(2, list_reg.getId());
-            stm.setTimestamp(3, new Timestamp((new Date()).getTime()));
+            stm.setTimestamp(2, new Timestamp((new Date()).getTime()));
+            stm.setInt(3, list_reg.getId());
             stm.setInt(4, product.getId());
             int count = stm.executeUpdate();
             if (count != 1) {
                 throw new DAOException("Purchased amount updated affected an invalid number of records: " + count);
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to update purchased amount", ex);
+            throw new DAOException("Impossible to update purchased amount: " + ex);
         }
     }
 
@@ -372,7 +394,7 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
                 return messages;
             }
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to get messages for given list", ex);
+            throw new DAOException("Impossible to get messages for given list: " + ex);
         }
     }
 
@@ -395,10 +417,10 @@ public class JDBC_List_regDAO extends JDBC_DAO<List_reg, Integer> implements Lis
         try (PreparedStatement stm = CON.prepareStatement(query)) {
             stm.setInt(1, list_reg.getId());
             stm.setInt(2, user.getId());
-            stm.setInt(3, (accessLevel == AccessLevel.FULL) ? 2 : (accessLevel == AccessLevel.PRODUCTS ? 1 : 0));
+            stm.setInt(3, accessLevelToInt(accessLevel));
             stm.executeUpdate();
         } catch (SQLException ex) {
-            throw new DAOException("Impossible to invite user to list", ex);
+            throw new DAOException("Impossible to invite user to list: " + ex);
         }
     }
 
