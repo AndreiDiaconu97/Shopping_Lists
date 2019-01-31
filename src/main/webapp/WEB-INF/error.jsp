@@ -23,6 +23,7 @@
                         <c:choose>
                             <c:when test='${param.error == "shop_list"}'>Error in retrieving shopping lists</c:when>
                             <c:when test='${param.error == "list_cat"}'>Error in retrieving list categories</c:when>
+                            <c:when test='${param.error == "nojs"}'>Please enable javascript and retry</c:when>
                         </c:choose>
                     </div>
                 </div>

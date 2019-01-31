@@ -131,6 +131,7 @@
         List<Product> listProducts = list_regDao.getProducts(list);
         pageContext.setAttribute("listProducts", listProducts);
 
+        boolean empty_missing = true;
         JSONArray listProductsJSON = new JSONArray();
         for (Product p : listProducts) {
             int purchased = list_regDao.getAmountPurchased(list, p);
@@ -141,8 +142,12 @@
             pJSON.put("total", total);
             pJSON.put("last_purchase", last_purchase);
             listProductsJSON.put(pJSON);
+            if (purchased != total) {
+                empty_missing = false;
+            }
         }
         pageContext.setAttribute("listProductsJSON", listProductsJSON);
+        pageContext.setAttribute("empty_missing", empty_missing);
 
         Set<Product> otherProducts = new HashSet<>();
         for (Prod_category p_c : prod_categories) {
@@ -174,7 +179,13 @@
 
     <head>
         <title>Shopping lists manager</title>
+        <noscript>
+        <META HTTP-EQUIV="Refresh" CONTENT="0;URL=../error.html?error=nojs">
+        </noscript>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+        <noscript>
+        <META HTTP-EQUIV="Refresh" CONTENT="0;URL=../error.html?error=nojs">
+        </noscript>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
@@ -349,16 +360,18 @@
 
 
         <div class="container-fluid">
-            <div class="row mx-auto mb-2 justify-content-end">
-                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#sendPurchasedModal" data-toggle="modal">
-                    Confirm
-                    <i class="fa fa-check ml-1"></i>
-                </button>
-                <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetPurchased()">
-                    Reset
-                    <i class="fas fa-redo ml-1"></i>
-                </button>
-            </div>
+            <c:if test="${!empty_missing}">
+                <div class="row mx-auto mb-2 justify-content-end">
+                    <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#sendPurchasedModal" data-toggle="modal">
+                        Confirm
+                        <i class="fa fa-check ml-1"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetPurchased()">
+                        Reset
+                        <i class="fas fa-redo ml-1"></i>
+                    </button>
+                </div>
+            </c:if>
 
             <!-- Missing products (not fully purchased) -->
             <div id="missing-products">
@@ -366,17 +379,18 @@
 
 
 
-
-            <div class="row mx-auto mb-2 justify-content-end">
-                <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#sendPurchasedModal" data-toggle="modal">
-                    Confirm
-                    <i class="fa fa-check ml-1"></i>
-                </button>
-                <button type="button" class="btn btn-danger my-auto shadow rounded"  onclick="resetPurchased()">
-                    Reset
-                    <i class="fas fa-redo ml-1"></i>
-                </button>
-            </div>
+            <c:if test="${!empty_missing}">
+                <div class="row mx-auto mb-2 justify-content-end">
+                    <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#sendPurchasedModal" data-toggle="modal">
+                        Confirm
+                        <i class="fa fa-check ml-1"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger my-auto shadow rounded"  onclick="resetPurchased()">
+                        Reset
+                        <i class="fas fa-redo ml-1"></i>
+                    </button>
+                </div>
+            </c:if>
 
 
 

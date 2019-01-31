@@ -94,6 +94,7 @@ public class ShoppingListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+        
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -240,6 +241,9 @@ public class ShoppingListServlet extends HttpServlet {
                     Integer list_id = Integer.parseInt(request.getParameter("list_id"));
                     List_reg list_reg = list_regDao.getByPrimaryKey(list_id);
                     String[] prod_ids_s = request.getParameterValues("product_id[]");
+                    if(prod_ids_s==null){
+                        prod_ids_s = new String[0];
+                    }
                     for (String prod_id_s : prod_ids_s) {
                         Integer prod_id = Integer.parseInt(prod_id_s);
                         Product product = productDao.getByPrimaryKey(prod_id);

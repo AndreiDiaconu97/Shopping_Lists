@@ -119,6 +119,9 @@
 <html>
     <head>
         <title>Shopping lists manager</title>
+        <noscript>
+        <META HTTP-EQUIV="Refresh" CONTENT="0;URL=../error.html?error=nojs">
+        </noscript>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">

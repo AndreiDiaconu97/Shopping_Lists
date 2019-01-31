@@ -81,7 +81,7 @@ public class AnonymousListServlet extends HttpServlet {
                     List_anonymous list = new List_anonymous(name, description, l_cat);
                     list_anonymousDao.insert(list);
                     System.err.println("Ok, list_anonymous created: " + list.getId());
-                    response.addCookie(new Cookie("listID", list.getId().toString()));
+                    response.addCookie(new Cookie("anonymous_list_ID", list.getId().toString()));
                     response.sendRedirect(contextPath + "anonymous/homepage.html");
                 } catch (Exception ex) {
                     System.err.println("Cannot create list_anonymous: " + ex);
@@ -188,6 +188,9 @@ public class AnonymousListServlet extends HttpServlet {
                     Integer list_id = Integer.parseInt(request.getParameter("list_id"));
                     List_anonymous list = list_anonymousDao.getByPrimaryKey(list_id);
                     String[] prod_ids_s = request.getParameterValues("product_id[]");
+                    if(prod_ids_s==null){
+                        prod_ids_s = new String[0];
+                    }
                     for (String prod_id_s : prod_ids_s) {
                         Integer prod_id = Integer.parseInt(prod_id_s);
                         Product product = productDao.getByPrimaryKey(prod_id);

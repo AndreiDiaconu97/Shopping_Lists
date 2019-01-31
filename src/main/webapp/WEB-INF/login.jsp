@@ -10,10 +10,25 @@
     <c:redirect url="${errorURL}"/>
 </c:if>
 
+<%
+    String contextPath = getServletContext().getContextPath();
+    if (!contextPath.endsWith("/")) {
+        contextPath += "/";
+    }
+    if(session.getAttribute("user")!=null){
+        if(!response.isCommitted()){
+            response.sendRedirect(contextPath + "restricted/homepage.html");
+        }
+    }
+%>
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>Shopping lists</title>
+        <noscript>
+        <META HTTP-EQUIV="Refresh" CONTENT="0;URL=../error.html?error=nojs">
+        </noscript>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- Latest compiled and minified CSS -->
@@ -57,11 +72,6 @@
                             </div>
                         </c:if>
                     </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="rememberMe" value="true"> Remember me
-                        </label>
-                    </div>
                     <button class="btn btn-primary mt-2" type="submit">Log in</button>
                     <input type="hidden" name="action" value="login"><br>
                 </form>
@@ -93,19 +103,15 @@
         <div class="container mt-4 mb-4 mx-auto">
             <div class="row mx-auto mb-2 justify-content-center my-auto">
                 <div class="text-left my-auto mr-2">Aren't you registered yet? Subscribe here</div>
-                <button class="btn btn-info ml-2">
-                    <a href="registration.html" style="color: white; text-decoration: none">Sign up</a>
-                </button>
+                <a href="registration.html" class="btn btn-info ml-2" style="color: white; text-decoration: none">Sign up</a>
             </div>
             <hr>
             <div class="row mx-auto justify-content-center my-auto mb-2">
                 <div class="text-left my-auto mr-2">Or you can just enter as a non registered user</div>
-                <button class="btn btn-success my-auto">
-                    <a href="anonymous/homepage.html" class="my-auto" style="color: white; text-decoration: none">
-                        <i class="fa fa-shopping-cart" style="font-size:30px"></i>
-                        Enter
-                    </a>
-                </button>
+                <a  class="btn btn-success my-auto" style="color: white; text-decoration: none" href="anonymous/homepage.html">
+                    <i class="fa fa-shopping-cart" style="font-size:30px"></i>
+                    Enter
+                </a>
             </div>
         </div>
         <footer class="footer font-small blue">

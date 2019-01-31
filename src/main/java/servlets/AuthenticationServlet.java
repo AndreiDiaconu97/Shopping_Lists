@@ -5,6 +5,8 @@
  */
 package servlets;
 
+import db.daos.List_anonymousDAO;
+import db.daos.List_regDAO;
 import db.daos.NV_UserDAO;
 import db.entities.NV_User;
 import db.entities.User;
@@ -27,6 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import db.daos.UserDAO;
+import db.entities.List_anonymous;
+import db.entities.List_reg;
+import db.entities.Product;
+import java.util.List;
+import javax.servlet.http.Cookie;
 
 /**
  *
@@ -36,12 +43,14 @@ public class AuthenticationServlet extends HttpServlet {
 
     UserDAO userDao;
     NV_UserDAO nv_userDao;
+    List_regDAO list_regDao;
+    List_anonymousDAO list_anonymousDao;
     final String m_host = "smtp.gmail.com";
     final String m_port = "465";
     final String m_username = "test.progetto.lopardo@gmail.com";
     final String m_password = "Abcde1234%";
     Properties props;
-    Session session;
+    Session mail_session;
 
     @Override
     public void init() throws ServletException {
@@ -69,7 +78,7 @@ public class AuthenticationServlet extends HttpServlet {
         props.setProperty("mail.smtp.starttls.enable", "true");
         //props.setProperty("mail.debug", "true");
 
-        session = Session.getInstance(props, new Authenticator() {
+        mail_session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(m_username, m_password);
@@ -80,6 +89,7 @@ public class AuthenticationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -90,7 +100,36 @@ public class AuthenticationServlet extends HttpServlet {
             String email = request.getParameter("email");
             String code = request.getParameter("code");
             try {
-                nv_userDao.validateUsingEmailAndCode(email, code);
+                User user = nv_userDao.validateUsingEmailAndCode(email, code);
+                HttpSession session = request.getSession(false);
+                if (session != null && user != null) {
+                    session.setAttribute("user", user);
+                }
+
+                Cookie[] cookies = request.getCookies();
+                String listID_s = null;
+                for (Cookie c : cookies) {
+                    if ("anonymous_list_ID".equals(c.getName())) {
+                        listID_s = c.getValue();
+                    }
+                }
+                if (listID_s != null) {
+                    try{
+                    Integer listID = Integer.parseInt(listID_s);
+                    List_anonymous list_anonymous = list_anonymousDao.getByPrimaryKey(listID);
+                    List<Product> products = list_anonymousDao.getProducts(list_anonymous);
+                    List_reg list_reg = new List_reg(list_anonymous.getName(), user, list_anonymous.getCategory(), list_anonymous.getDescription());
+                    list_regDao.insert(list_reg);
+                    for(Product p : products){
+                        list_regDao.insertProduct(list_reg, p, list_anonymousDao.getAmountTotal(list_anonymous, p));
+                        list_regDao.updateAmountPurchased(list_reg, p, list_anonymousDao.getAmountPurchased(list_anonymous, p));
+                    }
+                    list_anonymousDao.delete(list_anonymous);
+                    response.addCookie(new Cookie("anonymous_list_ID", null));
+                    } catch(DAOException e){
+                        System.err.println("Cannot transfer anonymous list to normal list");
+                    }
+                }
             } catch (DAOException ex) {
                 request.getServletContext().log("Unable to validate user", ex);
                 response.sendRedirect(contextPath + "registration.html?status=error");
@@ -161,7 +200,7 @@ public class AuthenticationServlet extends HttpServlet {
                         String message = contextPath + "auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
                         request.getServletContext().log("Message is: " + message);
 
-                        Message msg = new MimeMessage(session);
+                        Message msg = new MimeMessage(mail_session);
                         try {
                             msg.setFrom(new InternetAddress(m_username));
                             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(nv_user.getEmail(), false));

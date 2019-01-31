@@ -79,13 +79,17 @@ public class ShareShoppingListServlet extends HttpServlet {
                     Integer access = Integer.parseInt(request.getParameter("selectAccess"));
                     Integer list_id = Integer.parseInt(request.getParameter("listToshare"));
                     String email = request.getParameter("userToshare");
-
+                    if(email==null){
+                        email = "";
+                    }
                     User invited = userDao.getByEmail(email);
                     List_reg list = list_regDao.getByPrimaryKey(list_id);
                     List<User> shared_users = list_regDao.getUsersSharedTo(list);
                     List<User> invited_users = list_regDao.getInvitedUsers(list);
 
-                    if (!user.equals(list.getOwner())) {
+                    if(invited==null){
+                        System.err.println("Cannot invite user: cannot find by email");
+                    } else if (!user.equals(list.getOwner())) {
                         System.err.println("Cannot invite: only owner can invite");
                     } else if (invited.equals(list.getOwner())) {
                         System.err.println("Cannot invite " + invited.getEmail() + ": is owner");

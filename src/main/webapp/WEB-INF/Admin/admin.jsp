@@ -119,6 +119,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Shopping lists manager - admin area</title>
+        <noscript>
+        <META HTTP-EQUIV="Refresh" CONTENT="0;URL=../error.html?error=nojs">
+        </noscript>
         <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -710,6 +713,7 @@
                         products.sort((l, r) => l.name > r.name ? 1 : -1);
                         break;
                 }
+                products = products.slice(0,29);
                 let innerhtml = "";
                 for (p of products) {
                     innerhtml = innerhtml
