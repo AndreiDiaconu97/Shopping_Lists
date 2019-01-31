@@ -103,12 +103,12 @@
         <div class="container mt-4 mb-4 mx-auto">
             <div class="row mx-auto mb-2 justify-content-center my-auto">
                 <div class="text-left my-auto mr-2">Aren't you registered yet? Subscribe here</div>
-                <a href="registration.html" class="btn btn-info ml-2" style="color: white; text-decoration: none">Sign up</a>
+                <a href="registration.html" class="btn btn-info ml-2">Sign up</a>
             </div>
             <hr>
             <div class="row mx-auto justify-content-center my-auto mb-2">
                 <div class="text-left my-auto mr-2">Or you can just enter as a non registered user</div>
-                <a  class="btn btn-success my-auto" style="color: white; text-decoration: none" href="anonymous/homepage.html">
+                <a href="anonymous/homepage.html" class="btn btn-success my-auto">
                     <i class="fa fa-shopping-cart" style="font-size:30px"></i>
                     Enter
                 </a>

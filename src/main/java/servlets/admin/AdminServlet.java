@@ -8,6 +8,7 @@ package servlets.admin;
 import db.daos.List_categoryDAO;
 import db.daos.Prod_categoryDAO;
 import db.daos.ProductDAO;
+import db.daos.UserDAO;
 import db.entities.List_category;
 import db.entities.Prod_category;
 import db.entities.Product;
@@ -36,6 +37,7 @@ public class AdminServlet extends HttpServlet {
     private Prod_categoryDAO prod_categoryDao;
     private List_categoryDAO list_categoryDao;
     private ProductDAO productDao; // maybe useless: create product = post to ProductServlet
+    private UserDAO userDao;
 
     private void saveImage(Part imagePart, String folder, String imageName) throws IOException {
         if (imagePart.getSubmittedFileName().equals("")) {
@@ -73,12 +75,17 @@ public class AdminServlet extends HttpServlet {
         } catch (DAOFactoryException ex) {
             throw new ServletException("Impossible to get dao for products", ex);
         }
+        try {
+            userDao = daoFactory.getDAO(UserDAO.class);
+        } catch (DAOFactoryException ex) {
+            throw new ServletException("Impossible to get dao for user", ex);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        
+
         String contextPath = getServletContext().getContextPath();
         if (!contextPath.endsWith("/")) {
             contextPath += "/";
@@ -87,9 +94,34 @@ public class AdminServlet extends HttpServlet {
         String action = "";
         if (request.getParameter("action") != null) {
             action = request.getParameter("action");
+        } else {
+            response.sendRedirect(response.encodeRedirectURL(contextPath + "error.html?admin"));
+            return;
         }
 
         switch (action) {
+
+            case "edit": {
+                try {
+                    HttpSession session = request.getSession(false);
+                    User user = (User) session.getAttribute("user");
+
+                    String firstname = request.getParameter("firstname");
+                    String lastname = request.getParameter("lastname");
+                    user.setFirstname(firstname);
+                    user.setLastname(lastname);
+
+                    userDao.update(user);
+                    saveImage(request.getPart("image"), "avatars", user.getId().toString());
+                } catch (Exception ex) {
+                    System.err.println("Error updating admin: " + ex);
+                    response.sendRedirect(response.encodeRedirectURL("../error.html?userEdit"));
+                }
+                if (!response.isCommitted()) {
+                    response.sendRedirect(request.getHeader("referer"));
+                }
+                break;
+            }
 
             case "listcat": {
                 String id_s = request.getParameter("id");

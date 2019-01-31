@@ -76,11 +76,6 @@
         getServletContext().log("homepage.html is already committed");
     }
 
-    String contextPath = getServletContext().getContextPath();
-    if (!contextPath.endsWith("/")) {
-        contextPath += "/";
-    }
-
     String currentTab = "listCats";
     if ("prodCats".equals(request.getParameter("tab")) || ("publicProds".equals(request.getParameter("tab")))) {
         currentTab = request.getParameter("tab");
@@ -109,10 +104,9 @@
     } catch (Exception ex) {
         System.err.println("Error loading admin (jsp)" + ex);
         if (!response.isCommitted()) {
-            response.sendRedirect(contextPath + "error.html?error=");
+            response.sendRedirect("../error.html?error=");
         }
     }
-
 %>
 <!DOCTYPE html>
 <html>
@@ -130,28 +124,9 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
-            <a class="navbar-brand " href="admin.html">
-                <i class="fa fa-shopping-cart" style="font-size:30px"></i>
-                Shopping lists - admin area
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="nav navbar-nav ml-auto">
-                    <li class="dropdown ml-auto">
-                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
-                    </li>                    
-                    <li class="dropdown ml-auto">
-                        <form class="form-inline" action="<%=contextPath%>auth" method="POST" method="POST">
-                            <input class="form-control" type="hidden" name="action" value="logout" required>
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        
+        <%@include file="../sharedHtml/navbar.html" %>
+        
         <main role="main">
             <div class="jumbotron">
                 <div class="container-fluid">
@@ -297,7 +272,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="createListCat-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="createListCat-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="listcat"/>
                             <input type="hidden" name="tab" value="listCats"/>
                             <div class="md-form mb-3">
@@ -340,7 +315,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="createProdCat-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="createProdCat-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="productcat"/>
                             <input type="hidden" name="tab" value="prodCats"/>
                             <div class="md-form mb-3">
@@ -398,7 +373,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="createProduct-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="createProduct-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="product"/>
                             <input type="hidden" name="tab" value="publicProds"/>
                             <div class="md-form mb-3">
@@ -451,7 +426,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="editListCat-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="editListCat-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="listcat"/>
                             <input type="hidden" name="id" id="editListCat-id"/>
                             <input type="hidden" name="tab" value="listCats"/>
@@ -495,7 +470,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="editProdCat-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="editProdCat-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="productcat"/>
                             <input type="hidden" name="id" id="editProdCat-id"/>
                             <input type="hidden" name="tab" value="prodCats"/>
@@ -544,7 +519,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="editProduct-form" action="${contextPath}admin.handler" method="POST" enctype="multipart/form-data">
+                        <form id="editProduct-form" action="admin.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="action" value="product"/>
                             <input type="hidden" name="id" id="editProduct-id"/>
                             <input type="hidden" name="tab" value="publicProds"/>
@@ -737,7 +712,7 @@
             }
 
             function changeTab(tab) {
-                window.history.pushState(null, null, '${contextPath}?tab=' + tab);
+                window.history.pushState(null, null, 'admin.html?tab=' + tab);
             }
 
             changeTab('${currentTab}');
@@ -746,10 +721,6 @@
             showProducts();
         </script>
 
-        <footer class="footer font-small blue pt-3">
-            <div class="p-3 mb-2 bg-dark text-white">
-                Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-            </div>
-        </footer>
+        <%@include file="../sharedHtml/footer.html" %>
     </body>
 </html>

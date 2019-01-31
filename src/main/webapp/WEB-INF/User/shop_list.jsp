@@ -76,12 +76,6 @@
     }
 %>
 <%
-    String contextPath = getServletContext().getContextPath();
-    if (!contextPath.endsWith("/")) {
-        contextPath += "/";
-    }
-    pageContext.setAttribute("contextPath", contextPath);
-
     // get user
     User user = (User) session.getAttribute("user");
 
@@ -89,7 +83,7 @@
     String listID_s = request.getParameter("listID");
     if ((listID_s == null) || (listID_s.equals(""))) {
         if (!response.isCommitted()) {
-            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+            response.sendRedirect(response.encodeRedirectURL("homepage.html"));
         }
         return;
     }
@@ -103,14 +97,14 @@
     } catch (DAOException ex) {
         System.err.println("Error retrieving shopping lists (jsp)" + ex);
         if (!response.isCommitted()) {
-            response.sendRedirect(contextPath + "error.html?error=");
+            response.sendRedirect("../error.html?error=");
         }
         return;
     }
     if (list == null) {
         System.err.println("List not found");
         if (!response.isCommitted()) {
-            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+            response.sendRedirect(response.encodeRedirectURL("homepage.html"));
         }
         return;
     }
@@ -119,7 +113,7 @@
     if (!(user.equals(list.getOwner())) && !(list_regDao.getUsersSharedTo(list)).contains(user)) {
         System.err.println("Access to this list DENIED");
         if (!response.isCommitted()) {
-            response.sendRedirect(response.encodeRedirectURL(contextPath + "restricted/homepage.html"));
+            response.sendRedirect(response.encodeRedirectURL("homepage.html"));
         }
         return;
     }
@@ -196,29 +190,7 @@
 
     <body>
         <!-- navbar -->
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
-            <!-- Title -->
-            <a class="navbar-brand" href="homepage.html">
-                <i class="fa fa-shopping-cart" style="font-size:30px"></i>
-                Shopping lists
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="nav navbar-nav ml-auto">
-                    <li class="dropdown ml-auto my-auto">
-                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
-                    </li>
-                    <li class="dropdown ml-auto my-auto">
-                        <form class="form-inline" action="${contextPath}auth" method="POST">
-                            <input class="form-control" type="hidden" name="action" value="logout" required>
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <%@include file="../sharedHtml/navbar.html"%>
 
         <!-- name and logo -->
         <div class="container-fluid pt-2 pb-3 mb-2 shadow">
@@ -423,7 +395,7 @@
                             </button>
                         </div>
                         <div class="modal-body mx-3">
-                            <form id="editListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST" enctype="multipart/form-data">
+                            <form id="editListForm" action="shopping.lists.handler" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="list_id" value="${list.id}"/>
                                 <input type="hidden" name="action" value="edit"/>
                                 <div class="md-form mb-3">
@@ -485,7 +457,7 @@
                             <hr>
                         </c:forEach>
                     </div>
-                    <form action="${contextPath}restricted/chat" method="POST" class="modal-footer form-horizontal">
+                    <form action="chat" method="POST" class="modal-footer form-horizontal">
                         <input type="hidden" name="list_id" value="${list.id}">
                         <input class="form-control mr-2" type="text" name="text" style="width: 92%" placeholder="write a message...">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-arrow-circle-right my-auto" style="font-size:23px;"></i></button>
@@ -500,7 +472,7 @@
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header shadow">
-                            <form id="participantsModal-form" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                            <form id="participantsModal-form" action="shareShoppingList.handler" method="POST">
                                 <input type="hidden" name="action" value="changeAccess">
                                 <input type="hidden" name="list_id" value="${list.id}">
                             </form>
@@ -582,7 +554,7 @@
                                         ${friend.email}
                                     </p>
                                     <div class="row ml-auto mx-2 my-auto">
-                                        <form id="shareList-form${i.index}" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                        <form id="shareList-form${i.index}" action="shareShoppingList.handler" method="POST">
                                             <input type="hidden" name="action" value="sharing" >
                                             <input type="hidden" name="userToshare" value="${friend.email}" >
                                             <input type="hidden" name="listToshare" value="${list.id}">
@@ -608,7 +580,7 @@
                                 <hr>
                             </c:forEach>
                         </div>
-                        <form class="modal-footer form-inline justify-content-between" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                        <form class="modal-footer form-inline justify-content-between" action="shareShoppingList.handler" method="POST">
                             <input type="hidden" name="action" value="sharing" >
                             <input type="hidden" name="listToshare" value="${list.id}">
                             <input type="hidden" name="access" value="${list.id}">
@@ -673,7 +645,7 @@
                                 </select>
                                 <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="fillProductsAddModal()">
                             </div>
-                            <form id="add-Product-Form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                            <form id="add-Product-Form" action="shopping.lists.handler" method="POST">
                                 <div class="input-group my-auto mr-auto" style="max-width: 200px">
                                     <input type="hidden" name="list_id"value="${list.id}">
                                     <input type="hidden" name="action" value="addProduct">
@@ -684,7 +656,6 @@
                                     </button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>
@@ -694,7 +665,7 @@
         <!-- manage product -->
         <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
             <div class="modal" id="productManageModal">
-                <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
+                <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px">
                     <div class="modal-content">
                         <div class="modal-header shadow">
                             <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
@@ -705,24 +676,24 @@
                         </div>
                         <div class="modal-body mx-3">
                             <div class="text my-auto mr-2">Change needed amount  (more than purchased)</div>
-                            <div id="manage-product-changeProductTotal" class="input-group mb-2 justify-content-center" style="max-width: 300px" onclick="manageProduct('changeProductTotal')">
-                                <div class="input-group-prepend">
-                                    <span id="manage-product-min" class="input-group-text" style="min-width: 50px">10</span>
-                                </div>
-                                <form id="manage-product-form" action="${contextPath}restricted/shopping.lists.handler" method="POST">
-                                    <input type="hidden" name="list_id" value="${list.id}">
-                                    <input id="manage-product-action" type="hidden" name="action">
-                                    <input id="manage-product-product_id" type="hidden" name="product_id">
+                            <form id="manage-product-form" action="shopping.lists.handler" method="POST">
+                                <div class="input-group mx-auto" id="manage-product-changeProductTotal" style="max-width: 300px" onclick="manageProduct('changeProductTotal')">
+                                    <div class="input-group-prepend">
+                                        <label id="manage-product-min" class="input-group-text" style="min-width: 50px">10</label>
+                                    </div>
                                     <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="mouseUpInput_check(this, 'manage-product-confirm')" onfocusout="focusOutInput_check(this, 'manage-product-confirm')">
-                                </form>
-                            </div>
+                                </div>
+                                <input type="hidden" name="list_id" value="${list.id}">
+                                <input id="manage-product-action" type="hidden" name="action">
+                                <input id="manage-product-product_id" type="hidden" name="product_id">
+                            </form>
                             <button id="manage-product-removeProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('removeProduct')">
                                 Remove product
                                 <i class="fa fa-trash mr-auto"></i>
                             </button>
                             <button id="manage-product-resetProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('resetProduct')">
                                 Reset purchased
-                                <i class="fa fa-trash mr-auto"></i>
+                                <i class="fa fa-redo mr-auto"></i>
                             </button>
                         </div>
                         <div class="modal-footer">
@@ -744,7 +715,7 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="sendPurchaseForm" action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                    <form id="sendPurchaseForm" action="shopping.lists.handler" method="POST">
                         <input type="hidden" name="action" value="purchaseProducts">
                         <input type="hidden" name="list_id" value="${list.id}">
                     </form>
@@ -771,7 +742,7 @@
                         Delete this list definitely?
                     </div>
                     <div class="modal-footer form-horizontal">
-                        <form action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                        <form action="shopping.lists.handler" method="POST">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="list_id" value="${list.id}">
                             <button type="submit" class="btn btn-danger">Confirm</button>
@@ -797,7 +768,7 @@
                         Remove this list from your shared?
                     </div>
                     <div class="modal-footer form-horizontal">
-                        <form action="${contextPath}restricted/shopping.lists.handler" method="POST">
+                        <form action="shopping.lists.handler" method="POST">
                             <input type="hidden" name="action" value="removeFromShared">
                             <input type="hidden" name="list_id" value="${list.id}">
                             <button type="submit" class="btn btn-danger">Confirm</button>
@@ -808,12 +779,7 @@
             </div>
         </div>
 
-        <footer class="page-footer font-small blue pt-3">
-            <hr>
-            <div class="p-3 mb-2 bg-dark text-white">
-                Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-            </div>
-        </footer>
+        <%@include file="../sharedHtml/footer.html" %>
 
         <script>
             // spoiler setup

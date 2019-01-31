@@ -74,12 +74,6 @@
     }
 %>
 <%
-    String contextPath = getServletContext().getContextPath();
-    if (!contextPath.endsWith("/")) {
-        contextPath += "/";
-    }
-    pageContext.setAttribute("contextPath", contextPath);
-
     // check shopping list
     Cookie[] cookies = request.getCookies();
     String listID_s = null;
@@ -100,7 +94,7 @@
         } catch (DAOException ex) {
             System.err.println("Error retrieving shopping list (jsp)" + ex);
             if (!response.isCommitted()) {
-                response.sendRedirect(contextPath + "error.html?error=");
+                response.sendRedirect("../error.html?error=");
             }
             return;
         }
@@ -146,7 +140,7 @@
             pageContext.setAttribute("list_anonymousDao", list_anonymousDao);
         } catch (DAOException ex) {
             System.err.println("Error getting some info: " + ex);
-            response.sendRedirect(contextPath + "error.html");
+            response.sendRedirect("../error.html");
             return;
         }
     }
@@ -216,7 +210,10 @@
                                     </span>
                                 </small>
                             </h4>
-                            <button type="button" class="btn btn-secondary ml-auto" href="#listSettingsModal" data-toggle="modal">
+                            <button type="button" class="btn btn-danger ml-auto" href="#listDeleteModal" data-toggle="modal">
+                                <i class="fa fa-trash" style="font-size:20px"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary ml-2" href="#listSettingsModal" data-toggle="modal">
                                 <i class="fa fa-cog" style="font-size:20px"></i>
                             </button>
                         </div>
@@ -337,15 +334,33 @@
                 </div>
 
 
-
-
-
-
-
-
-
-
                 <!-- MODALS -->
+
+                <!-- delete list modal -->
+                <div class="modal modal-fluid" id="listDeleteModal">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header shadow">
+                                <i class="fa fa-exclamation-triangle my-auto mr-auto" style="font-size:25px; color: crimson"></i>
+                                <h5 class="modal-title">Warning!</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Delete this list definitely?
+                            </div>
+                            <div class="modal-footer form-horizontal">
+                                <form action="anonymous.lists.handler" method="POST">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="list_id" value="${list.id}">
+                                    <button type="submit" class="btn btn-danger">Confirm</button>
+                                    <button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- list settings -->
                 <div class="modal modal-fluid" id="listSettingsModal">
@@ -359,7 +374,7 @@
                                 </button>
                             </div>
                             <div class="modal-body mx-3">
-                                <form id="editListForm" action="${contextPath}anonymous/anonymous.lists.handler" method="POST">
+                                <form id="editListForm" action="anonymous.lists.handler" method="POST">
                                     <input type="hidden" name="list_id" value="${list.id}"/>
                                     <input type="hidden" name="action" value="edit"/>
                                     <div class="md-form mb-3">
@@ -395,10 +410,10 @@
                             </div>
 
                             <!-- Other products (that can be added) -->
-                            <div class="modal-body" id="otherProducts" style="height:72vh; overflow-y:scroll; width: 100%">
+                            <div class="modal-body" id="otherProducts" style="height:65vh; overflow-y:scroll; width: 100%">
                             </div>
 
-                            <div class="modal-footer form-horizontal">
+                            <div class="modal-footer">
                                 <div class="input-group my-auto ml-auto">
                                     <select id="p-add-sort" class="custom-select" style="min-width: 90px" onchange="fillProductsAddModal()">
                                         <option value="Name">Name</option>
@@ -413,17 +428,17 @@
                                     </select>
                                     <input id="p-add-name" class="form-control" style="min-width: 90px" type="text" placeholder="Search name..." onkeyup="fillProductsAddModal()">
                                 </div>
-                                <div class="input-group my-auto mr-auto" style="max-width: 200px">
-                                    <form id="add-Product-Form" action="${contextPath}anonymous/anonymous.lists.handler" method="POST">
+                                <form id="add-Product-Form" action="anonymous.lists.handler" method="POST">
+                                    <div class="input-group my-auto mr-auto" style="max-width: 200px">
                                         <input type="hidden" name="list_id"value="${list.id}">
                                         <input type="hidden" name="action" value="addProduct">
                                         <input type="hidden" id="add-Product-Hidden-Id" name="product_id">
-                                        <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" style="appearance: none; margin: 0" name="amount" placeholder="Amount">
-                                        <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn btn-primary shadow rounded-circle">
-                                            <i class="fa fa-plus" style="font-size:23px"></i>
+                                        <input type="number" required id="add-Product-Form-Amount" class="form-control rounded shadow-sm my-auto" name="amount" placeholder="Amount">
+                                        <button id="add-Product-Send-Btn" type="submit" onclick="submitAddProduct()" class="btn ml-2 btn-primary shadow rounded-circle">
+                                            <i class="fa fa-plus"></i>
                                         </button>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -431,7 +446,7 @@
 
                 <!-- manage product -->
                 <div class="modal" id="productManageModal">
-                    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
+                    <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px">
                         <div class="modal-content">
                             <div class="modal-header shadow">
                                 <i class="fa fa-cog my-auto mr-auto" style="font-size:25px;"></i>
@@ -442,27 +457,24 @@
                             </div>
                             <div class="modal-body mx-3">
                                 <div class="text my-auto mr-2">Change needed amount  (more than purchased)</div>
-                                <div id="manage-product-changeProductTotal" class="input-group mb-2 justify-content-center" style="max-width: 300px" onclick="manageProduct('changeProductTotal')">
-                                    <div class="input-group-prepend">
-                                        <span id="manage-product-min" class="input-group-text" style="min-width: 50px">10</span>
+                                <form id="manage-product-form" action="anonymous.lists.handler" method="POST">
+                                    <div class="input-group mx-auto" id="manage-product-changeProductTotal" style="max-width: 300px" onclick="manageProduct('changeProductTotal')">
+                                        <div class="input-group-prepend">
+                                            <label id="manage-product-min" class="input-group-text" style="min-width: 50px">10</label>
+                                        </div>
+                                        <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="mouseUpInput_check(this, 'manage-product-confirm')" onfocusout="focusOutInput_check(this, 'manage-product-confirm')">
                                     </div>
-                                    <form id="manage-product-form" action="${contextPath}anonymous/anonymous.lists.handler" method="POST">
-                                        <input type="hidden" name="list_id" value="${list.id}">
-                                        <input id="manage-product-action" type="hidden" name="action">
-                                        <input id="manage-product-product_id" type="hidden" name="product_id">
-                                        <input type="number" id="manage-product-amount_input" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none" name="amount" min="10" placeholder="10" onkeyup="{
-                                                    if (this.value < this.min)
-                                                        this.value = this.min
-                                                }">
-                                    </form>
-                                </div>
+                                    <input type="hidden" name="list_id" value="${list.id}">
+                                    <input id="manage-product-action" type="hidden" name="action">
+                                    <input id="manage-product-product_id" type="hidden" name="product_id">
+                                </form>
                                 <button id="manage-product-removeProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('removeProduct')">
                                     Remove product
                                     <i class="fa fa-trash mr-auto"></i>
                                 </button>
                                 <button id="manage-product-resetProduct" type="button" class="btn btn-danger shadow-sm mx-auto my-2" onclick="manageProduct('resetProduct')">
                                     Reset purchased
-                                    <i class="fa fa-trash mr-auto"></i>
+                                    <i class="fa fa-redo mr-auto"></i>
                                 </button>
                             </div>
                             <div class="modal-footer">
@@ -482,7 +494,7 @@
                                     <span>&times;</span>
                                 </button>
                             </div>
-                            <form id="sendPurchaseForm" action="${contextPath}anonymous/anonymous.lists.handler" method="POST">
+                            <form id="sendPurchaseForm" action="anonymous.lists.handler" method="POST">
                                 <input type="hidden" name="action" value="purchaseProducts">
                                 <input type="hidden" name="list_id" value="${list.id}">
                             </form>
@@ -598,6 +610,21 @@
                         } else {
                             $('#leftBtn' + id)[0].disabled = true;
                         }
+                    }
+
+                    function mouseUpInput_check(input_bar, confirmBtn_id) {
+                        if (!parseInt(input_bar.value) || (parseInt(input_bar.value) < parseInt(input_bar.min))) {
+                            $('#' + confirmBtn_id)[0].disabled = true;
+                        } else if ((parseInt(input_bar.max)) && (parseInt(input_bar.value) > parseInt(input_bar.max))) {
+                            $('#' + confirmBtn_id)[0].disabled = true;
+                        } else {
+                            $('#' + confirmBtn_id)[0].disabled = false;
+                        }
+                    }
+                    function focusOutInput_check(input_bar, confirmBtn_id) {
+                        if (!parseInt(input_bar.value) || (parseInt(input_bar.value) < parseInt(input_bar.min)))
+                            input_bar.value = input_bar.placeholder;
+                        $('#' + confirmBtn_id)[0].disabled = false;
                     }
 
                     var listProducts = ${listProductsJSON};
@@ -834,9 +861,12 @@
                 </script>
             </c:when>
             <c:otherwise>
-                <button type="button" class="btn btn-primary mx-auto my-auto shadow rounded btn-block" style="background-color: green" href="#createListModal" data-toggle="modal">          
-                    <i class="fa fa-plus" style="width: 100%; height:100%"></i>
-                </button>
+                <div class="container-fluid mt-3">
+                    <button type="button" class="btn btn-grey shadow-lg rounded btn-block" style="height: 80vh;" href="#createListModal" data-toggle="modal">          
+                        <img class="img-fluid" src="../images/plus_button" style="max-height: 80%">
+                    </button>
+                </div>
+
 
                 <!-- create list -->
                 <div class="modal modal-fluid" id="createListModal">
@@ -849,7 +879,7 @@
                                     <span>&times;</span>
                                 </button>
                             </div>
-                            <form id="createListForm" action="${contextPath}anonymous/anonymous.lists.handler" method="POST">
+                            <form id="createListForm" action="anonymous.lists.handler" method="POST">
                                 <input type="hidden" name="tab" value="mylists" id="tab-input-0"/>
                                 <input type="hidden" name="action" value="create"/>
                                 <div class="modal-body mx-3">
@@ -883,12 +913,7 @@
                     </div>
                 </div>
 
-                <footer class="page-footer font-small blue pt-3">
-                    <hr>
-                    <div class="p-3 mb-2 bg-dark text-white">
-                        Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-                    </div>
-                </footer>
+                <%@include file="../sharedHtml/footer.html" %>
             </c:otherwise>
         </c:choose>
 

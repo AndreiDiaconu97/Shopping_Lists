@@ -53,6 +53,10 @@
         <servlet-name>ShareShoppingListServlet</servlet-name>
         <servlet-class>servlets.user.ShareShoppingListServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>servlets.user.UserServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Homepage_jsp</servlet-name>
         <url-pattern>/restricted/homepage.html</url-pattern>
@@ -156,6 +160,10 @@
     <servlet-mapping>
         <servlet-name>AnonymousListServlet</servlet-name>
         <url-pattern>/anonymous/anonymous.lists.handler</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/restricted/user.handler</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

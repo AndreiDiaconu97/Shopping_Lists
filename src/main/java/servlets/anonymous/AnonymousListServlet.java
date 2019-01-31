@@ -20,8 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import db.entities.List_anonymous;
 import db.entities.List_category;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Cookie;
 
+@MultipartConfig
 public class AnonymousListServlet extends HttpServlet {
 
     private List_anonymousDAO list_anonymousDao;
@@ -181,6 +183,7 @@ public class AnonymousListServlet extends HttpServlet {
                     System.err.println("Cannot change product total amount: " + ex);
                     response.sendRedirect(contextPath + "error.html");
                 }
+                break;
             }
 
             case "purchaseProducts": {

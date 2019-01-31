@@ -51,21 +51,18 @@
                         <input type="password" class="form-control" name="password" id='passwordInput' placeholder="enter yor password" required>
                     </div>
                     <input type="checkbox" required>I agree..<br>
-                    <input class="btn btn-primary mt-2" type="submit" name="action" value="register">
-                </form>
-                <div class="row justify-content-between">
-                    <button class="btn btn-secondary btn-sm ml-auto mt-2" type="submit">
-                        <a href="login.html" class="my-auto" style="color: white; text-decoration: none">
-                            Go to login
-                        </a>
-                    </button>
+                    <div class="row justify-content-between my-auto mx-auto">
+                        <input class="btn btn-primary mt-2" type="submit" name="action" value="register">
+                    <a href="login.html" class="btn btn-secondary btn-sm my-auto">Go to login</a>
                 </div>
+                </form>
+                
                 <c:choose>
                     <c:when test="${param.status=='success'}">
-                        Registrato con successo!!Vai a <a href="/Shopping/login.html">login</a><br>
+                        Registrato con successo!!Vai a <a href="login.html">login</a><br>
                     </c:when>
                     <c:when test= "${param.status=='alreadyregistered'}">
-                        Già registrato! Vai a <a href="/Shopping/login.html">login</a><br>
+                        Già registrato! Vai a <a href="login.html">login</a><br>
                     </c:when>
                     <c:when test="${param.status=='needtoverify'}">
                         Devi verificare il tuo account. Controlla la tua mail<br>

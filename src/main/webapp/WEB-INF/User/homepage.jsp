@@ -72,11 +72,6 @@
         getServletContext().log("homepage.html is already committed");
     }
 
-    String contextPath = getServletContext().getContextPath();
-    if (!contextPath.endsWith("/")) {
-        contextPath += "/";
-    }
-
     User user = (User) session.getAttribute("user");
 
     String currentTab = "mylists";
@@ -106,12 +101,11 @@
         pageContext.setAttribute("prod_categories", prod_categories);
         pageContext.setAttribute("list_catDao", list_catDao);
         pageContext.setAttribute("list_regDao", list_regDao);
-        pageContext.setAttribute("contextPath", contextPath);
         pageContext.setAttribute("invites", invites);
     } catch (DAOException ex) {
         System.err.println("Error loading shopping lists (jsp)" + ex);
         if (!response.isCommitted()) {
-            response.sendRedirect(contextPath + "error.html?error=");
+            response.sendRedirect("../error.html?error=");
         }
     }
 %>
@@ -132,28 +126,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
-            <a class="navbar-brand " href="homepage.html">
-                <i class="fa fa-shopping-cart" style="font-size:30px"></i>
-                Shopping lists
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="nav navbar-nav ml-auto">
-                    <li class="dropdown ml-auto my-auto">
-                        <div class="text-white mx-2">logged in as <b>${user.email}</b></div>
-                    </li>                    
-                    <li class="dropdown ml-auto">
-                        <form class="form-inline" action="${contextPath}auth" method="POST">
-                            <input class="form-control" type="hidden" name="action" value="logout" required/>
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        <%@include file="../sharedHtml/navbar.html"%>
         <main role="main">
             <!-- Main jumbotron for a primary marketing message or call to action -->
             <div class="jumbotron">
@@ -320,7 +293,7 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="createListForm" action="${contextPath}restricted/shopping.lists.handler" method="POST" enctype="multipart/form-data">
+                    <form id="createListForm" action="shopping.lists.handler" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="mylists" id="tab-input-0"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
@@ -385,7 +358,7 @@
                                 </p>
                                 <div class="row ml-auto mx-2 my-2">
                                     <div class="input-group my-auto">
-                                        <form id="invites-form-${invite.id}" class="form-inline" action="${contextPath}restricted/shareShoppingList.handler" method="POST">
+                                        <form id="invites-form-${invite.id}" class="form-inline" action="shareShoppingList.handler" method="POST">
                                             <input id="invites-action-${invite.id}" type="hidden" name="action">
                                             <input type="hidden" name="list_id" value="${invite.id}">
                                             <button type="submit" class="btn btn-success my-auto mx-2 ml-auto shadow-sm rounded" onclick="acceptInvite(${invite.id})">
@@ -416,7 +389,7 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="createProductForm" action="${contextPath}restricted/product.handler" method="POST" enctype="multipart/form-data">
+                    <form id="createProductForm" action="product.handler" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="myproducts" id="tab-input-1"/>
                         <input type="hidden" name="action" value="create"/>
                         <div class="modal-body mx-3">
@@ -470,7 +443,7 @@
                         </button>
                     </div>
                     <div class="modal-body mx-3">
-                        <form id="editProductForm" action="${contextPath}restricted/product.handler" method="POST" enctype="multipart/form-data">
+                        <form id="editProductForm" action="product.handler" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
                             <input type="hidden" name="action" value="edit"/>
                             <input type="hidden" name="prodID" value="" id="editProductForm-prodID"/>
@@ -513,7 +486,7 @@
                             <span>&times;</span>
                         </button>
                     </div>
-                    <form id="deleteProductForm" action="${contextPath}restricted/product.handler" method="POST">
+                    <form id="deleteProductForm" action="product.handler" method="POST">
                         <input type="hidden" name="tab" value="myproducts" id="tab-input-2"/>
                         <input type="hidden" name="action" value="delete"/>
                         <input type="hidden" name="prodID" value="" id="deleteProductForm-prodID"/>
@@ -526,12 +499,7 @@
             </div>
         </div>
 
-        <footer class="footer font-small blue pt-3">
-            <div class="p-3 mb-2 bg-dark text-white">
-                Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-            </div>
-        </footer>
-
+        <%@include file="../sharedHtml/footer.html" %>
 
         <script>
             var user_products = ${Product.toJSON(userProducts)};
@@ -580,7 +548,7 @@
                             + '<div class="card-header" style="font-weight: bold; background-color: ' + getRGB(l.purchased, l.total) + '">'
                             + l.name
                             + '</div>'
-                            + '<img class="card-img-top" src="../images/shopping_lists/' + l.id + '" alt="Card image cap">';
+                            + '<img class="card-img-bottom" src="../images/shopping_lists/' + l.id + '" alt="Card image cap">';
                     if (shared) {
                         lhtml += '<div class="card-body" style="font-size: 15px; text-align: right">'
                                 + l.owner.firstname + ' ' + l.owner.lastname
@@ -667,20 +635,20 @@
             }
 
             function changeTab(tab) {
-                window.history.pushState(null, null, '${contextPath}restricted/homepage.html?tab=' + tab);
+                window.history.pushState(null, null, 'homepage.html?tab=' + tab);
             }
 
             showLists();
             showLists(true);
             showProducts();
             changeTab('${currentTab}');
-            
-            function acceptInvite(id){
+
+            function acceptInvite(id) {
                 $('#invites-action-' + id)[0].value = 'accept';
                 $('#invites-form-' + id)[0].submit();
             }
-            
-            function declineInvite(id){
+
+            function declineInvite(id) {
                 $('#invites-action-' + id)[0].value = 'decline';
                 $('#invites-form-' + id)[0].submit();
             }

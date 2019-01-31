@@ -1,0 +1,89 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top shadow">
+    <a class="navbar-brand " href=
+       <c:choose>
+            <c:when test="${user.is_admin}">
+                "admin.html"
+            </c:when>
+            <c:otherwise>
+                "homepage.html"
+            </c:otherwise>
+        </c:choose>">
+        <i class="fa fa-shopping-cart" style="font-size:30px"></i>
+        Shopping lists
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav navbar-nav ml-auto">
+            <li class="dropdown ml-auto py-1 my-auto">
+                <div class="text-white mx-2 my-auto">
+                    <img class="img rounded-circle mr-1 border bg-white" style="width: 32px; height: 100%;" src="../images/avatars/${user.id}">
+                    ${user.email}
+                </div>
+            </li>      
+            <li class="dropdown ml-auto py-1 my-auto">
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-info btn-sm mr-2 my-auto shadow rounded" href="#editUserModal" data-toggle="modal">          
+                        <i class="fa fa-cog mr-auto"></i>
+                    </button>
+                    <form class="form-inline" action="../auth" method="POST">
+                        <input class="form-control" type="hidden" name="action" value="logout" required/>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!--Edit user modal-->
+<div class="modal modal-fluid" id="editUserModal">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content mx-auto">
+            <div class="modal-header shadow">
+                <i class="fa fa-user my-auto mr-auto" style="font-size:30px;"></i>
+                <h5 class="modal-title">Edit user</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mx-3">
+                <form id="editUserForm" action=
+                      <c:choose>
+                        <c:when test="${user.is_admin}">
+                            "admin.handler"
+                        </c:when>
+                        <c:otherwise>
+                            "user.handler"
+                        </c:otherwise>
+                    </c:choose>
+                    method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="edit"/>
+                    <div class="md-form mb-3">
+                        <i class="fa fa-image prefix grey-text"></i>
+                        <label data-error="error" data-success="success">Avatar</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="image" accept="image/*">
+                            <label class="custom-file-label">Choose file</label>
+                        </div>
+                    </div>
+                    <div class="md-form mb-3">
+                        <i class="fa fa-dice-one prefix grey-text"></i>
+                        <label data-error="error" data-success="success">First name</label>
+                        <input type="text" class="form-control validate" name="firstname" value="${user.firstname}"/>
+                    </div>
+                    <div class="md-form mb-3">
+                        <i class="fa fa-dice-two prefix grey-text"></i>
+                        <label data-error="error" data-success="success">Last name</label>
+                        <input type="text" class="form-control validate" name="lastname" value="${user.lastname}"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer form-horizontal">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#editUserForm')[0].submit()">Confirm</button> 
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

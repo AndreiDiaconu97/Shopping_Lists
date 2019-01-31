@@ -110,15 +110,15 @@ public class ProductServlet extends HttpServlet {
                     Integer prodID = Integer.parseInt(request.getParameter("prodID"));
                     String name = request.getParameter("name");
                     String description = request.getParameter("description");
-                    Integer cat_id = Integer.parseInt(request.getParameter("category"));
-                    Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
+                    //Integer cat_id = Integer.parseInt(request.getParameter("category"));
+                    //Prod_category p_cat = prod_categoryDao.getByPrimaryKey(cat_id);
 
                     System.err.println("NAME: " + name);
 
                     Product product = productDao.getByPrimaryKey(prodID);
                     product.setName(name);
                     product.setDescription(description);
-                    product.setCategory(p_cat);
+                    //product.setCategory(p_cat);
                     productDao.update(product);
                     saveImage(request.getPart("image"), "products", product.getId().toString());
                     System.err.println("Ok, product modified: " + product.getId());
