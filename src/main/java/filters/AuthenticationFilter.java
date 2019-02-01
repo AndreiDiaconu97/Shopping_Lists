@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Logger;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -246,7 +245,7 @@ public class AuthenticationFilter implements Filter {
         if (filterConfig != null) {
             filterConfig.getServletContext().log(msg);
         } else {
-            Logger.getLogger(msg);
+            System.err.println(msg);
         }
     }
 
