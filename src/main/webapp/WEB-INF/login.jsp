@@ -110,10 +110,6 @@
                 </a>
             </div>
         </div>
-        <footer class="footer font-small blue">
-            <div class="p-3 bg-dark text-white">
-                Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-            </div>
-        </footer>
+        <%@include file="./sharedHtml/footer.html" %>
     </body>
 </html>

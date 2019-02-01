@@ -76,6 +76,9 @@
 <%
     // check shopping list
     Cookie[] cookies = request.getCookies();
+    if(cookies==null){
+        cookies = new Cookie[0];
+    }
     String listID_s = null;
     for (Cookie c : cookies) {
         if (c.getName().equals("anonymous_list_ID")) {
@@ -176,14 +179,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="nav navbar-nav ml-auto">              
                     <li class="dropdown ml-auto my-1">
-                        <button class="btn btn-outline-secondary">
-                            <a href="../registration.html" style="color: white; text-decoration: none"/>Sign-up</a>
-                        </button>
+                        <a href="../registration.html" class="btn btn-outline-secondary" style="color: white; text-decoration: none"/>Sign-up</a>
                     </li>                            
                     <li class="dropdown ml-auto my-1">
-                        <button class="btn btn-outline-secondary ml-2">
-                            <a href="../login.html" style="color: white; text-decoration: none">Log-in</a>
-                        </button>
+                        <a href="../login.html" class="btn btn-outline-secondary ml-2" style="color: white; text-decoration: none">Log-in</a>
                     </li>
                 </ul>
             </div>
@@ -506,12 +505,7 @@
                     </div>
                 </div>
 
-                <footer class="page-footer font-small blue pt-3">
-                    <hr>
-                    <div class="p-3 mb-2 bg-dark text-white">
-                        Follow us on Github: <a href="https://github.com/AndreiDiaconu97/Shopping_Lists"> Shopping_Lists</a>
-                    </div>
-                </footer>
+                <%@include file="../sharedHtml/footer.html" %>
 
                 <script>
                     // spoiler setup
