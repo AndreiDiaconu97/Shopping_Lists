@@ -713,6 +713,7 @@
                                     + '                    <button type="button" id="modifyProdBtn' + p.id + '" class="btn btn-info btn-sm shadow-sm ' + (need_reset ? '' : 'ml-auto') + '" data-toggle="modal" data-target="#productManageModal" onclick="fillProductManageModal(' + p.id + ')">'
                                     + '                       <i class="fa fa-edit mr-auto" style="font-size: 28px"></i>'
                                     + '                    </button>'
+                                    + '                    <span class="input-group-text mx-1" id="basic-addon2">' + p.total + '/' + p.total + '</span>'
                                     + '                </div>'
                                     + '            </div>'
                                     + '        </div>'

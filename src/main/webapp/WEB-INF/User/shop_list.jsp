@@ -992,6 +992,7 @@
                                 + '                </button>';
                     }
                     purchasedhtml = purchasedhtml
+                            + '                    <span class="input-group-text mx-1" id="basic-addon2">' + p.total + '/' + p.total + '</span>'
                             + '                </div>'
                             + '            </div>'
                             + '        </div>'
