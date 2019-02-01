@@ -35,10 +35,6 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" crossorigin="anonymous">
         <!-- Custom styles for this template -->
-        <link href="css/floating-labels.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/floating-labels.css" type="text/css"/>
-        <link rel="stylesheet" href="css/signin.css" type="text/css">
-
     </head>
     <body>
         <div class="jumbotron text-center mb-4">
