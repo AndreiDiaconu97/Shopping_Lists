@@ -18,7 +18,6 @@ import db.factories.DAOFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import javax.mail.Session;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +32,7 @@ public class ShareShoppingListServlet extends HttpServlet {
 
     private UserDAO userDao;
     private List_regDAO list_regDao;
-    private JDBC_utility utility;
     Properties props;
-    Session session;
 
     @Override
     public void init() throws ServletException {
@@ -79,30 +76,35 @@ public class ShareShoppingListServlet extends HttpServlet {
                     Integer access = Integer.parseInt(request.getParameter("selectAccess"));
                     Integer list_id = Integer.parseInt(request.getParameter("listToshare"));
                     String email = request.getParameter("userToshare");
-                    if(email==null){
-                        email = "";
-                    }
-                    User invited = userDao.getByEmail(email);
-                    List_reg list = list_regDao.getByPrimaryKey(list_id);
-                    List<User> shared_users = list_regDao.getUsersSharedTo(list);
-                    List<User> invited_users = list_regDao.getInvitedUsers(list);
+                    if (email != null && !"".equals(email)) {
+                        User invited = userDao.getByEmail(email);
+                        List_reg list = list_regDao.getByPrimaryKey(list_id);
+                        List<User> shared_users = list_regDao.getUsersSharedTo(list);
+                        List<User> invited_users = list_regDao.getInvitedUsers(list);
 
-                    if(invited==null){
-                        System.err.println("Cannot invite user: cannot find by email");
-                    } else if (!user.equals(list.getOwner())) {
-                        System.err.println("Cannot invite: only owner can invite");
-                    } else if (invited.equals(list.getOwner())) {
-                        System.err.println("Cannot invite " + invited.getEmail() + ": is owner");
-                    } else if (invited.getIs_admin()) {
-                        System.err.println("Cannot invite " + invited.getEmail() + ": is admin");
-                    } else if (shared_users.contains(invited)) {
-                        System.err.println("Cannot invite " + invited.getEmail() + ": already shared");
-                    } else if (invited_users.contains(invited)) {
-                        System.err.println("Cannot invite " + invited.getEmail() + ": already invited");
-                    } else {
-                        JDBC_utility.AccessLevel accesslv = utility.intToAccessLevel(access);
-                        list_regDao.inviteUser(list, invited, accesslv);
-                        System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName() + " with permissions: " + accesslv.name());
+                        if (invited == null) {
+                            System.err.println("Cannot invite user: cannot find by email");
+
+                        } else if (!user.equals(list.getOwner())) {
+                            System.err.println("Cannot invite: only owner can invite");
+
+                        } else if (invited.equals(list.getOwner())) {
+                            System.err.println("Cannot invite " + invited.getEmail() + ": is owner");
+
+                        } else if (invited.getIs_admin()) {
+                            System.err.println("Cannot invite " + invited.getEmail() + ": is admin");
+
+                        } else if (shared_users.contains(invited)) {
+                            System.err.println("Cannot invite " + invited.getEmail() + ": already shared");
+
+                        } else if (invited_users.contains(invited)) {
+                            System.err.println("Cannot invite " + invited.getEmail() + ": already invited");
+
+                        } else {
+                            JDBC_utility.AccessLevel accesslv = intToAccessLevel(access);
+                            list_regDao.inviteUser(list, invited, accesslv);
+                            System.err.println("Invited user " + invited.getEmail() + " to list " + list.getName() + " with permissions: " + accesslv.name());
+                        }
                     }
                     response.sendRedirect(contextPath + "restricted/shopping.list.html?listID=" + list_id);
 
