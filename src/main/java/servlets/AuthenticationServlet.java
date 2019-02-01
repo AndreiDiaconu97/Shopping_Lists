@@ -32,6 +32,9 @@ import db.daos.UserDAO;
 import db.entities.List_anonymous;
 import db.entities.List_reg;
 import db.entities.Product;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import javax.servlet.http.Cookie;
 
@@ -114,19 +117,19 @@ public class AuthenticationServlet extends HttpServlet {
                     }
                 }
                 if (listID_s != null) {
-                    try{
-                    Integer listID = Integer.parseInt(listID_s);
-                    List_anonymous list_anonymous = list_anonymousDao.getByPrimaryKey(listID);
-                    List<Product> products = list_anonymousDao.getProducts(list_anonymous);
-                    List_reg list_reg = new List_reg(list_anonymous.getName(), user, list_anonymous.getCategory(), list_anonymous.getDescription());
-                    list_regDao.insert(list_reg);
-                    for(Product p : products){
-                        list_regDao.insertProduct(list_reg, p, list_anonymousDao.getAmountTotal(list_anonymous, p));
-                        list_regDao.updateAmountPurchased(list_reg, p, list_anonymousDao.getAmountPurchased(list_anonymous, p));
-                    }
-                    list_anonymousDao.delete(list_anonymous);
-                    response.addCookie(new Cookie("anonymous_list_ID", null));
-                    } catch(DAOException e){
+                    try {
+                        Integer listID = Integer.parseInt(listID_s);
+                        List_anonymous list_anonymous = list_anonymousDao.getByPrimaryKey(listID);
+                        List<Product> products = list_anonymousDao.getProducts(list_anonymous);
+                        List_reg list_reg = new List_reg(list_anonymous.getName(), user, list_anonymous.getCategory(), list_anonymous.getDescription());
+                        list_regDao.insert(list_reg);
+                        for (Product p : products) {
+                            list_regDao.insertProduct(list_reg, p, list_anonymousDao.getAmountTotal(list_anonymous, p));
+                            list_regDao.updateAmountPurchased(list_reg, p, list_anonymousDao.getAmountPurchased(list_anonymous, p));
+                        }
+                        list_anonymousDao.delete(list_anonymous);
+                        response.addCookie(new Cookie("anonymous_list_ID", null));
+                    } catch (DAOException e) {
                         System.err.println("Cannot transfer anonymous list to normal list");
                     }
                 }
@@ -189,6 +192,7 @@ public class AuthenticationServlet extends HttpServlet {
                     } else {
                         NV_User nv_user = new NV_User(email, password, firstname, lastname);
                         String code = nv_user.getCode();
+                        
                         try {
                             nv_userDao.insert(nv_user);
                         } catch (DAOException ex) {
@@ -197,19 +201,25 @@ public class AuthenticationServlet extends HttpServlet {
                             break;
                         }
                         // send email with code
-                        String message = contextPath + "auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
-                        request.getServletContext().log("Message is: " + message);
+                        String link = "http://localhost:8084" + contextPath + "auth?validate=true&email=" + nv_user.getEmail() + "&code=" + code;
+                        request.getServletContext().log("Message is: " + link);
 
                         Message msg = new MimeMessage(mail_session);
                         try {
-                            msg.setFrom(new InternetAddress(m_username));
+                            File email_html = new File((String) getServletContext().getInitParameter("realPath") + "\\src\\main\\webapp\\WEB-INF\\email.html");
+                            byte[] encoded = Files.readAllBytes(Paths.get(email_html.getAbsolutePath()));
+                            String email_string = new String(encoded, "UTF-8");
+                            email_string = email_string.replace("NOME E COGNOME", nv_user.getFirstname() + " " + nv_user.getLastname());
+                            email_string = email_string.replace("LINK", link);
+                            msg.setFrom(new InternetAddress(m_username, "LISTR shopping"));
                             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(nv_user.getEmail(), false));
-                            msg.setSubject("Registration to LopardoShopping");
-                            msg.setText(message);
+                            msg.setSubject("Registration to LISTR");
+                            msg.setContent(email_string, "text/html");
                             msg.setSentDate(new java.util.Date());
                             Transport.send(msg);
                         } catch (MessagingException me) {
                             me.printStackTrace(System.err);
+                            System.err.println("MAIL ERROR");
                             status = "mailerror";
                             break;
                         }
