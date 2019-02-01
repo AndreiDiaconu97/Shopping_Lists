@@ -854,6 +854,13 @@
                 </script>
             </c:when>
             <c:otherwise>
+                <div class="jumbotron">
+                    <div class="container-fluid">
+                        <h1 class="display-3">Hello, anonymous!</h1>
+                        <p>This is your personal area where you can create and manage your shopping lists.</p>
+                        <p>You have not a shopping list, please press the below add button in order to create a new one.</p>
+                    </div>
+                </div>
                 <div class="container-fluid mt-3">
                     <button type="button" class="btn btn-grey shadow-lg rounded btn-block" style="height: 80vh;" href="#createListModal" data-toggle="modal">          
                         <img class="img-fluid" src="../images/plus_button" style="max-height: 80%">
