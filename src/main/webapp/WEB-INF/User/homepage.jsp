@@ -552,7 +552,7 @@
                     if (shared) {
                         lhtml += '<div class="card-body" style="font-size: 15px; text-align: right">'
                                 + l.owner.firstname + ' ' + l.owner.lastname
-                                + '<i class="fa fa-user" style="font-size:20px;"></i>'
+                                + ' <i class="fa fa-user" style="font-size:20px;"></i>'
                                 + '</div>';
                     }
                     lhtml += '<div class="card-footer text-muted" style="background-color: ' + getRGB(l.purchased, l.total) + '">'
