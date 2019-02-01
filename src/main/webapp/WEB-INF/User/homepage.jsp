@@ -156,7 +156,10 @@
                 <div class="tab-pane fade <c:if test="${currentTab.equals('mylists')}">show active</c:if>" id="nav-myLists" role="tabpanel">
                 </my:n>
                 <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
+                    <div class="text-right ml-auto my-auto mr-2" style="font-size: 20px">
+                        Filter by:                                                            
+                    </div>
+                    <div class="row mr-1 mt-2 ml-0">
                         <div class="row ml-2 mr-0 my-2">
                             <div class="input-group my-auto">
                                 <select class="custom-select" id="ml-search-sort" onchange="showLists()">
@@ -198,7 +201,10 @@
             <my:n><div class="tab-pane fade <c:if test="${currentTab.equals('sharedlists')}">show active</c:if>" id="nav-sharedLists" role="tabpanel">
                 </my:n>
                 <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
+                    <div class="text-right ml-auto my-auto mr-2" style="font-size: 20px">
+                        Filter by:                                                            
+                    </div>
+                    <div class="row mr-1 mt-2 ml-0">
                         <div class="row ml-2 mr-0 my-2">
                             <div class="input-group my-auto">
                                 <select class="custom-select" id="sl-search-sort" onchange="showLists(true)">
@@ -225,7 +231,7 @@
                                     <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#importListModal" data-toggle="modal">          
-                                    <i class="fa fa-plus mr-auto"></i>
+                                    <i class="fa fa-envelope mr-auto"></i>
                                 </button>
                             </div>
                         </div>
@@ -240,7 +246,10 @@
             <my:n><div class="tab-pane fade <c:if test="${currentTab.equals('myproducts')}">show active</c:if>" id="nav-myProducts" role="tabpanel">
                 </my:n>
                 <div class="row  mx-1">
-                    <div class="row ml-auto mr-1 mt-2">
+                    <div class="text-right ml-auto my-auto mr-2" style="font-size: 20px">
+                        Filter by:                                                            
+                    </div>
+                    <div class="row mr-1 mt-2 ml-0">
                         <div class="row ml-2 mr-0 my-2">
                             <div class="input-group my-auto">
                                 <select class="custom-select" id="p-search-sort" onchange="showProducts()">

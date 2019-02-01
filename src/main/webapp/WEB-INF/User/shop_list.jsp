@@ -218,7 +218,7 @@
                     </c:if>
                     <c:if test="${!user.equals(list.getOwner())}">
                         <button type="button" class="btn btn-danger ml-auto" href="#listUnsubscribeModal" data-toggle="modal">
-                            <i class="fa fa-ban" style="font-size:20px"></i>
+                            <i class="fa fa-sign-out-alt" style="font-size:20px"></i>
                         </button>
                     </c:if>
                     <c:if test="${userAccessLevel=='FULL'}">
@@ -289,9 +289,13 @@
                         <h4 class="my-auto pb-2">Products <small><span class="badge badge-secondary shadow">${list.purchased}/${list.total}</span></small></h4>
                     </div>
                     <div class="row  mx-1">
+                        <div class="text-right my-auto mr-2" style="font-size: 20px">
+                            Filter by:                                                            
+                        </div>
                         <div class="row ml-auto mr-1 mt-2">
                             <div class="row ml-2 mr-0 my-2">
                                 <div class="input-group my-auto">
+
                                     <select class="custom-select" id="p-search-sort" onchange="showProducts()">
                                         <option value="Name">Name</option>
                                         <option value="Rating">Rating</option>
@@ -312,12 +316,14 @@
                             <div class="row ml-auto mx-2 my-2">
                                 <div class="input-group">
                                     <input class="form-control" type="search" placeholder="Search name ..." id="p-search-name" onkeyup="showProducts()">
-                                    <button class="btn btn-outline-success" onclick="showProducts()">
-                                        <i class="fa fa-search mr-auto" style="font-size:20px;"></i>
-                                    </button>
+                                    <div class="input-group-append">
+                                        <label class="input-group-text rounded">
+                                            <i class="fa fa-search"></i>
+                                        </label>
+                                    </div>  
                                     <c:if test="${userAccessLevel=='FULL' || userAccessLevel=='PRODUCTS'}">
-                                        <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded-circle" href="#addProductModal" data-toggle="modal">
-                                            <i class="fa fa-plus mr-auto"></i>
+                                        <button type="button" class="btn btn-primary ml-2 my-auto shadow rounded" href="#addProductModal" data-toggle="modal">
+                                            Add product
                                         </button>
                                     </c:if>
                                 </div>
@@ -331,17 +337,10 @@
 
 
 
-        <div class="container-fluid">
+        <div class="container-fluid pt-3">
             <c:if test="${!empty_missing}">
-                <div class="row mx-auto mb-2 justify-content-end">
-                    <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" href="#sendPurchasedModal" data-toggle="modal">
-                        Confirm
-                        <i class="fa fa-check ml-1"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetPurchased()">
-                        Reset
-                        <i class="fas fa-redo ml-1"></i>
-                    </button>
+                <div class="row mx-auto mb-2 justify-content-center" style="color: darkcyan; font-family: sans-serif; font-size: 20px">
+                    <div class="text-center">Select your purchases and press the confirm button</div>
                 </div>
             </c:if>
 
@@ -352,7 +351,7 @@
 
 
             <c:if test="${!empty_missing}">
-                <div class="row mx-auto mb-2 justify-content-end">
+                <div class="row mx-auto mb-4 pb-4 justify-content-end">
                     <button type="button" class="btn btn-success mr-2 my-auto shadow rounded" href="#sendPurchasedModal" data-toggle="modal">
                         Confirm
                         <i class="fa fa-check ml-1"></i>

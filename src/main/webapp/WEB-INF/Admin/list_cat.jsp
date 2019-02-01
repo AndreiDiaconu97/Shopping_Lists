@@ -177,17 +177,6 @@
                         </div>
                     </div>
                     <div class="container-fluid">
-                        <div class="row mx-auto mb-2 justify-content-end">
-                            <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" onclick="$('#unlinkProdCat-form').submit()">  
-                                Update
-                                <i class="fa fa-check ml-1"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetParameters('unlink')">  
-                                Cancel
-                                <i class="fa fa-times ml-1"></i>
-                            </button>
-                        </div>
-                        <hr>
                         <!-- load own product categories -->
                         <form id="unlinkProdCat-form" action="admin.handler" method="POST"></form>
                     <hr>
@@ -228,17 +217,6 @@
                         </div>
                     </div>
                     <div class="container-fluid">
-                        <div class="row mx-auto mb-2 justify-content-end">
-                            <button type="button" class="btn btn-success mr-2 my-auto shadow rounded border" onclick="$('#linkProdCat-form').submit()">  
-                                Update
-                                <i class="fa fa-check ml-1"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger my-auto shadow rounded" onclick="resetParameters('link')">  
-                                Cancel
-                                <i class="fa fa-times ml-1"></i>
-                            </button>
-                        </div>
-                        <hr>
                         <!-- load other product categories -->
                         <form id="linkProdCat-form" action="admin.handler" method="POST"></form>
                     <hr>
