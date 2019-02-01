@@ -953,7 +953,7 @@
                             + '                    <button type="button" id="leftBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" disabled onmousedown="intervalClick(this,\'-\')">'
                             + '                        <i class="fa fa-chevron-left mr-auto"></i>'
                             + '                    </button>'
-                            + '                    <input type="number" id="prodAmount' + p.id + '" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" oninput="handleChange(this,' + p.id + ')"><br>'
+                            + '                    <input type="number" id="prodAmount' + p.id + '" class="form-control text-center rounded shadow-sm my-auto" style="appearance: none; margin: 0"  name="quantity" min="' + p.purchased + '" max="' + p.total + '" value="' + p.purchased + '" placeholder="' + p.purchased + '" onfocusout="handleChange(this,' + p.id + ')"><br>'
                             + '                        <span class="input-group-text" id="basic-addon2">' + p.total + '</span>'
                             + '                    <button type="button" id="rightBtn' + p.id + '" class="btn btn-secondary btn-sq-sm shadow-sm" onmousedown="intervalClick(this, \'+\')">'
                             + '                        <i class="fa fa-chevron-right mr-auto"></i>'
